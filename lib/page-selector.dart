@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 
-import 'package:mobile_programming/pages/home.dart';
-import 'package:mobile_programming/pages/charts.dart';
-import 'package:mobile_programming/pages/wallet.dart';
-import 'package:mobile_programming/pages/setting.dart';
+import 'pages/home.dart';
+import 'pages/charts.dart';
+import 'pages/wallet.dart';
+import 'pages/setting.dart';
+
+import 'pages/new_operation.dart';
+
+import 'fab.dart';
 
 class BottomBarDemo extends StatefulWidget {
   @override
@@ -12,6 +16,9 @@ class BottomBarDemo extends StatefulWidget {
 
 class _BottomBarDemoState extends State<BottomBarDemo> {
   int _selectedIndex = 0;
+
+  late AnimationController _animationController;
+  bool _isMenuOpen = false;
 
   final List<Widget> _widgetOptions = <Widget>[
     MyHomePage(),
@@ -29,9 +36,6 @@ class _BottomBarDemoState extends State<BottomBarDemo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Welcome User!'),
-      ),
       body: IndexedStack(
         index: _selectedIndex,
         children: _widgetOptions,
@@ -50,31 +54,45 @@ class _BottomBarDemoState extends State<BottomBarDemo> {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
+      // floatingActionButton: FabPieMenu(),
       floatingActionButton: FloatingActionButton(
-        onPressed: () {},
-        tooltip: 'Increment',
-        child: Icon(Icons.add),
-        shape: CircleBorder(),
-        elevation: 0,
-      ),
+          child: Icon(Icons.add),
+          shape: CircleBorder(),
+          elevation: 0,
+          onPressed: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      NewOperation()), 
+            );
+          }),
     );
   }
 
   Widget _buildNavBarItem(IconData icon, int index, String label) {
-    return InkWell(
-      onTap: () => _onItemTapped(index),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, color: _selectedIndex == index ? Colors.blue : Colors.grey),
-          Text(
-            label,
-            style: TextStyle(
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () => _onItemTapped(index),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
               color: _selectedIndex == index ? Colors.blue : Colors.grey,
-              fontWeight: _selectedIndex == index ? FontWeight.bold : FontWeight.normal,
             ),
-          ),
-        ],
+            Text(
+              label,
+              style: TextStyle(
+                color: _selectedIndex == index ? Colors.blue : Colors.grey,
+                fontWeight: _selectedIndex == index
+                    ? FontWeight.bold
+                    : FontWeight.normal,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
