@@ -59,26 +59,8 @@ class _WalletPageState extends State<WalletPage> {
     });
   }
 
-/*   void deleteNote(int index) async {
-    await DatabaseHelper().deleteWallet(data[index].title);
-    setState(() {
-      data.removeAt(index);
-    });
-  }
-
-  void deleteSelectedNotes() {
-    setState(() {
-      List<int> indicesToRemove = selectedIndices.toList();
-      indicesToRemove.sort((a, b) => b.compareTo(a));
-      for (int index in indicesToRemove) {
-        deleteNote(index);
-      }
-      selectedIndices.clear();
-      _saveNotes();
-    });
-  } */
-
   void addOrEditNote({
+    required BuildContext context,
     required int index,
     required String title,
     required String body,
@@ -136,7 +118,7 @@ class _WalletPageState extends State<WalletPage> {
               crossAxisCount: 2,
               children: data.map((note) {
                 final index = data.indexOf(note);
-                return buildItem(index, note.title, note.body);
+                return buildItem(context, index, note.title, note.body);
               }).toList(),
               onReorder: (oldIndex, newIndex) {
                 setState(() {
@@ -157,6 +139,7 @@ class _WalletPageState extends State<WalletPage> {
                         builder: (context) => AddNotePage(
                           onSave: (title, body) {
                             addOrEditNote(
+                              context: context,
                               index: -1,
                               title: title,
                               body: body,
@@ -205,7 +188,7 @@ class _WalletPageState extends State<WalletPage> {
     );
   }
 
-  Widget buildItem(int index, String title, String body) {
+  Widget buildItem(BuildContext context, int index, String title, String body) {
     final isSelected = selectedIndices.contains(index);
 
     return GestureDetector(
@@ -227,29 +210,30 @@ class _WalletPageState extends State<WalletPage> {
               selectedIndices.add(index);
             }
           });
-        } /* else {
+        } else {
           Navigator.push(
             context,
             MaterialPageRoute(
               builder: (context) => AddNotePage(
                 onSave: (newTitle, newBody) {
                   addOrEditNote(
+                    context: context,
                     index: index,
                     title: newTitle,
                     body: newBody,
                   );
-                  Navigator.pop(context);
+                  Navigator.pop(context); // Chiudi AddNotePage dopo il salvataggio
                 },
                 initialTitle: title,
                 initialBody: body,
                 onDelete: () {
-                  deleteNote(index);
-                  Navigator.pop(context);
+                  //  deleteNote(index); // Chiama deleteNote quando viene attivato onDelete
+                  Navigator.pop(context); // Chiudi AddNotePage dopo la cancellazione
                 },
               ),
             ),
           );
-        } */
+        }
       },
       key: ValueKey(index),
       child: Padding(
@@ -304,8 +288,9 @@ class _WalletPageState extends State<WalletPage> {
                 ),
               ),
             ],
-          ),
+         
         ),
+      ),
       ),
     );
   }

@@ -28,8 +28,7 @@ class _AddNotePageState extends State<AddNotePage> {
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: _onWillPop,
+    return PopScope(
       child: GestureDetector(
         onTap: () {
           FocusScope.of(context).unfocus();
