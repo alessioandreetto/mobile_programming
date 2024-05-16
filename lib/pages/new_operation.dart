@@ -138,11 +138,12 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                 _valueController.clear();
 
                 // Show a success message
-                ScaffoldMessenger.of(context).showSnackBar(
+              /*   ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(
                     content: Text('Transazione aggiunta con successo'),
                   ),
-                );
+                ); */
+                 Navigator.pop(context);
               },
               child: Text('Aggiungi Transazione'),
             ),
