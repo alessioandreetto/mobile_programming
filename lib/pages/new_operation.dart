@@ -125,7 +125,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                 Wallet updatedWallet = Wallet(
                   id: existingWallet.id,
                   name: existingWallet.name,
-                  balance: newTransaction.value,
+                  balance: newBalance,
                 );
                 await dbHelper.updateWallet(updatedWallet);
 
