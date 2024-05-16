@@ -28,7 +28,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
     Category(id: 2, name: 'Category 2'),
     Category(id: 3, name: 'Category 3'),
   ];
-  List<String> actionTypes = ['Entrata', 'Uscita'];
+  List<String> actionTypes = ['Entrata', 'Uscita', 'Exchange'];
 
   @override
   void initState() {
@@ -40,9 +40,6 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
     final wallets = await dbHelper.getWallets();
     setState(() {
       _wallets = wallets;
-      if(_wallets.length>1){
-        actionTypes = ['Entrata', 'Uscita', 'Exchange'];
-      }
       if (_wallets.isNotEmpty) {
         _selectedWallet = _wallets[0].name!;
       }
@@ -87,9 +84,6 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                   labelText: 'Portafoglio',
                 ),
               ),
-//select per 
-
-              //select per la categoria 
             DropdownButtonFormField<Category>(
               value: categories.firstWhere((category) => category.id == _selectedCategoryId, orElse: () => categories[0]), // Updated
               onChanged: (newValue) {
@@ -123,6 +117,21 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
 
                 // Insert the transaction into the database
                 await dbHelper.insertTransaction(newTransaction);
+                    Wallet existingWallet =
+                    _wallets.firstWhere((wallet) => wallet.name == _selectedWallet);
+
+                double newBalance = existingWallet.balance! + newTransaction.value!;
+
+                Wallet updatedWallet = Wallet(
+                  id: existingWallet.id,
+                  name: existingWallet.name,
+                  balance: newTransaction.value,
+                );
+                await dbHelper.updateWallet(updatedWallet);
+
+
+                _nameController.clear();
+                _valueController.clear();
 
                 // Clear text fields after insertion
                 _nameController.clear();
