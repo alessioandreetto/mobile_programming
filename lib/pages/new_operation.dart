@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 import '../model/database_model.dart';
 
+class Category {
+  final int id;
+  final String name;
+
+  Category({required this.id, required this.name});
+}
+
 class NewTransactionPage extends StatefulWidget {
   @override
   _NewTransactionPageState createState() => _NewTransactionPageState();
@@ -13,27 +20,31 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
 
   List<Wallet> _wallets = [];
   String _selectedWallet = '';
-  String _selectedCategory = '';
+  int _selectedCategoryId = 0; // Updated
   String _selectedActionType = '';
 
-  List<String> categories = ['Category 1', 'Category 2', 'Category 3'];
+  List<Category> categories = [
+    Category(id: 1, name: 'Category 1'),
+    Category(id: 2, name: 'Category 2'),
+    Category(id: 3, name: 'Category 3'),
+  ];
   List<String> actionTypes = ['Entrata', 'Uscita', 'Exchange'];
 
-@override
-void initState() {
-  super.initState();
-  _loadWallets();
-}
+  @override
+  void initState() {
+    super.initState();
+    _loadWallets();
+  }
 
-Future<void> _loadWallets() async {
-  final wallets = await dbHelper.getWallets();
-  setState(() {
-    _wallets = wallets;
-    if (_wallets.isNotEmpty) {
-      _selectedWallet = _wallets[0].name!;
-    }
-  });
-}
+  Future<void> _loadWallets() async {
+    final wallets = await dbHelper.getWallets();
+    setState(() {
+      _wallets = wallets;
+      if (_wallets.isNotEmpty) {
+        _selectedWallet = _wallets[0].name!;
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -73,47 +84,30 @@ Future<void> _loadWallets() async {
                   labelText: 'Portafoglio',
                 ),
               ),
-/*             DropdownButtonFormField<String>(
-              value: _selectedCategory,
+            DropdownButtonFormField<Category>(
+              value: categories.firstWhere((category) => category.id == _selectedCategoryId, orElse: () => categories[0]), // Updated
               onChanged: (newValue) {
                 setState(() {
-                  _selectedCategory = newValue!;
+                  _selectedCategoryId = newValue!.id; // Updated
                 });
               },
               items: categories.map((category) {
                 return DropdownMenuItem(
                   value: category,
-                  child: Text(category),
+                  child: Text(category.name),
                 );
               }).toList(),
               decoration: InputDecoration(
                 labelText: 'Categoria',
               ),
-            ), */
-/*             DropdownButtonFormField<String>(
-              value: _selectedActionType,
-              onChanged: (newValue) {
-                setState(() {
-                  _selectedActionType = newValue!;
-                });
-              },
-              items: actionTypes.map((actionType) {
-                return DropdownMenuItem(
-                  value: actionType,
-                  child: Text(actionType),
-                );
-              }).toList(),
-              decoration: InputDecoration(
-                labelText: 'Tipologia di Azione',
-              ),
-            ), */
+            ),
             SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: () async {
                 // Create a new transaction
                 Transaction newTransaction = Transaction(
                   name: _nameController.text,
-                  categoryId: categories.indexOf(_selectedCategory),
+                  categoryId: _selectedCategoryId, // Updated
                   date: DateTime.now().toString(),
                   value: double.parse(_valueController.text),
                   transactionId: _wallets
