@@ -1,14 +1,13 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 
 class AddNotePage extends StatefulWidget {
   final TextEditingController titleController;
   final TextEditingController bodyController;
-  final Function(String title, String body) onSave;
+  final Function(double title, String body) onSave;
   final VoidCallback? onDelete;
-  final String? initialTitle;
+  final double? initialTitle; // Cambiato il tipo da String? a double?
   final String? initialBody;
 
   AddNotePage({
@@ -16,7 +15,7 @@ class AddNotePage extends StatefulWidget {
     this.onDelete,
     this.initialTitle,
     this.initialBody,
-  })  : titleController = TextEditingController(text: initialTitle),
+  })  : titleController = TextEditingController(text: initialTitle != null ? initialTitle.toString() : null),
         bodyController = TextEditingController(text: initialBody);
 
   @override
@@ -28,7 +27,8 @@ class _AddNotePageState extends State<AddNotePage> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
+    return WillPopScope(
+      onWillPop: _onWillPop, // Utilizza la funzione _onWillPop per gestire la navigazione all'indietro
       child: GestureDetector(
         onTap: () {
           FocusScope.of(context).unfocus();
@@ -108,7 +108,6 @@ class _AddNotePageState extends State<AddNotePage> {
                                 true; // Segna che ci sono modifiche non salvate
                           });
                         },
-                        
                         keyboardType: TextInputType.number,
                         decoration: InputDecoration(
                           hintText: 'Start Balance (€)',
@@ -159,7 +158,7 @@ class _AddNotePageState extends State<AddNotePage> {
   void _saveNote() {
     if (widget.titleController.text.isNotEmpty &&
         widget.bodyController.text.isNotEmpty) {
-      widget.onSave(widget.titleController.text, widget.bodyController.text);
+      widget.onSave(double.parse(widget.titleController.text), widget.bodyController.text);
       setState(() {
         _isDirty = false; // Le modifiche sono state salvate
       });

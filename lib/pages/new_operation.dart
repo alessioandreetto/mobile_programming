@@ -19,9 +19,9 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
   TextEditingController _valueController = TextEditingController();
 
   List<Wallet> _wallets = [];
-  String? _selectedWallet; // Updated
-  int _selectedCategoryId = 0; 
-  String? _selectedActionType; // Updated
+  String _selectedWallet = '';
+  int _selectedCategoryId = 0; // Updated
+  String _selectedActionType = '';
 
   List<Category> categories = [
     Category(id: 1, name: 'Category 1'),
@@ -40,12 +40,11 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
     final wallets = await dbHelper.getWallets();
     setState(() {
       _wallets = wallets;
+      if(_wallets.length>1){
+        actionTypes = ['Entrata', 'Uscita', 'Exchange'];
+      }
       if (_wallets.isNotEmpty) {
-        // Se ci sono più di un portafoglio, imposta il primo portafoglio come selezionato
-        if (_wallets.length > 1) {
-          _selectedWallet = _wallets[0].name!;
-           actionTypes = ['Entrata', 'Uscita', 'Exchange'];
-        }
+        _selectedWallet = _wallets[0].name!;
       }
     });
   }
@@ -70,7 +69,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
               keyboardType: TextInputType.number,
               decoration: InputDecoration(labelText: 'Valore'),
             ),
-            if (_wallets.isNotEmpty && _wallets.length > 1) // Aggiunto controllo per mostrare il form solo se ci sono più di un portafoglio
+            if (_wallets.isNotEmpty)
               DropdownButtonFormField<String>(
                 value: _selectedWallet,
                 onChanged: (newValue) {
@@ -88,28 +87,14 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                   labelText: 'Portafoglio',
                 ),
               ),
-            DropdownButtonFormField<String>( // Form di selezione del tipo di azione
-              value: _selectedActionType,
-              onChanged: (newValue) {
-                setState(() {
-                  _selectedActionType = newValue;
-                });
-              },
-              items: actionTypes.map((actionType) {
-                return DropdownMenuItem(
-                  value: actionType,
-                  child: Text(actionType),
-                );
-              }).toList(),
-              decoration: InputDecoration(
-                labelText: 'Tipo di Azione',
-              ),
-            ),
+//select per 
+
+              //select per la categoria 
             DropdownButtonFormField<Category>(
-              value: categories.firstWhere((category) => category.id == _selectedCategoryId, orElse: () => categories[0]),
+              value: categories.firstWhere((category) => category.id == _selectedCategoryId, orElse: () => categories[0]), // Updated
               onChanged: (newValue) {
                 setState(() {
-                  _selectedCategoryId = newValue!.id;
+                  _selectedCategoryId = newValue!.id; // Updated
                 });
               },
               items: categories.map((category) {
@@ -125,41 +110,30 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
             SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: () async {
-                if (_selectedActionType != null && (_selectedWallet != null )) { // Controllo se sia stato selezionato un tipo di azione e un portafoglio (se presente)
-                  // Creare una nuova transazione
-                  Transaction newTransaction = Transaction(
-                    name: _nameController.text,
-                    categoryId: _selectedCategoryId,
-                    date: DateTime.now().toString(),
-                    value: double.parse(_valueController.text),
-                    transactionId: _selectedWallet != null
-                        ? _wallets.firstWhere((wallet) => wallet.name == _selectedWallet).id
-                        : _wallets[0].id, // Usare il primo portafoglio se ne è selezionato uno
-                 
-                  );
+                // Create a new transaction
+                Transaction newTransaction = Transaction(
+                  name: _nameController.text,
+                  categoryId: _selectedCategoryId, // Updated
+                  date: DateTime.now().toString(),
+                  value: double.parse(_valueController.text),
+                  transactionId: _wallets
+                      .firstWhere((wallet) => wallet.name == _selectedWallet)
+                      .id, // Using the id of the selected wallet
+                );
 
-                  // Inserire la transazione nel database
-                  await dbHelper.insertTransaction(newTransaction);
+                // Insert the transaction into the database
+                await dbHelper.insertTransaction(newTransaction);
 
-                  // Cancella i campi di testo dopo l'inserimento
-                  _nameController.clear();
-                  _valueController.clear();
+                // Clear text fields after insertion
+                _nameController.clear();
+                _valueController.clear();
 
-                  // Mostra un messaggio di successo
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Transazione aggiunta con successo'),
-                    ),
-                  );
-                } else {
-                  // Mostra un messaggio di errore se il tipo di azione o il portafoglio non sono selezionati
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text('Seleziona un tipo di azione e un portafoglio'),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                }
+                // Show a success message
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Transazione aggiunta con successo'),
+                  ),
+                );
               },
               child: Text('Aggiungi Transazione'),
             ),

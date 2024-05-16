@@ -37,7 +37,7 @@ class DatabaseHelper {
           CREATE TABLE $walletTable (
             $colId INTEGER PRIMARY KEY AUTOINCREMENT,
             $colName TEXT,
-            $colBalance TEXT
+            $colBalance REAL
           )
         ''');
 
@@ -122,7 +122,7 @@ class DatabaseHelper {
 class Wallet {
   int? id;
   String? name;
-  String? balance;
+  double ? balance;
 
   Wallet({this.id, this.name, this.balance});
 

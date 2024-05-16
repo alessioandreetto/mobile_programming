@@ -10,7 +10,7 @@ class WalletPage extends StatefulWidget {
 
 class Note {
   int? id;
-  String title;
+  double title;
   String body;
 
   Note({
@@ -51,8 +51,8 @@ class _WalletPageState extends State<WalletPage> {
     setState(() {
       data = wallets.map((wallet) => Note(
         id: wallet.id,
-        title: wallet.name!,
-        body: wallet.balance!,
+        title: wallet.balance!,
+        body: wallet.name!,
       )).toList();
     });
   }
@@ -60,8 +60,8 @@ class _WalletPageState extends State<WalletPage> {
   void _saveNotes() async {
     List<Wallet> wallets = data.map((note) => Wallet(
       id: note.id,
-      name: note.title,
-      balance: note.body,
+      name: note.body,
+      balance: note.title,
     )).toList();
     for (var wallet in wallets) {
       if (wallet.id == null) {
@@ -75,7 +75,7 @@ class _WalletPageState extends State<WalletPage> {
   void addOrEditNote({
     required BuildContext context,
     required int index,
-    required String title,
+    required double title,
     required String body,
   }) async {
     if (index >= 0 && index < data.length) {
@@ -228,7 +228,7 @@ class _WalletPageState extends State<WalletPage> {
     );
   }
 
-  Widget buildItem(BuildContext context, int index, String title, String body) {
+  Widget buildItem(BuildContext context, int index, double title, String body) {
     final isSelected = selectedIndices.contains(index);
 
     return GestureDetector(
