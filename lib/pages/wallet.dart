@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:reorderable_grid_view/reorderable_grid_view.dart';
-import 'package:path/path.dart';
-import 'package:sqflite/sqflite.dart';
-import 'dart:convert';
-import 'new_wallet.dart';
 import '../model/database_model.dart';
+import 'new_wallet.dart';
 
 class WalletPage extends StatefulWidget {
   @override
@@ -12,16 +9,19 @@ class WalletPage extends StatefulWidget {
 }
 
 class Note {
+  int? id;
   String title;
   String body;
 
   Note({
+    this.id,
     required this.title,
     required this.body,
   });
 
   Map<String, dynamic> toJson() {
     return {
+      'id': id,
       'title': title,
       'body': body,
     };
@@ -29,6 +29,7 @@ class Note {
 
   factory Note.fromJson(Map<String, dynamic> json) {
     return Note(
+      id: json['id'],
       title: json['title'],
       body: json['body'],
     );
@@ -48,15 +49,27 @@ class _WalletPageState extends State<WalletPage> {
   void _loadNotes() async {
     List<Wallet> wallets = await DatabaseHelper().getWallets();
     setState(() {
-      data = wallets.map((wallet) => Note(title: wallet.name!, body: wallet.balance.toString())).toList();
+      data = wallets.map((wallet) => Note(
+        id: wallet.id,
+        title: wallet.name!,
+        body: wallet.balance!,
+      )).toList();
     });
   }
 
   void _saveNotes() async {
-    List<Wallet> wallets = data.map((note) => Wallet(name: note.title, balance: note.body)).toList();
-    wallets.forEach((wallet) async {
-      await DatabaseHelper().insertWallet(wallet);
-    });
+    List<Wallet> wallets = data.map((note) => Wallet(
+      id: note.id,
+      name: note.title,
+      balance: note.body,
+    )).toList();
+    for (var wallet in wallets) {
+      if (wallet.id == null) {
+        await DatabaseHelper().insertWallet(wallet);
+      } else {
+        await DatabaseHelper().updateWallet(wallet);
+      }
+    }
   }
 
   void addOrEditNote({
@@ -65,19 +78,45 @@ class _WalletPageState extends State<WalletPage> {
     required String title,
     required String body,
   }) async {
-    Wallet wallet = Wallet(name: title, balance: body);
     if (index >= 0 && index < data.length) {
-      await DatabaseHelper().updateWallet(wallet);
+      // Update existing wallet
+      Wallet existingWallet = await DatabaseHelper().getWalletById(data[index].id!);
+      Wallet updatedWallet = Wallet(
+        id: existingWallet.id,
+        name: title,
+        balance: body,
+      );
+      await DatabaseHelper().updateWallet(updatedWallet);
       setState(() {
-        data[index] = Note(title: title, body: body);
+        data[index] = Note(
+          id: existingWallet.id,
+          title: title,
+          body: body,
+        );
       });
     } else {
-      await DatabaseHelper().insertWallet(wallet);
-      print('wallet');
+      // Insert new wallet
+      Wallet newWallet = Wallet(
+        name: title,
+        balance: body,
+      );
+      int id = await DatabaseHelper().insertWallet(newWallet);
       setState(() {
-        data.add(Note(title: title, body: body));
+        data.add(Note(
+          id: id,
+          title: title,
+          body: body,
+        ));
       });
     }
+  }
+
+  void deleteNote(int index) async {
+    int id = data[index].id!;
+    await DatabaseHelper().deleteWallet(id);
+    setState(() {
+      data.removeAt(index);
+    });
   }
 
   @override
@@ -99,8 +138,9 @@ class _WalletPageState extends State<WalletPage> {
           if (selectedIndices.isNotEmpty)
             IconButton(
               icon: Icon(Icons.delete),
-              onPressed: (){},
-            /*   onPressed: deleteSelectedNotes, */
+              onPressed: () {
+                // Implement delete functionality
+              },
             ),
         ],
       ),
@@ -192,15 +232,16 @@ class _WalletPageState extends State<WalletPage> {
     final isSelected = selectedIndices.contains(index);
 
     return GestureDetector(
+      //per eliminazione multipla di wallet, manca la funzione del db 
       onLongPress: () {
-        setState(() {
+/*         setState(() {
           if (isSelected) {
             selectedIndices.remove(index);
           } else {
             selectedIndices.add(index);
           }
-        });
-      },
+        }); */
+      }, 
       onTap: () {
         if (selectedIndices.isNotEmpty) {
           setState(() {
@@ -227,7 +268,7 @@ class _WalletPageState extends State<WalletPage> {
                 initialTitle: title,
                 initialBody: body,
                 onDelete: () {
-                  //  deleteNote(index); // Chiama deleteNote quando viene attivato onDelete
+                  deleteNote(index); // Chiama deleteNote quando viene attivato onDelete
                   Navigator.pop(context); // Chiudi AddNotePage dopo la cancellazione
                 },
               ),
@@ -288,9 +329,8 @@ class _WalletPageState extends State<WalletPage> {
                 ),
               ),
             ],
-         
+          ),
         ),
-      ),
       ),
     );
   }

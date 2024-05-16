@@ -74,6 +74,21 @@ class DatabaseHelper {
     return result.map((item) => Wallet.fromMap(item)).toList();
   }
 
+  // Ottenimento di un portafoglio tramite ID
+  Future<Wallet> getWalletById(int id) async {
+    Database db = await this.database;
+    List<Map<String, dynamic>> result = await db.query(
+      walletTable,
+      where: '$colId = ?',
+      whereArgs: [id],
+    );
+    if (result.isNotEmpty) {
+      return Wallet.fromMap(result.first);
+    } else {
+      throw Exception('Wallet not found');
+    }
+  }
+
   // Aggiornamento di un portafoglio
   Future<int> updateWallet(Wallet wallet) async {
     Database db = await this.database;
