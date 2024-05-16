@@ -83,8 +83,8 @@ class _WalletPageState extends State<WalletPage> {
       Wallet existingWallet = await DatabaseHelper().getWalletById(data[index].id!);
       Wallet updatedWallet = Wallet(
         id: existingWallet.id,
-        name: title,
-        balance: body,
+        name: body,
+        balance: title,
       );
       await DatabaseHelper().updateWallet(updatedWallet);
       setState(() {
@@ -97,8 +97,8 @@ class _WalletPageState extends State<WalletPage> {
     } else {
       // Insert new wallet
       Wallet newWallet = Wallet(
-        name: title,
-        balance: body,
+        name: body,
+        balance: title,
       );
       int id = await DatabaseHelper().insertWallet(newWallet);
       setState(() {

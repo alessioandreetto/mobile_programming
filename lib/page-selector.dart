@@ -64,7 +64,7 @@ class _BottomBarDemoState extends State<BottomBarDemo> {
               context,
               MaterialPageRoute(
                   builder: (context) =>
-                      NewOperation()), 
+                      NewTransactionPage()), 
             );
           }),
     );

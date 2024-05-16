@@ -12,7 +12,7 @@ class DatabaseHelper {
   static const String colId = 'id';
   static const String colName = 'name';
   static const String colBalance = 'balance';
-  static const String colTransactionId = 'transaction_id';
+  static const String colWalletid = 'Wallet_id';
   static const String colCategoryId = 'category_id';
   static const String colDate = 'date';
   static const String colValue = 'value';
@@ -49,8 +49,8 @@ class DatabaseHelper {
             $colCategoryId INTEGER,
             $colDate TEXT,
             $colValue REAL,
-            $colTransactionId INTEGER,
-            FOREIGN KEY ($colTransactionId) REFERENCES $walletTable($colId)
+            $colWalletid INTEGER,
+            FOREIGN KEY ($colWalletid) REFERENCES $walletTable($colId)
           )
         ''');
       },
@@ -114,7 +114,7 @@ class DatabaseHelper {
   Future<List<Transaction>> getTransactionsForWallet(int walletId) async {
     Database db = await this.database;
     List<Map<String, dynamic>> result = await db.query(transactionsTable,
-        where: '$colTransactionId = ?', whereArgs: [walletId]);
+        where: '$colWalletid = ?', whereArgs: [walletId]);
     return result.map((item) => Transaction.fromMap(item)).toList();
   }
 }
@@ -166,7 +166,7 @@ class Transaction {
       DatabaseHelper.colCategoryId: categoryId,
       DatabaseHelper.colDate: date,
       DatabaseHelper.colValue: value,
-      DatabaseHelper.colTransactionId: transactionId,
+      DatabaseHelper.colWalletid: transactionId,
     };
   }
 
@@ -177,7 +177,7 @@ class Transaction {
       categoryId: map[DatabaseHelper.colCategoryId],
       date: map[DatabaseHelper.colDate],
       value: map[DatabaseHelper.colValue],
-      transactionId: map[DatabaseHelper.colTransactionId],
+      transactionId: map[DatabaseHelper.colWalletid],
     );
   }
 }
