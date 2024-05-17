@@ -8,7 +8,6 @@ class WalletProvider with ChangeNotifier {
 
   Future<List<Wallet>> loadWallets() async {
     _wallets = await DatabaseHelper().getWallets();
-    print("prova providers");
     notifyListeners();
     return _wallets; // Aggiungi questa riga per restituire la lista di wallet
   }
