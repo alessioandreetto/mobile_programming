@@ -22,8 +22,8 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
 
   List<Wallet> _wallets = [];
   String _selectedWallet = '';
-  int _selectedCategoryId = 0; // Updated
-  String _selectedActionType = '';
+  int _selectedCategoryId = 0;
+  int _selectedActionIndex = 0; // Aggiunto per tenere traccia dell'azione selezionata
 
   List<Category> categories = [
     Category(id: 1, name: 'Category 1'),
@@ -86,7 +86,8 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                   labelText: 'Portafoglio',
                 ),
               ),
-            DropdownButtonFormField<Category>(
+
+                          DropdownButtonFormField<Category>(
               value: categories.firstWhere((category) => category.id == _selectedCategoryId, orElse: () => categories[0]), // Updated
               onChanged: (newValue) {
                 setState(() {
@@ -104,22 +105,32 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
               ),
             ),
             SizedBox(height: 16.0),
+            ToggleButtons(
+              children: _buildToggleButtons(),
+              isSelected: List.generate(actionTypes.length, (index) => _selectedActionIndex == index),
+              onPressed: (index) {
+                setState(() {
+                  _selectedActionIndex = index;
+                });
+              },
+            ),
+            SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: () async {
                 // Create a new transaction
                 Transaction newTransaction = Transaction(
                   name: _nameController.text,
-                  categoryId: _selectedCategoryId, // Updated
+                  categoryId: _selectedCategoryId,
                   date: DateTime.now().toString(),
                   value: double.parse(_valueController.text),
                   transactionId: _wallets
                       .firstWhere((wallet) => wallet.name == _selectedWallet)
-                      .id, // Using the id of the selected wallet
+                      .id,
                 );
 
                 // Insert the transaction into the database
                 await dbHelper.insertTransaction(newTransaction);
-                    Wallet existingWallet =
+                Wallet existingWallet =
                     _wallets.firstWhere((wallet) => wallet.name == _selectedWallet);
 
                 double newBalance = existingWallet.balance! + newTransaction.value!;
@@ -131,25 +142,12 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                 );
                 await dbHelper.updateWallet(updatedWallet);
 
-
                 _nameController.clear();
                 _valueController.clear();
 
-                // Clear text fields after insertion
-                _nameController.clear();
-                _valueController.clear();
+                Provider.of<WalletProvider>(context, listen: false).loadWallets();
 
-                // Show a success message
-              /*   ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(
-                    content: Text('Transazione aggiunta con successo'),
-                  ),
-                ); */
-
-
-                  Provider.of<WalletProvider>(context, listen: false).loadWallets();
-
-                 Navigator.pop(context);
+                Navigator.pop(context);
               },
               child: Text('Aggiungi Transazione'),
             ),
@@ -158,4 +156,26 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
       ),
     );
   }
+
+  List<Widget> _buildToggleButtons() {
+    List<Widget> buttons = [];
+    if (_wallets.length == 1) {
+      // Se ho un solo portafoglio, mostrare solo Entrata e Uscita
+      
+      actionTypes = ['Entrata', 'Uscita'];
+      buttons = actionTypes.map((action) {
+        return Text(action);
+      }).toList();
+    } else {
+      // Altrimenti, mostrare tutte e tre le opzioni
+
+      buttons = actionTypes.map((action) {
+        return Text(action);
+      }).toList();
+    }
+    return buttons;
+  }
 }
+
+
+
