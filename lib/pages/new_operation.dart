@@ -22,8 +22,10 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
 
   List<Wallet> _wallets = [];
   String _selectedWallet = '';
+  String _selectedWalletForExchangeOut = '';
+  String _selectedWalletForExchangeIn = '';
   int _selectedCategoryId = 0;
-  int _selectedActionIndex = 0; // Aggiunto per tenere traccia dell'azione selezionata
+  int _selectedActionIndex = 0;
 
   List<Category> categories = [
     Category(id: 1, name: 'Category 1'),
@@ -44,6 +46,8 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
       _wallets = wallets;
       if (_wallets.isNotEmpty) {
         _selectedWallet = _wallets[0].name!;
+        _selectedWalletForExchangeOut = _wallets[0].name!;
+        _selectedWalletForExchangeIn = _wallets[0].name!;
       }
     });
   }
@@ -68,7 +72,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
               keyboardType: TextInputType.number,
               decoration: InputDecoration(labelText: 'Valore'),
             ),
-            if (_wallets.isNotEmpty)
+            if (_selectedActionIndex != 2 && _wallets.isNotEmpty)
               DropdownButtonFormField<String>(
                 value: _selectedWallet,
                 onChanged: (newValue) {
@@ -86,12 +90,49 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                   labelText: 'Portafoglio',
                 ),
               ),
+            if (_selectedActionIndex == 2 && _wallets.length > 1) ...[
+              SizedBox(height: 16.0),
+              DropdownButtonFormField<String>(
+                value: _selectedWalletForExchangeOut,
+                onChanged: (newValue) {
+                  setState(() {
+                    _selectedWalletForExchangeOut = newValue!;
+                  });
+                },
+                items: _wallets.map((wallet) {
+                  return DropdownMenuItem(
+                    value: wallet.name!,
+                    child: Text(wallet.name!),
+                  );
+                }).toList(),
+                decoration: InputDecoration(
+                  labelText: 'Portafoglio Uscita',
+                ),
+              ),
+              DropdownButtonFormField<String>(
+                value: _selectedWalletForExchangeIn,
+                onChanged: (newValue) {
+                  setState(() {
+                    _selectedWalletForExchangeIn = newValue!;
+                  });
+                },
+                items: _wallets.map((wallet) {
+                  return DropdownMenuItem(
+                    value: wallet.name!,
+                    child: Text(wallet.name!),
+                  );
+                }).toList(),
+                decoration: InputDecoration(
+                  labelText: 'Portafoglio Entrata',
+                ),
+              ),
+            ],
             SizedBox(height: 16.0),
             DropdownButtonFormField<Category>(
-              value: categories.firstWhere((category) => category.id == _selectedCategoryId, orElse: () => categories[0]), // Updated
+              value: categories.firstWhere((category) => category.id == _selectedCategoryId, orElse: () => categories[0]),
               onChanged: (newValue) {
                 setState(() {
-                  _selectedCategoryId = newValue!.id; // Updated
+                  _selectedCategoryId = newValue!.id;
                 });
               },
               items: categories.map((category) {
@@ -117,37 +158,11 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
             SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: () async {
-                // Ottieni il segno corretto della transazione in base all'azione selezionata
-                double transactionValue = double.parse(_valueController.text);
-                if (_selectedActionIndex == 1) {
-                  // Uscita selezionata, trasforma il valore in negativo
-                  transactionValue = -transactionValue;
+                if (_selectedActionIndex == 2) {
+                  await _performExchangeTransaction(double.parse(_valueController.text));
+                } else {
+                  await _performRegularTransaction();
                 }
-
-                // Create a new transaction
-                Transaction newTransaction = Transaction(
-                  name: _nameController.text,
-                  categoryId: _selectedCategoryId,
-                  date: DateTime.now().toString(),
-                  value: transactionValue,
-                  transactionId: _wallets
-                      .firstWhere((wallet) => wallet.name == _selectedWallet)
-                      .id,
-                );
-
-                // Insert the transaction into the database
-                await dbHelper.insertTransaction(newTransaction);
-                Wallet existingWallet =
-                    _wallets.firstWhere((wallet) => wallet.name == _selectedWallet);
-
-                double newBalance = existingWallet.balance! + newTransaction.value!;
-
-                Wallet updatedWallet = Wallet(
-                  id: existingWallet.id,
-                  name: existingWallet.name,
-                  balance: newBalance,
-                );
-                await dbHelper.updateWallet(updatedWallet);
 
                 _nameController.clear();
                 _valueController.clear();
@@ -164,22 +179,84 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
     );
   }
 
-  List<Widget> _buildToggleButtons() {
-    List<Widget> buttons = [];
-    if (_wallets.length == 1) {
-      // Se ho un solo portafoglio, mostrare solo Entrata e Uscita
-      
-      actionTypes = ['Entrata', 'Uscita'];
-      buttons = actionTypes.map((action) {
-        return Text(action);
-      }).toList();
-    } else {
-      // Altrimenti, mostrare tutte e tre le opzioni
-
-      buttons = actionTypes.map((action) {
-        return Text(action);
-      }).toList();
+  Future<void> _performRegularTransaction() async {
+    double transactionValue = double.parse(_valueController.text);
+    if (_selectedActionIndex == 1) {
+      // Uscita selezionata, trasforma il valore in negativo
+      transactionValue = -transactionValue;
     }
-    return buttons;
+
+    // Create a new transaction
+    Transaction newTransaction = Transaction(
+      name: _nameController.text,
+      categoryId: _selectedCategoryId,
+      date: DateTime.now().toString(),
+      value: transactionValue,
+      transactionId: _wallets.firstWhere((wallet) => wallet.name == _selectedWallet).id,
+    );
+
+    // Insert the transaction into the database
+    await dbHelper.insertTransaction(newTransaction);
+    Wallet existingWallet = _wallets.firstWhere((wallet) => wallet.name == _selectedWallet);
+
+    double newBalance = existingWallet.balance! + newTransaction.value!;
+    Wallet updatedWallet = Wallet(
+      id: existingWallet.id,
+      name: existingWallet.name,
+      balance: newBalance,
+    );
+    await dbHelper.updateWallet(updatedWallet);
+  }
+
+  Future<void> _performExchangeTransaction(double value) async {
+    // Valore negativo per il portafoglio di uscita
+    double outValue = -value;
+
+    // Transazione per il portafoglio di uscita
+    Transaction outgoingTransaction = Transaction(
+      name: _nameController.text,
+      categoryId: _selectedCategoryId,
+      date: DateTime.now().toString(),
+      value: outValue,
+      transactionId: _wallets.firstWhere((wallet) => wallet.name == _selectedWalletForExchangeOut).id,
+    );
+
+    // Inserisci la transazione di uscita nel database
+    await dbHelper.insertTransaction(outgoingTransaction);
+    Wallet existingOutgoingWallet = _wallets.firstWhere((wallet) => wallet.name == _selectedWalletForExchangeOut);
+    double newOutgoingBalance = existingOutgoingWallet.balance! + outgoingTransaction.value!;
+    Wallet updatedOutgoingWallet = Wallet(
+      id: existingOutgoingWallet.id,
+      name: existingOutgoingWallet.name,
+      balance: newOutgoingBalance,
+    );
+    await dbHelper.updateWallet(updatedOutgoingWallet);
+
+    // Transazione per il portafoglio di entrata
+    Transaction incomingTransaction = Transaction(
+      name: _nameController.text,
+      categoryId: _selectedCategoryId,
+      date: DateTime.now().toString(),
+      value: value,
+      transactionId: _wallets.firstWhere((wallet) => wallet.name == _selectedWalletForExchangeIn).id,
+    );
+
+    // Inserisci la transazione di entrata nel database
+    await dbHelper.insertTransaction(incomingTransaction);
+    Wallet existingIncomingWallet = _wallets.firstWhere((wallet) => wallet.name == _selectedWalletForExchangeIn);
+    double newIncomingBalance = existingIncomingWallet.balance! + incomingTransaction.value!;
+    Wallet updatedIncomingWallet = Wallet(
+      id: existingIncomingWallet.id,
+      name: existingIncomingWallet.name,
+      balance: newIncomingBalance,
+    );
+    await dbHelper.updateWallet(updatedIncomingWallet);
+  }
+
+  List<Widget> _buildToggleButtons() {
+    return actionTypes.map((type) => Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+      child: Text(type),
+    )).toList();
   }
 }
