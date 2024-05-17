@@ -28,18 +28,21 @@ class _HomeListState extends State<HomeList> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-           Consumer<WalletProvider>(
+          // Sezione per il nome del wallet e il bilancio
+          Consumer<WalletProvider>(
             builder: (context, walletProvider, _) {
               Wallet selectedWallet = walletProvider.wallets[_selectedWalletIndex];
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text("Nome: ${selectedWallet.name}"),
+                  Text("Nome Wallet: ${selectedWallet.name}"),
                   Text("Bilancio: ${selectedWallet.balance}"),
                 ],
               );
             },
           ),
+          SizedBox(height: 20),
+          // Lista orizzontale di bottoni per i wallet
           Container(
             height: 50, // Imposta l'altezza della lista a 50px
             child: Consumer<WalletProvider>(
@@ -73,7 +76,48 @@ class _HomeListState extends State<HomeList> {
             ),
           ),
           SizedBox(height: 20),
-         
+          // Lista verticale delle transazioni
+          Expanded(
+            child: Consumer<WalletProvider>(
+              builder: (context, walletProvider, _) {
+                Wallet selectedWallet = walletProvider.wallets[_selectedWalletIndex];
+                return Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text("Transazioni per ${selectedWallet.name}:"),
+                    SizedBox(height: 10),
+                    Expanded(
+                      child: FutureBuilder<List<Transaction>>(
+                        future: DatabaseHelper().getTransactionsForWallet(selectedWallet.id!),
+                        builder: (context, snapshot) {
+                          if (snapshot.connectionState == ConnectionState.waiting) {
+                            return Center(
+                              child: CircularProgressIndicator(), // Visualizza un indicatore di caricamento durante il recupero dei dati
+                            );
+                          } else if (snapshot.hasError) {
+                            return Center(
+                              child: Text('Error: ${snapshot.error}'),
+                            );
+                          } else {
+                            List<Transaction> transactions = snapshot.data!;
+                            return ListView.builder(
+                              itemCount: transactions.length,
+                              itemBuilder: (context, index) {
+                                return ListTile(
+                                  title: Text(transactions.reversed.toList()[index].name ?? ''),
+                                  subtitle: Text("Data: ${transactions.reversed.toList()[index].date}, Valore: ${transactions.reversed.toList()[index].value}"),
+                                );
+                              },
+                            );
+                          }
+                        },
+                      ),
+                    ),
+                  ],
+                );
+              },
+            ),
+          ),
         ],
       ),
     );
