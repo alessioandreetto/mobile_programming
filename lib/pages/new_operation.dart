@@ -86,8 +86,8 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                   labelText: 'Portafoglio',
                 ),
               ),
-
-                          DropdownButtonFormField<Category>(
+            SizedBox(height: 16.0),
+            DropdownButtonFormField<Category>(
               value: categories.firstWhere((category) => category.id == _selectedCategoryId, orElse: () => categories[0]), // Updated
               onChanged: (newValue) {
                 setState(() {
@@ -117,12 +117,19 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
             SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: () async {
+                // Ottieni il segno corretto della transazione in base all'azione selezionata
+                double transactionValue = double.parse(_valueController.text);
+                if (_selectedActionIndex == 1) {
+                  // Uscita selezionata, trasforma il valore in negativo
+                  transactionValue = -transactionValue;
+                }
+
                 // Create a new transaction
                 Transaction newTransaction = Transaction(
                   name: _nameController.text,
                   categoryId: _selectedCategoryId,
                   date: DateTime.now().toString(),
-                  value: double.parse(_valueController.text),
+                  value: transactionValue,
                   transactionId: _wallets
                       .firstWhere((wallet) => wallet.name == _selectedWallet)
                       .id,
@@ -176,6 +183,3 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
     return buttons;
   }
 }
-
-
-
