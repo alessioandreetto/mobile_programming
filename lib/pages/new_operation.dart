@@ -252,11 +252,22 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
     );
     await dbHelper.updateWallet(updatedIncomingWallet);
   }
-
   List<Widget> _buildToggleButtons() {
-    return actionTypes.map((type) => Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0),
-      child: Text(type),
-    )).toList();
+    List<Widget> buttons = [];
+    if (_wallets.length == 1) {
+      // Se ho un solo portafoglio, mostrare solo Entrata e Uscita
+      
+      actionTypes = ['Entrata', 'Uscita'];
+      buttons = actionTypes.map((action) {
+        return Text(action);
+      }).toList();
+    } else {
+      // Altrimenti, mostrare tutte e tre le opzioni
+
+      buttons = actionTypes.map((action) {
+        return Text(action);
+      }).toList();
+    }
+    return buttons;
   }
 }
