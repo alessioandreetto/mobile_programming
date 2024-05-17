@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:reorderable_grid_view/reorderable_grid_view.dart';
 import '../model/database_model.dart';
 import 'new_wallet.dart';
+import '../providers/wallet_provider.dart';
+import 'package:provider/provider.dart';
 
 class WalletPage extends StatefulWidget {
   @override
@@ -43,11 +45,23 @@ class _WalletPageState extends State<WalletPage> {
   @override
   void initState() {
     super.initState();
+    // Non è necessario chiamare _loadNotes() qui, lo chiameremo in didChangeDependencies().
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    print('Prova');
+    // Chiamiamo _loadNotes() qui per essere sicuri che venga chiamato quando il Provider notifica i cambiamenti.
     _loadNotes();
   }
 
+
   void _loadNotes() async {
-    List<Wallet> wallets = await DatabaseHelper().getWallets();
+        List<Wallet> wallets = await Provider.of<WalletProvider>(context, listen: false).loadWallets();
+
+    print("wallets" + wallets.toString());
+
     setState(() {
       data = wallets.map((wallet) => Note(
         id: wallet.id,
@@ -94,6 +108,7 @@ class _WalletPageState extends State<WalletPage> {
           body: body,
         );
       });
+      Provider.of<WalletProvider>(context, listen: false).loadWallets();
     } else {
       // Insert new wallet
       Wallet newWallet = Wallet(
@@ -108,6 +123,7 @@ class _WalletPageState extends State<WalletPage> {
           body: body,
         ));
       });
+      Provider.of<WalletProvider>(context, listen: false).loadWallets();
     }
   }
 
@@ -117,6 +133,7 @@ class _WalletPageState extends State<WalletPage> {
     setState(() {
       data.removeAt(index);
     });
+    Provider.of<WalletProvider>(context, listen: false).loadWallets();
   }
 
   @override
@@ -144,32 +161,27 @@ class _WalletPageState extends State<WalletPage> {
             ),
         ],
       ),
-      body: Column(
-        crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Divider(
-            height: 0.5,
-            color: Color(0xffb3b3b3),
-          ),
-          Expanded(
-            child: ReorderableGridView.count(
-              crossAxisSpacing: 0,
-              mainAxisSpacing: 0,
-              crossAxisCount: 2,
-              children: data.map((note) {
-                final index = data.indexOf(note);
-                return buildItem(context, index, note.title, note.body);
-              }).toList(),
-              onReorder: (oldIndex, newIndex) {
-                setState(() {
-                  if (oldIndex < newIndex) {
-                    newIndex -= 1;
-                  }
-                  final movedItem = data.removeAt(oldIndex);
-                  data.insert(newIndex, movedItem);
-                  _saveNotes();
-                });
-              },
+ body: Consumer<WalletProvider>(
+        builder: (context, walletProvider, _) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Divider(
+                height: 0.5,
+                color: Color(0xffb3b3b3),
+              ),
+              Expanded(
+                child: ReorderableGridView.count(
+                  crossAxisSpacing: 0,
+                  mainAxisSpacing: 0,
+                  crossAxisCount: 2,
+                  children: walletProvider.wallets.map((wallet) {
+                    final index = walletProvider.wallets.indexOf(wallet);
+                    return buildItem(context, index, wallet.balance!, wallet.name!);
+                  }).toList(),
+                  onReorder: (oldIndex, newIndex) {
+                    // Implement reorder functionality
+                  },
               footer: [
                 GestureDetector(
                   onTap: () {
@@ -213,17 +225,19 @@ class _WalletPageState extends State<WalletPage> {
                               Icons.add,
                               color: Color(0xff262626),
                               size: 50,
+                       ),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
+                  ],
                 ),
-              ],
-            ),
-          ),
-        ],
+              ),
+            ],
+          );
+        },
       ),
     );
   }

@@ -4,7 +4,7 @@ import 'pages/home.dart';
 import 'pages/charts.dart';
 import 'pages/wallet.dart';
 import 'pages/setting.dart';
-
+import 'providers/wallet_provider.dart';
 import 'pages/new_operation.dart';
 
 import 'fab.dart';

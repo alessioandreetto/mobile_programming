@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../model/database_model.dart';
+import '../providers/wallet_provider.dart';
+import 'package:provider/provider.dart';
 
 class Category {
   final int id;
@@ -143,6 +145,10 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                     content: Text('Transazione aggiunta con successo'),
                   ),
                 ); */
+
+
+                  Provider.of<WalletProvider>(context, listen: false).loadWallets();
+
                  Navigator.pop(context);
               },
               child: Text('Aggiungi Transazione'),
