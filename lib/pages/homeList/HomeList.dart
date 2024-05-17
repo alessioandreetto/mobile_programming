@@ -3,8 +3,20 @@ import '../../model/database_model.dart';
 import '../../providers/wallet_provider.dart';
 import 'package:provider/provider.dart';
 
+class HomeList extends StatefulWidget {
+  @override
+  _HomeListState createState() => _HomeListState();
+}
 
-class HomeList extends StatelessWidget {
+class _HomeListState extends State<HomeList> {
+  late int _selectedWalletIndex; // Indice del wallet selezionato, inizialmente impostato sul primo
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedWalletIndex = 0; // Imposta il primo wallet come selezionato all'inizio
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -16,6 +28,18 @@ class HomeList extends StatelessWidget {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
+           Consumer<WalletProvider>(
+            builder: (context, walletProvider, _) {
+              Wallet selectedWallet = walletProvider.wallets[_selectedWalletIndex];
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text("Nome: ${selectedWallet.name}"),
+                  Text("Bilancio: ${selectedWallet.balance}"),
+                ],
+              );
+            },
+          ),
           Container(
             height: 50, // Imposta l'altezza della lista a 50px
             child: Consumer<WalletProvider>(
@@ -27,14 +51,20 @@ class HomeList extends StatelessWidget {
                   itemBuilder: (context, index) {
                     return Padding(
                       padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
-                      child: SizedBox(
-                        height: 30, // Imposta l'altezza del pulsante a 30px
-                        child: ElevatedButton(
-                          onPressed: () {
-                            // Aggiungi qui l'azione quando il pulsante viene premuto
-                          },
-                          child: Text(wallets[index].name!),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            _selectedWalletIndex = index; // Imposta l'indice del wallet selezionato
+                          });
+                        },
+                        style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                            (Set<MaterialState> states) {
+                              return _selectedWalletIndex == index ? Colors.blue : Colors.transparent; // Imposta il colore del pulsante in base allo stato
+                            },
+                          ),
                         ),
+                        child: Text(wallets[index].name!),
                       ),
                     );
                   },
@@ -42,6 +72,8 @@ class HomeList extends StatelessWidget {
               },
             ),
           ),
+          SizedBox(height: 20),
+         
         ],
       ),
     );
