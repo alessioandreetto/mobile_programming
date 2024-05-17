@@ -19,6 +19,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
   final dbHelper = DatabaseHelper();
   TextEditingController _nameController = TextEditingController();
   TextEditingController _valueController = TextEditingController();
+  TextEditingController _dateController = TextEditingController();
 
   List<Wallet> _wallets = [];
   String _selectedWallet = '';
@@ -26,6 +27,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
   String _selectedWalletForExchangeIn = '';
   int _selectedCategoryId = 0;
   int _selectedActionIndex = 0;
+  DateTime? _selectedDate;
 
   List<Category> categories = [
     Category(id: 1, name: 'Category 1'),
@@ -52,6 +54,20 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
     });
   }
 
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: _selectedDate ?? DateTime.now(),
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2101),
+    );
+    if (picked != null && picked != _selectedDate) {
+      setState(() {
+        _selectedDate = picked;
+        _dateController.text = "${_selectedDate!.toLocal()}".split(' ')[0]; // Formatta la data come stringa
+      });
+    }
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -71,6 +87,17 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
               controller: _valueController,
               keyboardType: TextInputType.number,
               decoration: InputDecoration(labelText: 'Valore'),
+            ),
+                        TextField(
+              controller: _dateController,
+              readOnly: true,
+              decoration: InputDecoration(
+                labelText: 'Data',
+                suffixIcon: IconButton(
+                  icon: Icon(Icons.calendar_today),
+                  onPressed: () => _selectDate(context),
+                ),
+              ),
             ),
             if (_selectedActionIndex != 2 && _wallets.isNotEmpty)
               DropdownButtonFormField<String>(
@@ -166,6 +193,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
 
                 _nameController.clear();
                 _valueController.clear();
+                _dateController.clear();
 
                 Provider.of<WalletProvider>(context, listen: false).loadWallets();
 
@@ -190,7 +218,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
     Transaction newTransaction = Transaction(
       name: _nameController.text,
       categoryId: _selectedCategoryId,
-      date: DateTime.now().toString(),
+      date: _selectedDate?.toIso8601String() ?? DateTime.now().toIso8601String(),
       value: transactionValue,
       transactionId: _wallets.firstWhere((wallet) => wallet.name == _selectedWallet).id,
     );
@@ -216,7 +244,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
     Transaction outgoingTransaction = Transaction(
       name: _nameController.text,
       categoryId: _selectedCategoryId,
-      date: DateTime.now().toString(),
+      date: _selectedDate?.toIso8601String() ?? DateTime.now().toIso8601String(),
       value: outValue,
       transactionId: _wallets.firstWhere((wallet) => wallet.name == _selectedWalletForExchangeOut).id,
     );
@@ -236,7 +264,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
     Transaction incomingTransaction = Transaction(
       name: _nameController.text,
       categoryId: _selectedCategoryId,
-      date: DateTime.now().toString(),
+      date: _selectedDate?.toIso8601String() ?? DateTime.now().toIso8601String(),
       value: value,
       transactionId: _wallets.firstWhere((wallet) => wallet.name == _selectedWalletForExchangeIn).id,
     );
