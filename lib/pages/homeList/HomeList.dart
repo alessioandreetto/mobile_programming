@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'dart:math' as Math;
 import '../../model/database_model.dart';
 import '../../providers/wallet_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 class HomeList extends StatefulWidget {
   @override
@@ -9,14 +11,12 @@ class HomeList extends StatefulWidget {
 }
 
 class _HomeListState extends State<HomeList> {
-  late int
-      _selectedWalletIndex; // Indice del wallet selezionato, inizialmente impostato sul primo
+  late int _selectedWalletIndex;
 
   @override
   void initState() {
     super.initState();
-    _selectedWalletIndex =
-        0; // Imposta il primo wallet come selezionato all'inizio
+    _selectedWalletIndex = 0;
   }
 
   @override
@@ -24,37 +24,69 @@ class _HomeListState extends State<HomeList> {
     return Scaffold(
       appBar: AppBar(
         title: Text('Welcome User'),
-        elevation: 0, // Rimuove l'ombra sotto l'AppBar
-        backgroundColor: Colors.transparent, // Imposta il colore dell'AppBar
+        elevation: 0,
+        backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          // Sezione per il nome del wallet e il bilancio
           Consumer<WalletProvider>(
             builder: (context, walletProvider, _) {
               Wallet selectedWallet =
                   walletProvider.wallets[_selectedWalletIndex];
-              return Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text("Nome Wallet: ${selectedWallet.name}"),
-                  Text("Bilancio: ${selectedWallet.balance}"),
-                ],
+              return Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text("Nome Wallet: ${selectedWallet.name}"),
+                        Text("Bilancio: ${selectedWallet.balance}"),
+                      ],
+                    ),
+                    FutureBuilder<List<Transaction>>(
+                      future: DatabaseHelper()
+                          .getTransactionsForWallet(selectedWallet.id!),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return CircularProgressIndicator();
+                        } else if (snapshot.hasError) {
+                          return Text('Error: ${snapshot.error}');
+                        } else {
+                          List<Transaction> transactions = snapshot.data!;
+                          
+                          Map<String, double> categoryAmounts =
+                              _calculateCategoryAmounts(transactions);
+                          return Container(
+                            width: 150,
+                            height: 150,
+                            child: PieChart(
+                              PieChartData(
+                                sections:
+                                    _createPieChartSections(categoryAmounts),
+                              ),
+                            ),
+                          );
+                        }
+                      },
+                    ),
+                  ],
+                ),
               );
             },
           ),
           SizedBox(height: 20),
-          // Lista orizzontale di bottoni per i wallet
           Container(
-            height: 50, // Imposta l'altezza della lista a 50px
+            height: 50,
             child: Consumer<WalletProvider>(
               builder: (context, walletProvider, _) {
                 List<Wallet> wallets = walletProvider.wallets;
                 return ListView.builder(
-                  scrollDirection: Axis
-                      .horizontal, // Imposta la direzione dello scorrimento orizzontale
+                  scrollDirection: Axis.horizontal,
                   itemCount: wallets.length,
                   itemBuilder: (context, index) {
                     return Padding(
@@ -63,28 +95,23 @@ class _HomeListState extends State<HomeList> {
                       child: ElevatedButton(
                         onPressed: () {
                           setState(() {
-                            _selectedWalletIndex =
-                                index; // Imposta l'indice del wallet selezionato
+                            _selectedWalletIndex = index;
                           });
                         },
                         style: ButtonStyle(
                           elevation: MaterialStateProperty.all(0),
-                          shape : MaterialStateProperty.all<RoundedRectangleBorder>(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20.0),
-                              side: BorderSide(
-                                color:  Colors.black
-                                   
-                              ),
-                            ),
-                          ),
+                          shape: MaterialStateProperty.all<
+                                  RoundedRectangleBorder>(
+                              RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.0),
+                            side: BorderSide(color: Colors.black),
+                          )),
                           foregroundColor:
                               MaterialStateProperty.resolveWith<Color>(
                             (Set<MaterialState> states) {
                               return _selectedWalletIndex == index
                                   ? Colors.white
-                                  : Colors
-                                      .black; // Imposta il colore del testo in base allo stato
+                                  : Colors.black;
                             },
                           ),
                           backgroundColor:
@@ -92,8 +119,7 @@ class _HomeListState extends State<HomeList> {
                             (Set<MaterialState> states) {
                               return _selectedWalletIndex == index
                                   ? Colors.black
-                                  : Colors
-                                      .white; // Imposta il colore del pulsante in base allo stato
+                                  : Colors.white;
                             },
                           ),
                         ),
@@ -106,7 +132,6 @@ class _HomeListState extends State<HomeList> {
             ),
           ),
           SizedBox(height: 20),
-          // Lista verticale delle transazioni
           Expanded(
             child: Consumer<WalletProvider>(
               builder: (context, walletProvider, _) {
@@ -125,8 +150,7 @@ class _HomeListState extends State<HomeList> {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
                             return Center(
-                              child:
-                                  CircularProgressIndicator(), // Visualizza un indicatore di caricamento durante il recupero dei dati
+                              child: CircularProgressIndicator(),
                             );
                           } else if (snapshot.hasError) {
                             return Center(
@@ -171,4 +195,60 @@ class _HomeListState extends State<HomeList> {
       ),
     );
   }
+
+Map<String, double> _calculateCategoryAmounts(
+  List<Transaction> transactions,
+) {
+  Map<String, double> categoryAmounts = {};
+
+  transactions.forEach((transaction) {
+    final categoryId = transaction.categoryId.toString(); // Convertiamo l'ID della categoria in una stringa
+    final value = transaction.value ?? 0.0; // Utilizziamo 0.0 come valore predefinito se value è nullo
+    if (categoryAmounts.containsKey(categoryId)) {
+      categoryAmounts[categoryId] = (categoryAmounts[categoryId] ?? 0) + value;
+    } else {
+      categoryAmounts[categoryId] = value;
+    }
+  });
+
+  return categoryAmounts;
+}
+
+
+
+List<PieChartSectionData> _createPieChartSections(
+  Map<String, double> categoryAmounts,
+) {
+  List<Color> fixedColors = [
+    Colors.red,
+    Colors.blue,
+    Colors.green,
+    Colors.orange,
+    Colors.purple,
+  ];
+
+  List<PieChartSectionData> sections = [];
+  int index = 0;
+
+  categoryAmounts.forEach((category, amount) {
+    sections.add(PieChartSectionData(
+      color: fixedColors[index % fixedColors.length],
+      value: amount,
+      title: 'Category ${index+1}: ${(amount ).toStringAsFixed(2)}€',
+    ));
+    index++;
+  });
+
+  return sections;
+}
+
+
+  double _getTotalAmount(Map<String, double> categoryAmounts) {
+    double total = 0;
+    categoryAmounts.values.forEach((amount) {
+      total += amount;
+    });
+    return total;
+  }
+
 }
