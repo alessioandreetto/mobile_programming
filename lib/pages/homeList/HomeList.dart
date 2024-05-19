@@ -9,12 +9,14 @@ class HomeList extends StatefulWidget {
 }
 
 class _HomeListState extends State<HomeList> {
-  late int _selectedWalletIndex; // Indice del wallet selezionato, inizialmente impostato sul primo
+  late int
+      _selectedWalletIndex; // Indice del wallet selezionato, inizialmente impostato sul primo
 
   @override
   void initState() {
     super.initState();
-    _selectedWalletIndex = 0; // Imposta il primo wallet come selezionato all'inizio
+    _selectedWalletIndex =
+        0; // Imposta il primo wallet come selezionato all'inizio
   }
 
   @override
@@ -24,6 +26,7 @@ class _HomeListState extends State<HomeList> {
         title: Text('Welcome User'),
         elevation: 0, // Rimuove l'ombra sotto l'AppBar
         backgroundColor: Colors.transparent, // Imposta il colore dell'AppBar
+        surfaceTintColor: Colors.transparent,
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -31,7 +34,8 @@ class _HomeListState extends State<HomeList> {
           // Sezione per il nome del wallet e il bilancio
           Consumer<WalletProvider>(
             builder: (context, walletProvider, _) {
-              Wallet selectedWallet = walletProvider.wallets[_selectedWalletIndex];
+              Wallet selectedWallet =
+                  walletProvider.wallets[_selectedWalletIndex];
               return Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -49,21 +53,47 @@ class _HomeListState extends State<HomeList> {
               builder: (context, walletProvider, _) {
                 List<Wallet> wallets = walletProvider.wallets;
                 return ListView.builder(
-                  scrollDirection: Axis.horizontal, // Imposta la direzione dello scorrimento orizzontale
+                  scrollDirection: Axis
+                      .horizontal, // Imposta la direzione dello scorrimento orizzontale
                   itemCount: wallets.length,
                   itemBuilder: (context, index) {
                     return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8.0, horizontal: 8.0),
                       child: ElevatedButton(
                         onPressed: () {
                           setState(() {
-                            _selectedWalletIndex = index; // Imposta l'indice del wallet selezionato
+                            _selectedWalletIndex =
+                                index; // Imposta l'indice del wallet selezionato
                           });
                         },
                         style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                          elevation: MaterialStateProperty.all(0),
+                          shape : MaterialStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20.0),
+                              side: BorderSide(
+                                color:  Colors.black
+                                   
+                              ),
+                            ),
+                          ),
+                          foregroundColor:
+                              MaterialStateProperty.resolveWith<Color>(
                             (Set<MaterialState> states) {
-                              return _selectedWalletIndex == index ? Colors.blue : Colors.transparent; // Imposta il colore del pulsante in base allo stato
+                              return _selectedWalletIndex == index
+                                  ? Colors.white
+                                  : Colors
+                                      .black; // Imposta il colore del testo in base allo stato
+                            },
+                          ),
+                          backgroundColor:
+                              MaterialStateProperty.resolveWith<Color>(
+                            (Set<MaterialState> states) {
+                              return _selectedWalletIndex == index
+                                  ? Colors.black
+                                  : Colors
+                                      .white; // Imposta il colore del pulsante in base allo stato
                             },
                           ),
                         ),
@@ -80,7 +110,8 @@ class _HomeListState extends State<HomeList> {
           Expanded(
             child: Consumer<WalletProvider>(
               builder: (context, walletProvider, _) {
-                Wallet selectedWallet = walletProvider.wallets[_selectedWalletIndex];
+                Wallet selectedWallet =
+                    walletProvider.wallets[_selectedWalletIndex];
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -88,11 +119,14 @@ class _HomeListState extends State<HomeList> {
                     SizedBox(height: 10),
                     Expanded(
                       child: FutureBuilder<List<Transaction>>(
-                        future: DatabaseHelper().getTransactionsForWallet(selectedWallet.id!),
+                        future: DatabaseHelper()
+                            .getTransactionsForWallet(selectedWallet.id!),
                         builder: (context, snapshot) {
-                          if (snapshot.connectionState == ConnectionState.waiting) {
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
                             return Center(
-                              child: CircularProgressIndicator(), // Visualizza un indicatore di caricamento durante il recupero dei dati
+                              child:
+                                  CircularProgressIndicator(), // Visualizza un indicatore di caricamento durante il recupero dei dati
                             );
                           } else if (snapshot.hasError) {
                             return Center(
@@ -103,9 +137,24 @@ class _HomeListState extends State<HomeList> {
                             return ListView.builder(
                               itemCount: transactions.length,
                               itemBuilder: (context, index) {
-                                return ListTile(
-                                  title: Text(transactions.reversed.toList()[index].name ?? ''),
-                                  subtitle: Text("Data: ${transactions.reversed.toList()[index].date}, Valore: ${transactions.reversed.toList()[index].value}"),
+                                return Container(
+                                  margin: EdgeInsets.only(
+                                      bottom: 10, left: 10, right: 10),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: Color(0xffb3b3b3),
+                                    ),
+                                    borderRadius: BorderRadius.circular(10),
+                                    color: Colors.white,
+                                  ),
+                                  child: ListTile(
+                                    title: Text(transactions.reversed
+                                            .toList()[index]
+                                            .name ??
+                                        ''),
+                                    subtitle: Text(
+                                        "Data: ${transactions.reversed.toList()[index].date}, Valore: ${transactions.reversed.toList()[index].value}"),
+                                  ),
                                 );
                               },
                             );
