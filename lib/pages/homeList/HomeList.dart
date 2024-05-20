@@ -179,6 +179,10 @@ class _HomeListState extends State<HomeList> {
                             return ListView.builder(
                               itemCount: transactions.length,
                               itemBuilder: (context, index) {
+                                final transaction =
+                                    transactions.reversed.toList()[index];
+                                final date = DateTime.parse(transaction.date!);
+                                final formattedDate = _formatDateTime(date);
                                 return Container(
                                   margin: EdgeInsets.only(
                                       bottom: 10, left: 10, right: 10),
@@ -190,12 +194,9 @@ class _HomeListState extends State<HomeList> {
                                     color: Colors.white,
                                   ),
                                   child: ListTile(
-                                    title: Text(transactions.reversed
-                                            .toList()[index]
-                                            .name ??
-                                        ''),
+                                    title: Text(transaction.name ?? ''),
                                     subtitle: Text(
-                                        "Data: ${transactions.reversed.toList()[index].date}, Valore: ${transactions.reversed.toList()[index].value}"),
+                                        "Data: $formattedDate, Valore: ${transaction.value}"),
                                   ),
                                 );
                               },
@@ -212,6 +213,19 @@ class _HomeListState extends State<HomeList> {
         ],
       ),
     );
+  }
+
+  String _twoDigits(int n) {
+    if (n >= 10) return "$n";
+    return "0$n";
+  }
+
+  String _formatDateTime(DateTime dateTime) {
+    final formattedDate =
+        "${dateTime.year}/${_twoDigits(dateTime.month)}/${_twoDigits(dateTime.day)}";
+    final formattedTime =
+        "${_twoDigits(dateTime.hour)}:${_twoDigits(dateTime.minute)}";
+    return "$formattedDate $formattedTime";
   }
 
   Map<String, double> _calculateCategoryAmounts(
