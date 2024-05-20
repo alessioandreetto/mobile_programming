@@ -1,5 +1,5 @@
 import 'package:flutter/foundation.dart';
-import '../model/database_model.dart';  // Assicurati che il percorso sia corretto
+import '../model/database_model.dart'; // Assicurati che il percorso sia corretto
 
 class WalletProvider with ChangeNotifier {
   List<Wallet> _wallets = [];

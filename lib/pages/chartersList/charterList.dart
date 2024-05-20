@@ -3,7 +3,6 @@ import '../../model/database_model.dart';
 import '../../providers/wallet_provider.dart';
 import 'package:provider/provider.dart';
 
-
 class CharterList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
@@ -22,11 +21,13 @@ class CharterList extends StatelessWidget {
               builder: (context, walletProvider, _) {
                 List<Wallet> wallets = walletProvider.wallets;
                 return ListView.builder(
-                  scrollDirection: Axis.horizontal, // Imposta la direzione dello scorrimento orizzontale
+                  scrollDirection: Axis
+                      .horizontal, // Imposta la direzione dello scorrimento orizzontale
                   itemCount: wallets.length,
                   itemBuilder: (context, index) {
                     return Padding(
-                      padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8.0, horizontal: 8.0),
                       child: SizedBox(
                         height: 30, // Imposta l'altezza del pulsante a 30px
                         child: ElevatedButton(

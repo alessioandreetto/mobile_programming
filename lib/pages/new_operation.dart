@@ -30,9 +30,13 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
   DateTime? _selectedDate;
 
   List<Category> categories = [
-    Category(id: 1, name: 'Category 1'),
-    Category(id: 2, name: 'Category 2'),
-    Category(id: 3, name: 'Category 3'),
+    Category(id: 1, name: 'Auto'),
+    Category(id: 2, name: 'Banca'),
+    Category(id: 3, name: 'Casa'),
+    Category(id: 4, name: 'Intrattenimento'),
+    Category(id: 5, name: 'Shopping'),
+    Category(id: 6, name: 'Viaggio'),
+    Category(id: 7, name: 'Varie'),
   ];
   List<String> actionTypes = ['Entrata', 'Uscita', 'Exchange'];
 
@@ -64,10 +68,12 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
     if (picked != null && picked != _selectedDate) {
       setState(() {
         _selectedDate = picked;
-        _dateController.text = "${_selectedDate!.toLocal()}".split(' ')[0]; // Formatta la data come stringa
+        _dateController.text = "${_selectedDate!.toLocal()}"
+            .split(' ')[0]; // Formatta la data come stringa
       });
     }
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,7 +94,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
               keyboardType: TextInputType.number,
               decoration: InputDecoration(labelText: 'Valore'),
             ),
-                        TextField(
+            TextField(
               controller: _dateController,
               readOnly: true,
               decoration: InputDecoration(
@@ -156,7 +162,9 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
             ],
             SizedBox(height: 16.0),
             DropdownButtonFormField<Category>(
-              value: categories.firstWhere((category) => category.id == _selectedCategoryId, orElse: () => categories[0]),
+              value: categories.firstWhere(
+                  (category) => category.id == _selectedCategoryId,
+                  orElse: () => categories[0]),
               onChanged: (newValue) {
                 setState(() {
                   _selectedCategoryId = newValue!.id;
@@ -175,7 +183,8 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
             SizedBox(height: 16.0),
             ToggleButtons(
               children: _buildToggleButtons(),
-              isSelected: List.generate(actionTypes.length, (index) => _selectedActionIndex == index),
+              isSelected: List.generate(
+                  actionTypes.length, (index) => _selectedActionIndex == index),
               onPressed: (index) {
                 setState(() {
                   _selectedActionIndex = index;
@@ -186,7 +195,8 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
             ElevatedButton(
               onPressed: () async {
                 if (_selectedActionIndex == 2) {
-                  await _performExchangeTransaction(double.parse(_valueController.text));
+                  await _performExchangeTransaction(
+                      double.parse(_valueController.text));
                 } else {
                   await _performRegularTransaction();
                 }
@@ -195,7 +205,8 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                 _valueController.clear();
                 _dateController.clear();
 
-                Provider.of<WalletProvider>(context, listen: false).loadWallets();
+                Provider.of<WalletProvider>(context, listen: false)
+                    .loadWallets();
 
                 Navigator.pop(context);
               },
@@ -218,14 +229,17 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
     Transaction newTransaction = Transaction(
       name: _nameController.text,
       categoryId: _selectedCategoryId,
-      date: _selectedDate?.toIso8601String() ?? DateTime.now().toIso8601String(),
+      date:
+          _selectedDate?.toIso8601String() ?? DateTime.now().toIso8601String(),
       value: transactionValue,
-      transactionId: _wallets.firstWhere((wallet) => wallet.name == _selectedWallet).id,
+      transactionId:
+          _wallets.firstWhere((wallet) => wallet.name == _selectedWallet).id,
     );
 
     // Insert the transaction into the database
     await dbHelper.insertTransaction(newTransaction);
-    Wallet existingWallet = _wallets.firstWhere((wallet) => wallet.name == _selectedWallet);
+    Wallet existingWallet =
+        _wallets.firstWhere((wallet) => wallet.name == _selectedWallet);
 
     double newBalance = existingWallet.balance! + newTransaction.value!;
     Wallet updatedWallet = Wallet(
@@ -244,15 +258,20 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
     Transaction outgoingTransaction = Transaction(
       name: _nameController.text,
       categoryId: _selectedCategoryId,
-      date: _selectedDate?.toIso8601String() ?? DateTime.now().toIso8601String(),
+      date:
+          _selectedDate?.toIso8601String() ?? DateTime.now().toIso8601String(),
       value: outValue,
-      transactionId: _wallets.firstWhere((wallet) => wallet.name == _selectedWalletForExchangeOut).id,
+      transactionId: _wallets
+          .firstWhere((wallet) => wallet.name == _selectedWalletForExchangeOut)
+          .id,
     );
 
     // Inserisci la transazione di uscita nel database
     await dbHelper.insertTransaction(outgoingTransaction);
-    Wallet existingOutgoingWallet = _wallets.firstWhere((wallet) => wallet.name == _selectedWalletForExchangeOut);
-    double newOutgoingBalance = existingOutgoingWallet.balance! + outgoingTransaction.value!;
+    Wallet existingOutgoingWallet = _wallets
+        .firstWhere((wallet) => wallet.name == _selectedWalletForExchangeOut);
+    double newOutgoingBalance =
+        existingOutgoingWallet.balance! + outgoingTransaction.value!;
     Wallet updatedOutgoingWallet = Wallet(
       id: existingOutgoingWallet.id,
       name: existingOutgoingWallet.name,
@@ -264,15 +283,20 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
     Transaction incomingTransaction = Transaction(
       name: _nameController.text,
       categoryId: _selectedCategoryId,
-      date: _selectedDate?.toIso8601String() ?? DateTime.now().toIso8601String(),
+      date:
+          _selectedDate?.toIso8601String() ?? DateTime.now().toIso8601String(),
       value: value,
-      transactionId: _wallets.firstWhere((wallet) => wallet.name == _selectedWalletForExchangeIn).id,
+      transactionId: _wallets
+          .firstWhere((wallet) => wallet.name == _selectedWalletForExchangeIn)
+          .id,
     );
 
     // Inserisci la transazione di entrata nel database
     await dbHelper.insertTransaction(incomingTransaction);
-    Wallet existingIncomingWallet = _wallets.firstWhere((wallet) => wallet.name == _selectedWalletForExchangeIn);
-    double newIncomingBalance = existingIncomingWallet.balance! + incomingTransaction.value!;
+    Wallet existingIncomingWallet = _wallets
+        .firstWhere((wallet) => wallet.name == _selectedWalletForExchangeIn);
+    double newIncomingBalance =
+        existingIncomingWallet.balance! + incomingTransaction.value!;
     Wallet updatedIncomingWallet = Wallet(
       id: existingIncomingWallet.id,
       name: existingIncomingWallet.name,
@@ -280,11 +304,12 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
     );
     await dbHelper.updateWallet(updatedIncomingWallet);
   }
+
   List<Widget> _buildToggleButtons() {
     List<Widget> buttons = [];
     if (_wallets.length == 1) {
       // Se ho un solo portafoglio, mostrare solo Entrata e Uscita
-      
+
       actionTypes = ['Entrata', 'Uscita'];
       buttons = actionTypes.map((action) {
         return Text(action);

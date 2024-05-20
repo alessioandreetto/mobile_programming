@@ -67,15 +67,19 @@ class _HomeListState extends State<HomeList> {
                             onTapUp: (details) {
                               _handlePieChartTap(details, categoryAmounts);
                             },
-                            child: Container(
-                              width: 150,
-                              height: 150,
-                              child: PieChart(
-                                PieChartData(
-                                  sections:
-                                      _createPieChartSections(categoryAmounts),
-                                  sectionsSpace: 2,
-                                  centerSpaceRadius: 30,
+                            child: Padding(
+                              padding: const EdgeInsets.only(
+                                  right: 35.0), // Add padding here
+                              child: Container(
+                                width: 150,
+                                height: 150,
+                                child: PieChart(
+                                  PieChartData(
+                                    sections: _createPieChartSections(
+                                        categoryAmounts),
+                                    sectionsSpace: 2,
+                                    centerSpaceRadius: 30,
+                                  ),
                                 ),
                               ),
                             ),
@@ -256,6 +260,8 @@ class _HomeListState extends State<HomeList> {
       Colors.green,
       Colors.orange,
       Colors.purple,
+      Colors.yellow,
+      Colors.brown,
     ];
 
     List<PieChartSectionData> sections = [];
@@ -266,7 +272,7 @@ class _HomeListState extends State<HomeList> {
       sections.add(PieChartSectionData(
         color: fixedColors[index % fixedColors.length],
         value: amount,
-        title: 'Category ${index + 1}: ${(amount).toStringAsFixed(2)}€',
+        title: '${(amount).toStringAsFixed(2)}€',
         radius: isSelected ? 60 : 50, // Highlight selected category
         titleStyle: TextStyle(
           fontSize: isSelected ? 18 : 14,
