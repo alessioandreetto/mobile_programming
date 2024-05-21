@@ -117,12 +117,30 @@ class DatabaseHelper {
         where: '$colWalletid = ?', whereArgs: [walletId]);
     return result.map((item) => Transaction.fromMap(item)).toList();
   }
+
+  // Eliminazione di una transazione
+  Future<int> deleteTransaction(int id) async {
+    Database db = await this.database;
+    return await db
+        .delete(transactionsTable, where: '$colId = ?', whereArgs: [id]);
+  }
+
+  // Aggiorna una transazione esistente nel database
+  Future<int> updateTransaction(Transaction transaction) async {
+    Database db = await this.database;
+    return await db.update(
+      transactionsTable,
+      transaction.toMap(),
+      where: '$colId = ?',
+      whereArgs: [transaction.id],
+    );
+  }
 }
 
 class Wallet {
   int? id;
   String? name;
-  double ? balance;
+  double? balance;
 
   Wallet({this.id, this.name, this.balance});
 

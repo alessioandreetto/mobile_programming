@@ -187,20 +187,26 @@ class _HomeListState extends State<HomeList> {
                                     transactions.reversed.toList()[index];
                                 final date = DateTime.parse(transaction.date!);
                                 final formattedDate = _formatDateTime(date);
-                                return Container(
-                                  margin: EdgeInsets.only(
-                                      bottom: 10, left: 10, right: 10),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: Color(0xffb3b3b3),
+                                return GestureDetector(
+                                  onTap: () {
+                                    _navigateToTransactionDetail(
+                                        context, transaction);
+                                  },
+                                  child: Container(
+                                    margin: EdgeInsets.only(
+                                        bottom: 10, left: 10, right: 10),
+                                    decoration: BoxDecoration(
+                                      border: Border.all(
+                                        color: Color(0xffb3b3b3),
+                                      ),
+                                      borderRadius: BorderRadius.circular(10),
+                                      color: Colors.white,
                                     ),
-                                    borderRadius: BorderRadius.circular(10),
-                                    color: Colors.white,
-                                  ),
-                                  child: ListTile(
-                                    title: Text(transaction.name ?? ''),
-                                    subtitle: Text(
-                                        "Data: $formattedDate, Valore: ${transaction.value}"),
+                                    child: ListTile(
+                                      title: Text(transaction.name ?? ''),
+                                      subtitle: Text(
+                                          "Data: $formattedDate, Valore: ${transaction.value}"),
+                                    ),
                                   ),
                                 );
                               },
@@ -335,5 +341,88 @@ class _HomeListState extends State<HomeList> {
       total += amount;
     });
     return total;
+  }
+
+  void _navigateToTransactionDetail(
+      BuildContext context, Transaction transaction) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => TransactionDetailPage(transaction: transaction),
+      ),
+    );
+  }
+}
+
+class TransactionDetailPage extends StatelessWidget {
+  final Transaction transaction;
+
+  TransactionDetailPage({required this.transaction});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text('Dettaglio Transazione'),
+      ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text('Nome Transazione: ${transaction.name}'),
+            Text('Valore: ${transaction.value}'),
+            Text('Categoria: ${transaction.categoryId}'),
+            ElevatedButton(
+              onPressed: () {
+                _editTransaction(context);
+              },
+              child: Text('Modifica Transazione'),
+            ),
+            IconButton(
+              onPressed: () {
+                _deleteTransaction(context);
+              },
+              icon: Icon(Icons.delete), // Icona del cestino
+              tooltip: 'Elimina Transazione', // Testo informativo
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _editTransaction(BuildContext context) {
+    // Implement editing logic here
+  }
+
+  void _deleteTransaction(BuildContext context) async {
+    bool confirmed = await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Elimina transazione'),
+        content: Text('Sei sicuro di voler eliminare questa transazione?'),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(false); // Return false when canceled
+            },
+            child: Text('Annulla'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(true); // Return true when confirmed
+            },
+            child: Text('Elimina'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed) {
+      // Call deleteTransaction method from WalletProvider
+      Provider.of<WalletProvider>(context, listen: false)
+          .deleteTransaction(transaction.id!);
+      Navigator.of(context).pop(); // Close detail page after deletion
+    }
   }
 }
