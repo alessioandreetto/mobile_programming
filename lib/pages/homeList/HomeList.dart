@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/pages/new_operation.dart';
 import 'dart:math' as Math;
 import '../../model/database_model.dart';
 import '../../providers/wallet_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
-import '../elimina_temp.dart';
+import '../new_operation.dart';
 
 class HomeList extends StatefulWidget {
   @override
@@ -53,7 +54,10 @@ class _HomeListState extends State<HomeList> {
                     FutureBuilder<List<Transaction>>(
                       future: _fetchNegativeTransactions(selectedWallet.id!),
                       builder: (context, snapshot) {
-                       if (snapshot.hasError) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Center(child: CircularProgressIndicator());
+                        } else if (snapshot.hasError) {
                           return Center(child: Text('Error: ${snapshot.error}'));
                         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                           return Center(child: Text('No transactions found'));
@@ -351,7 +355,7 @@ class _HomeListState extends State<HomeList> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => TransactionDetailPage(transaction: transaction),
+        builder: (context) => NewTransactionPage(transaction: transaction),
       ),
     );
   }
