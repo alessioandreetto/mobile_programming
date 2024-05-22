@@ -4,6 +4,7 @@ import '../../model/database_model.dart';
 import '../../providers/wallet_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
+import '../elimina_temp.dart';
 
 class HomeList extends StatefulWidget {
   @override
@@ -50,17 +51,14 @@ class _HomeListState extends State<HomeList> {
                       ],
                     ),
                     FutureBuilder<List<Transaction>>(
-                      future: DatabaseHelper()
-                          .getTransactionsForWallet(selectedWallet.id!),
+                      future: _fetchNegativeTransactions(selectedWallet.id!),
                       builder: (context, snapshot) {
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return CircularProgressIndicator();
-                        } else if (snapshot.hasError) {
-                          return Text('Error: ${snapshot.error}');
+                       if (snapshot.hasError) {
+                          return Center(child: Text('Error: ${snapshot.error}'));
+                        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                          return Center(child: Text('No transactions found'));
                         } else {
                           List<Transaction> transactions = snapshot.data!;
-
                           Map<String, double> categoryAmounts =
                               _calculateCategoryAmounts(transactions);
                           return GestureDetector(
@@ -68,8 +66,7 @@ class _HomeListState extends State<HomeList> {
                               _handlePieChartTap(details, categoryAmounts);
                             },
                             child: Padding(
-                              padding: const EdgeInsets.only(
-                                  right: 35.0), // Add padding here
+                              padding: const EdgeInsets.only(right: 35.0),
                               child: Container(
                                 width: 150,
                                 height: 150,
@@ -109,8 +106,7 @@ class _HomeListState extends State<HomeList> {
                         onPressed: () {
                           setState(() {
                             _selectedWalletIndex = index;
-                            _selectedCategory =
-                                null; // Reset selected category when changing wallet
+                            _selectedCategory = null;
                           });
                         },
                         style: ButtonStyle(
@@ -159,8 +155,7 @@ class _HomeListState extends State<HomeList> {
                     SizedBox(height: 10),
                     Expanded(
                       child: FutureBuilder<List<Transaction>>(
-                        future: DatabaseHelper()
-                            .getTransactionsForWallet(selectedWallet.id!),
+                        future: _fetchNegativeTransactions(selectedWallet.id!),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
@@ -170,6 +165,10 @@ class _HomeListState extends State<HomeList> {
                           } else if (snapshot.hasError) {
                             return Center(
                               child: Text('Error: ${snapshot.error}'),
+                            );
+                          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                            return Center(
+                              child: Text('No transactions found'),
                             );
                           } else {
                             List<Transaction> transactions = snapshot.data!;
@@ -223,6 +222,12 @@ class _HomeListState extends State<HomeList> {
         ],
       ),
     );
+  }
+
+  Future<List<Transaction>> _fetchNegativeTransactions(int walletId) async {
+    List<Transaction> transactions =
+        await DatabaseHelper().getTransactionsForWallet(walletId);
+    return transactions.where((transaction) => transaction.value! < 0).toList();
   }
 
   String _twoDigits(int n) {
@@ -279,7 +284,7 @@ class _HomeListState extends State<HomeList> {
         color: fixedColors[index % fixedColors.length],
         value: amount,
         title: '${(amount).toStringAsFixed(2)}€',
-        radius: isSelected ? 60 : 50, // Highlight selected category
+        radius: isSelected ? 60 : 50,
         titleStyle: TextStyle(
           fontSize: isSelected ? 18 : 14,
           fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
@@ -300,18 +305,16 @@ class _HomeListState extends State<HomeList> {
     setState(() {
       String tappedCategory = categoryAmounts.keys.elementAt(categoryIndex);
       if (_selectedCategory == tappedCategory) {
-        // If the tapped category is already selected, deselect it
         _selectedCategory = null;
       } else {
-        // Otherwise, select the tapped category
         _selectedCategory = tappedCategory;
       }
     });
   }
 
   double _getAngle(Offset position) {
-    final centerX = 75.0; // Assuming the center of the PieChart
-    final centerY = 75.0; // Assuming the center of the PieChart
+    final centerX = 75.0;
+    final centerY = 75.0;
     final dx = position.dx - centerX;
     final dy = position.dy - centerY;
     final angle = (Math.atan2(dy, dx) * 180 / Math.pi + 360) % 360;
@@ -332,7 +335,7 @@ class _HomeListState extends State<HomeList> {
       currentAngle += sweepAngle;
       index++;
     }
-    return -1; // Default case
+    return -1;
   }
 
   double _getTotalAmount(Map<String, double> categoryAmounts) {
@@ -351,78 +354,5 @@ class _HomeListState extends State<HomeList> {
         builder: (context) => TransactionDetailPage(transaction: transaction),
       ),
     );
-  }
-}
-
-class TransactionDetailPage extends StatelessWidget {
-  final Transaction transaction;
-
-  TransactionDetailPage({required this.transaction});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Dettaglio Transazione'),
-      ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text('Nome Transazione: ${transaction.name}'),
-            Text('Valore: ${transaction.value}'),
-            Text('Categoria: ${transaction.categoryId}'),
-            ElevatedButton(
-              onPressed: () {
-                _editTransaction(context);
-              },
-              child: Text('Modifica Transazione'),
-            ),
-            IconButton(
-              onPressed: () {
-                _deleteTransaction(context);
-              },
-              icon: Icon(Icons.delete), // Icona del cestino
-              tooltip: 'Elimina Transazione', // Testo informativo
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  void _editTransaction(BuildContext context) {
-    // Implement editing logic here
-  }
-
-  void _deleteTransaction(BuildContext context) async {
-    bool confirmed = await showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Elimina transazione'),
-        content: Text('Sei sicuro di voler eliminare questa transazione?'),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(false); // Return false when canceled
-            },
-            child: Text('Annulla'),
-          ),
-          TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(true); // Return true when confirmed
-            },
-            child: Text('Elimina'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed) {
-      // Call deleteTransaction method from WalletProvider
-      Provider.of<WalletProvider>(context, listen: false)
-          .deleteTransaction(transaction.id!);
-      Navigator.of(context).pop(); // Close detail page after deletion
-    }
   }
 }
