@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import '../model/database_model.dart';
 import '../providers/wallet_provider.dart';
@@ -14,12 +16,14 @@ class NewTransactionPage extends StatefulWidget {
   final TextEditingController nameController;
   final TextEditingController valueController;
   final TextEditingController dateController;
+  final TextEditingController walletController;
   final Transaction? transaction;
 
   NewTransactionPage({this.transaction}) 
     : nameController = TextEditingController(text: transaction?.name),
-      valueController = TextEditingController(),
-      dateController = TextEditingController();
+      valueController = TextEditingController(text: transaction?.value.toString()),
+      dateController = TextEditingController(text: transaction?.date),
+      walletController = TextEditingController(text: transaction?.categoryId.toString());
 
   @override
   _NewTransactionPageState createState() => _NewTransactionPageState();

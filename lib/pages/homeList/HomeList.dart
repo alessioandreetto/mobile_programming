@@ -48,7 +48,7 @@ class _HomeListState extends State<HomeList> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text("Nome Wallet: ${selectedWallet.name}"),
-                        Text("Bilancio: ${selectedWallet.balance}"),
+                        Text("Bilancio: ${selectedWallet.balance} €"),
                       ],
                     ),
                     FutureBuilder<List<Transaction>>(
@@ -208,7 +208,7 @@ class _HomeListState extends State<HomeList> {
                                     child: ListTile(
                                       title: Text(transaction.name ?? ''),
                                       subtitle: Text(
-                                          "Data: $formattedDate, Valore: ${transaction.value}"),
+                                          "Data: $formattedDate, Valore: ${transaction.value} €"),
                                     ),
                                   ),
                                 );
@@ -241,10 +241,10 @@ class _HomeListState extends State<HomeList> {
 
   String _formatDateTime(DateTime dateTime) {
     final formattedDate =
-        "${dateTime.year}/${_twoDigits(dateTime.month)}/${_twoDigits(dateTime.day)}";
+        "${dateTime.year}-${_twoDigits(dateTime.month)}-${_twoDigits(dateTime.day)}";
     final formattedTime =
         "${_twoDigits(dateTime.hour)}:${_twoDigits(dateTime.minute)}";
-    return "$formattedDate $formattedTime";
+    return "$formattedDate";
   }
 
   Map<String, double> _calculateCategoryAmounts(
