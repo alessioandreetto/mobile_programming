@@ -14,7 +14,19 @@ class HomeList extends StatefulWidget {
 
 class _HomeListState extends State<HomeList> {
   late int _selectedWalletIndex;
+  double valoreCategoria = 0;
+  String nomeCategoria = '';
   String? _selectedCategory;
+
+  List<Category> categories = [
+    Category(id: 1, name: 'Auto'),
+    Category(id: 2, name: 'Banca'),
+    Category(id: 3, name: 'Casa'),
+    Category(id: 4, name: 'Intrattenimento'),
+    Category(id: 5, name: 'Shopping'),
+    Category(id: 6, name: 'Viaggio'),
+    Category(id: 7, name: 'Varie'),
+  ];
 
   @override
   void initState() {
@@ -49,14 +61,18 @@ class _HomeListState extends State<HomeList> {
                       children: [
                         Text("Nome Wallet: ${selectedWallet.name}"),
                         Text("Bilancio: ${selectedWallet.balance} €"),
+                        if (_selectedCategory != null)
+                          Text("$nomeCategoria :  $valoreCategoria €"),
                       ],
                     ),
                     FutureBuilder<List<Transaction>>(
                       future: _fetchNegativeTransactions(selectedWallet.id!),
                       builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                          return Center(child: Text('Error: ${snapshot.error}'));
-                        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        if (snapshot.hasError) {
+                          return Center(
+                              child: Text('Error: ${snapshot.error}'));
+                        } else if (!snapshot.hasData ||
+                            snapshot.data!.isEmpty) {
                           return Center(child: Text('No transactions found'));
                         } else {
                           List<Transaction> transactions = snapshot.data!;
@@ -76,7 +92,7 @@ class _HomeListState extends State<HomeList> {
                                     sections: _createPieChartSections(
                                         categoryAmounts),
                                     sectionsSpace: 2,
-                                    centerSpaceRadius: 30,
+                                    centerSpaceRadius: 0,
                                   ),
                                 ),
                               ),
@@ -167,7 +183,8 @@ class _HomeListState extends State<HomeList> {
                             return Center(
                               child: Text('Error: ${snapshot.error}'),
                             );
-                          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                          } else if (!snapshot.hasData ||
+                              snapshot.data!.isEmpty) {
                             return Center(
                               child: Text('No transactions found'),
                             );
@@ -284,13 +301,10 @@ class _HomeListState extends State<HomeList> {
       sections.add(PieChartSectionData(
         color: fixedColors[index % fixedColors.length],
         value: amount,
-        title: '${(amount).toStringAsFixed(2)}€',
-        radius: isSelected ? 60 : 50,
-        titleStyle: TextStyle(
-          fontSize: isSelected ? 18 : 14,
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-        ),
+        title: '',
+        radius: isSelected ? 100 : 90,
       ));
+
       index++;
     });
 
@@ -309,6 +323,8 @@ class _HomeListState extends State<HomeList> {
         _selectedCategory = null;
       } else {
         _selectedCategory = tappedCategory;
+        nomeCategoria = categories[int.parse(tappedCategory) - 1].name;
+        valoreCategoria = categoryAmounts[tappedCategory]!;
       }
     });
   }
