@@ -245,8 +245,7 @@ class _HomeListState extends State<ChartsList> {
           Container(
             height: 50,
             child: Consumer<WalletProvider>(
-              builder: (context
-, walletProvider, _) {
+              builder: (context, walletProvider, _) {
                 List<Wallet> wallets = walletProvider.wallets;
                 return ListView.builder(
                   scrollDirection: Axis.horizontal,
@@ -392,33 +391,37 @@ class _HomeListState extends State<ChartsList> {
     return result;
   }
 
-  Future<List<Transaction>> _fetchNegativeTransactions(int walletId, String selectedButton) async {
-    // Recupera il periodo selezionato
-    DateTime startDate = DateTime.now();
-    DateTime now = DateTime.now();
-    if (selectedButton == 'Today') {
-      startDate = DateTime(now.year, now.month, now.day);
-    } else if (selectedButton == 'Weekly') {
-      startDate = now.subtract(Duration(days: now.weekday - 1));
-    } else if (selectedButton == 'Monthly') {
-      startDate = DateTime(now.year, now.month, 1);
-    } else if (selectedButton == 'Yearly') {
-      startDate = DateTime(now.year, 1, 1);
-    }
-
-    // Recupera le transazioni in base al periodo selezionato
-    List<Transaction> transactions =
-        await DatabaseHelper().getTransactionsForWallet(walletId);
-
-    // Filtra le transazioni in base alla data
-    transactions = transactions.where((transaction) {
-      DateTime transactionDate = DateTime.parse(transaction.date!);
-      return transactionDate.isAfter(startDate.subtract(Duration(days: 1))) &&
-          transactionDate.isBefore(now.add(Duration(days: 1)));
-    }).toList();
-
-    return transactions.toList();
+Future<List<Transaction>> _fetchNegativeTransactions(int walletId, String selectedButton) async {
+  // Recupera il periodo selezionato
+  DateTime startDate = DateTime.now();
+  DateTime now = DateTime.now();
+  if (selectedButton == 'Today') {
+    startDate = DateTime(now.year, now.month, now.day);
+  } else if (selectedButton == 'Weekly') {
+    startDate = now.subtract(Duration(days: now.weekday - 1));
+  } else if (selectedButton == 'Monthly') {
+    startDate = DateTime(now.year, now.month, 1);
+  } else if (selectedButton == 'Yearly') {
+    startDate = DateTime(now.year, 1, 1);
   }
+
+  // Recupera le transazioni in base al periodo selezionato
+  List<Transaction> transactions =
+      await DatabaseHelper().getTransactionsForWallet(walletId);
+
+  // Filtra le transazioni in base alla data e al periodo selezionato
+  transactions = transactions.where((transaction) {
+    DateTime transactionDate = DateTime.parse(transaction.date!);
+    return transactionDate.isAfter(startDate.subtract(Duration(days: 1))) &&
+        transactionDate.isBefore(now.add(Duration(days: 1)));
+  }).toList();
+
+  // Ordina le transazioni per data
+  transactions.sort((a, b) => DateTime.parse(a.date!).compareTo(DateTime.parse(b.date!)));
+
+  return transactions;
+}
+
 
   String _twoDigits(int n) {
     if (n >= 10) return "$n";
