@@ -162,6 +162,34 @@ class _ChartsPageState extends State<ChartsList> {
               ],
             ),
           ),
+          // Aggiungi qui il grafico LineChart
+          Container(
+            height: 200,
+            padding: EdgeInsets.symmetric(horizontal: 16.0),
+            child: LineChart(
+              LineChartData(
+                gridData: FlGridData(show: false),
+                titlesData: FlTitlesData(show: false),
+                borderData: FlBorderData(show: false),
+                lineBarsData: [
+                  LineChartBarData(
+                    spots: [
+                      FlSpot(0, 1),
+                      FlSpot(1, 1.5),
+                      FlSpot(2, 1.4),
+                      FlSpot(3, 2.2),
+                      FlSpot(4, 1.8),
+                    ],
+                    isCurved: true,
+                   
+                    barWidth: 4,
+                    isStrokeCapRound: true,
+                    belowBarData: BarAreaData(show: false),
+                  ),
+                ],
+              ),
+            ),
+          ),
           // Aggiungi qui i pulsanti per selezionare il portafoglio
           Container(
             height: 50,
