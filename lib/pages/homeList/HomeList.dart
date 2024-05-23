@@ -299,7 +299,7 @@ class _HomeListState extends State<HomeList> {
     categoryAmounts.forEach((category, amount) {
       bool isSelected = _selectedCategory == category;
       sections.add(PieChartSectionData(
-        color: fixedColors[index % fixedColors.length],
+        color: fixedColors[int.parse(category)-1],
         value: amount,
         title: '',
         radius: isSelected ? 100 : 90,
