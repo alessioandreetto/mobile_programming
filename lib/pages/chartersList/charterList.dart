@@ -69,6 +69,7 @@ class _HomeListState extends State<ChartsList> {
                               setState(() {
                                 _selectedButton = 'Today';
                               });
+                              _fetchAndUpdateChartData(selectedWallet.id!);
                             },
                             style: ButtonStyle(
                               shape: MaterialStateProperty.all<
@@ -101,6 +102,7 @@ class _HomeListState extends State<ChartsList> {
                               setState(() {
                                 _selectedButton = 'Weekly';
                               });
+                              _fetchAndUpdateChartData(selectedWallet.id!);
                             },
                             style: ButtonStyle(
                               shape: MaterialStateProperty.all<
@@ -133,6 +135,7 @@ class _HomeListState extends State<ChartsList> {
                               setState(() {
                                 _selectedButton = 'Monthly';
                               });
+                              _fetchAndUpdateChartData(selectedWallet.id!);
                             },
                             style: ButtonStyle(
                               shape: MaterialStateProperty.all<
@@ -165,6 +168,7 @@ class _HomeListState extends State<ChartsList> {
                               setState(() {
                                 _selectedButton = 'Yearly';
                               });
+                              _fetchAndUpdateChartData(selectedWallet.id!);
                             },
                             style: ButtonStyle(
                               shape: MaterialStateProperty.all<
@@ -197,7 +201,7 @@ class _HomeListState extends State<ChartsList> {
                       padding: EdgeInsets.symmetric(
                           vertical: 20.0, horizontal: 16.0),
                       child: FutureBuilder<Map<String, dynamic>>(
-                        future: _fetchTransactions(selectedWallet.id!),
+                        future: _fetchTransactions(selectedWallet.id!, _selectedButton),
                         builder: (context, snapshot) {
                           if (snapshot.hasError) {
                             return Center(
@@ -241,15 +245,15 @@ class _HomeListState extends State<ChartsList> {
           Container(
             height: 50,
             child: Consumer<WalletProvider>(
-              builder: (context, walletProvider, _) {
+              builder: (context
+, walletProvider, _) {
                 List<Wallet> wallets = walletProvider.wallets;
                 return ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: wallets.length,
                   itemBuilder: (context, index) {
                     return Padding(
-                      padding
-: const EdgeInsets.symmetric(
+                      padding: const EdgeInsets.symmetric(
                           vertical: 8.0, horizontal: 8.0),
                       child: ElevatedButton(
                         onPressed: () {
@@ -257,6 +261,7 @@ class _HomeListState extends State<ChartsList> {
                             _selectedWalletIndex = index;
                             _selectedCategory = null;
                           });
+                          _fetchAndUpdateChartData(wallets[index].id!);
                         },
                         style: ButtonStyle(
                           elevation: MaterialStateProperty.all(0),
@@ -304,7 +309,7 @@ class _HomeListState extends State<ChartsList> {
                     SizedBox(height: 10),
                     Expanded(
                       child: FutureBuilder<List<Transaction>>(
-                        future: _fetchNegativeTransactions(selectedWallet.id!),
+                        future: _fetchNegativeTransactions(selectedWallet.id!, _selectedButton),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
@@ -374,46 +379,45 @@ class _HomeListState extends State<ChartsList> {
     );
   }
 
-Future<List<Transaction>> _fetchNegativeTransactions(int walletId) async {
-  // Recupera il periodo selezionato
-  DateTime startDate = DateTime.now();
-  DateTime now = DateTime.now();
-  if (_selectedButton == 'Today') {
-    startDate = DateTime(now.year, now.month, now.day);
-  } else if (_selectedButton == 'Weekly') {
-    startDate = now.subtract(Duration(days: now.weekday - 1));
-  } else if (_selectedButton == 'Monthly') {
-    startDate = DateTime(now.year, now.month, 1);
-  } else if (_selectedButton == 'Yearly') {
-    startDate = DateTime(now.year, 1, 1);
-  }
-
-  // Recupera le transazioni in base al periodo selezionato
-  List<Transaction> transactions =
-      await DatabaseHelper().getTransactionsForWallet(walletId);
-
-  // Filtra le transazioni in base alla data
-  transactions = transactions.where((transaction) {
-    DateTime transactionDate = DateTime.parse(transaction.date!);
-    return transactionDate.isAfter(startDate.subtract(Duration(days: 1))) &&
-        transactionDate.isBefore(now.add(Duration(days: 1)));
-  }).toList();
-
-  return transactions.toList();
-}
-
-
-  Future<Map<String, dynamic>> _fetchTransactions(int walletId) async {
+  Future<Map<String, dynamic>> _fetchTransactions(int walletId, String selectedButton) async {
     Map<String, dynamic> result = {};
 
     Wallet wallet = await DatabaseHelper().getWalletById(walletId);
     result['wallet'] = wallet;
 
     List<Transaction> transactions =
-        await DatabaseHelper().getTransactionsForWallet(walletId);
+        await _fetchNegativeTransactions(walletId, selectedButton);
     result['transactions'] = transactions;
 
     return result;
+  }
+
+  Future<List<Transaction>> _fetchNegativeTransactions(int walletId, String selectedButton) async {
+    // Recupera il periodo selezionato
+    DateTime startDate = DateTime.now();
+    DateTime now = DateTime.now();
+    if (selectedButton == 'Today') {
+      startDate = DateTime(now.year, now.month, now.day);
+    } else if (selectedButton == 'Weekly') {
+      startDate = now.subtract(Duration(days: now.weekday - 1));
+    } else if (selectedButton == 'Monthly') {
+      startDate = DateTime(now.year, now.month, 1);
+    } else if (selectedButton == 'Yearly') {
+      startDate = DateTime(now.year, 1, 1);
+    }
+
+    // Recupera le transazioni in base al periodo selezionato
+    List<Transaction> transactions =
+        await DatabaseHelper().getTransactionsForWallet(walletId);
+
+    // Filtra le transazioni in base alla data
+    transactions = transactions.where((transaction) {
+      DateTime transactionDate = DateTime.parse(transaction.date!);
+      return transactionDate.isAfter(startDate.subtract(Duration(days: 1))) &&
+          transactionDate.isBefore(now.add(Duration(days: 1)));
+    }).toList();
+
+    return transactions.toList();
   }
 
   String _twoDigits(int n) {
@@ -461,5 +465,11 @@ Future<List<Transaction>> _fetchNegativeTransactions(int walletId) async {
         builder: (context) => NewTransactionPage(transaction: transaction),
       ),
     );
+  }
+
+  void _fetchAndUpdateChartData(int walletId) {
+    setState(() {
+      _transactionsFuture = _fetchTransactions(walletId, _selectedButton);
+    });
   }
 }
