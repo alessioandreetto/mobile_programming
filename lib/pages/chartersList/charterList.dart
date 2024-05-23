@@ -243,8 +243,9 @@ class _ChartsPageState extends State<ChartsList> {
               builder: (context, walletProvider, _) {
                 Wallet selectedWallet =
                     walletProvider.wallets[_selectedWalletIndex];
-                return FutureBuilder<List<Transaction>>(
-                  future: _fetchTransactions(selectedWallet.id!),
+                return FutureBuilder<Map<String, dynamic>>(
+                 
+future: _fetchTransactions(selectedWallet.id!),
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return Center(
@@ -254,15 +255,16 @@ class _ChartsPageState extends State<ChartsList> {
                       return Center(
                         child: Text('Error: ${snapshot.error}'),
                       );
-                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                    } else if (!snapshot.hasData || snapshot.data!['transactions'].isEmpty) {
                       return Center(
                         child: Text('No transactions found'),
                       );
                     } else {
-                      List<Transaction> transactions = snapshot.data!;
-                      
+                      Wallet selectedWallet = snapshot.data!['wallet'];
+                      List<Transaction> transactions = snapshot.data!['transactions'];
+
                       // Calcoliamo i dati per il grafico
-                      _calculateChartData(transactions);
+                      _calculateChartData(transactions, selectedWallet);
 
                       return ListView.builder(
                         itemCount: transactions.length,
@@ -305,10 +307,17 @@ class _ChartsPageState extends State<ChartsList> {
     );
   }
 
-  Future<List<Transaction>> _fetchTransactions(int walletId) async {
+  Future<Map<String, dynamic>> _fetchTransactions(int walletId) async {
+    Map<String, dynamic> result = {};
+
+    Wallet wallet = await DatabaseHelper().getWalletById(walletId);
+    result['wallet'] = wallet;
+
     List<Transaction> transactions =
         await DatabaseHelper().getTransactionsForWallet(walletId);
-    return transactions;
+    result['transactions'] = transactions;
+
+    return result;
   }
 
   String _twoDigits(int n) {
@@ -334,14 +343,30 @@ class _ChartsPageState extends State<ChartsList> {
     );
   }
 
-  void _calculateChartData(List<Transaction> transactions) {
-    // Resetta la lista dei dati del grafico
-    _chartData = [];
+void _calculateChartData(List<Transaction> transactions, Wallet wallet) {
+  // Resetta la lista dei dati del grafico
+  _chartData = [];
 
-    // Aggiunge i dati delle transazioni alla lista dei dati del grafico
-    for (int i = 0; i < transactions.length; i++) {
-      _chartData.add(FlSpot(i.toDouble(), transactions[i].value!));
-    }
+  // Inizializza il saldo con il saldo attuale del portafoglio
+  double balance = wallet.balance ?? 0;
+
+  // Inizializza la somma cumulativa delle transazioni a zero
+  double cumulativeSum = 0;
+
+  // Aggiunge il saldo attuale come ultimo punto nel grafico
+  _chartData.add(FlSpot(transactions.length.toDouble(), balance));
+
+  // Calcola il saldo retroattivamente partendo dal saldo attuale
+  for (int i = transactions.length - 1; i >= 0; i--) {
+    // Aggiunge il valore della transazione alla somma cumulativa
+    cumulativeSum += transactions[i].value!;
+    // Calcola il saldo retroattivo sottraendo la somma cumulativa dal saldo attuale
+    double currentBalance = balance - cumulativeSum;
+    // Aggiunge il saldo retroattivo come punto nel grafico
+    _chartData.insert(0, FlSpot(i.toDouble(), currentBalance));
   }
 }
 
+
+
+}
