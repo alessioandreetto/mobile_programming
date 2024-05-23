@@ -248,7 +248,8 @@ class _HomeListState extends State<ChartsList> {
                   itemCount: wallets.length,
                   itemBuilder: (context, index) {
                     return Padding(
-                      padding: const EdgeInsets.symmetric(
+                      padding
+: const EdgeInsets.symmetric(
                           vertical: 8.0, horizontal: 8.0),
                       child: ElevatedButton(
                         onPressed: () {
@@ -373,11 +374,34 @@ class _HomeListState extends State<ChartsList> {
     );
   }
 
-  Future<List<Transaction>> _fetchNegativeTransactions(int walletId) async {
-    List<Transaction> transactions =
-        await DatabaseHelper().getTransactionsForWallet(walletId);
-    return transactions.toList();
+Future<List<Transaction>> _fetchNegativeTransactions(int walletId) async {
+  // Recupera il periodo selezionato
+  DateTime startDate = DateTime.now();
+  DateTime now = DateTime.now();
+  if (_selectedButton == 'Today') {
+    startDate = DateTime(now.year, now.month, now.day);
+  } else if (_selectedButton == 'Weekly') {
+    startDate = now.subtract(Duration(days: now.weekday - 1));
+  } else if (_selectedButton == 'Monthly') {
+    startDate = DateTime(now.year, now.month, 1);
+  } else if (_selectedButton == 'Yearly') {
+    startDate = DateTime(now.year, 1, 1);
   }
+
+  // Recupera le transazioni in base al periodo selezionato
+  List<Transaction> transactions =
+      await DatabaseHelper().getTransactionsForWallet(walletId);
+
+  // Filtra le transazioni in base alla data
+  transactions = transactions.where((transaction) {
+    DateTime transactionDate = DateTime.parse(transaction.date!);
+    return transactionDate.isAfter(startDate.subtract(Duration(days: 1))) &&
+        transactionDate.isBefore(now.add(Duration(days: 1)));
+  }).toList();
+
+  return transactions.toList();
+}
+
 
   Future<Map<String, dynamic>> _fetchTransactions(int walletId) async {
     Map<String, dynamic> result = {};
