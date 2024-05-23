@@ -18,7 +18,7 @@ class _HomeListState extends State<ChartsList> {
   double valoreCategoria = 0;
   String nomeCategoria = '';
   String? _selectedCategory;
-    List<FlSpot> _chartData = []; // Lista per i dati del grafico
+  List<FlSpot> _chartData = []; // Lista per i dati del grafico
   late Future<Map<String, dynamic>> _transactionsFuture;
 
   List<Category> categories = [
@@ -58,188 +58,180 @@ class _HomeListState extends State<ChartsList> {
               return Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
-
                   children: [
                     Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                SizedBox(
-                  width: 85,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        _selectedButton = 'Today';
-                      });
-                    },
-                    style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                      ),
-                      elevation: MaterialStateProperty.all(0),
-                      backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
-                        return _selectedButton == 'Today' ? Color(0xffE63C3A) : Colors.transparent;
-                      }),
-                    ),
-                    child: Text('Today', style: TextStyle(fontSize: 12, color: _selectedButton == 'Today' ? Colors.black : Color(0xffb3b3b3))),
-                  ),
-                ),
-                SizedBox(
-                  width: 90,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        _selectedButton = 'Weekly';
-                      });
-                    },
-                    style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                      ),
-                      elevation: MaterialStateProperty.all(0),
-                      backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
-                        return _selectedButton == 'Weekly' ? Color(0xffE63C3A) : Colors.transparent;
-                      }),
-                    ),
-                    child: Text('Weekly', style: TextStyle(fontSize: 12, color: _selectedButton == 'Weekly' ? Colors.black : Color(0xffb3b3b3))),
-                  ),
-                ),
-                SizedBox(
-                  width: 95,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        _selectedButton = 'Monthly';
-                      });
-                    },
-                    style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                      ),
-                      elevation: MaterialStateProperty.all(0),
-                      backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
-                        return _selectedButton == 'Monthly' ? Color(0xffE63C3A) : Colors.transparent;
-                      }),
-                    ),
-                    child: Text('Monthly', style: TextStyle(fontSize: 12, color: _selectedButton == 'Monthly' ? Colors.black : Color(0xffb3b3b3))),
-                  ),
-                ),
-                SizedBox(
-                  width: 85,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      setState(() {
-                        _selectedButton = 'Yearly';
-                      });
-                    },
-                    style: ButtonStyle(
-                      shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                        RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                      ),
-                      elevation: MaterialStateProperty.all(0),
-                      backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
-                        return _selectedButton == 'Yearly' ? Color(0xffE63C3A) : Colors.transparent;
-                      }),
-                    ),
-                    child: Text('Yearly', style: TextStyle(fontSize: 12, color: _selectedButton == 'Yearly' ? Colors.black : Color(0xffb3b3b3))),
-                  ),
-                ),
-              ],
-            ),
-                   /*  Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text("Nome Wallet: ${selectedWallet.name}"),
-                            Text("Bilancio: ${selectedWallet.balance} €"),
-                            if (_selectedCategory != null)
-                              Text("$nomeCategoria :  $valoreCategoria €"),
-                          ],
-                        ),
-                        FutureBuilder<List<Transaction>>(
-                          future: _fetchNegativeTransactions(selectedWallet.id!),
-                          builder: (context, snapshot) {
-                            if (snapshot.hasError) {
-                              return Center(
-                                  child: Text('Error: ${snapshot.error}'));
-                            } else if (!snapshot.hasData ||
-                                snapshot.data!.isEmpty) {
-                              return Center(child: Text('No transactions found'));
-                            } else {
-                              List<Transaction> transactions = snapshot.data!;
-                              Map<String, double> categoryAmounts =
-                                  _calculateCategoryAmounts(transactions);
-                              return GestureDetector(
-                                onTapUp: (details) {
-                                  _handlePieChartTap(details, categoryAmounts);
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.only(right: 35.0),
-                                  child: Container(
-                                    width: 150,
-                                    height: 150,
-                                    child: PieChart(
-                                      PieChartData(
-                                        sections: _createPieChartSections(
-                                            categoryAmounts),
-                                        sectionsSpace: 2,
-                                        centerSpaceRadius: 0,
-                                      ),
-                                    ),
-                                  ),
+                        SizedBox(
+                          width: 85,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                _selectedButton = 'Today';
+                              });
+                            },
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all<
+                                  RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
                                 ),
-                              );
-                            }
-                          },
+                              ),
+                              elevation: MaterialStateProperty.all(0),
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (states) {
+                                return _selectedButton == 'Today'
+                                    ? Color(0xffE63C3A)
+                                    : Colors.transparent;
+                              }),
+                            ),
+                            child: Text('Today',
+                                style: TextStyle(
+                                    fontSize: 12,
+                                    color: _selectedButton == 'Today'
+                                        ? Colors.black
+                                        : Color(0xffb3b3b3))),
+                          ),
                         ),
-                      ],
-                    ), */
-                     Container(
-            height: 200,
-            padding: EdgeInsets.symmetric(horizontal: 16.0),
-            child: FutureBuilder<Map<String, dynamic>>(
-              future: _fetchTransactions(selectedWallet.id!),
-              builder: (context, snapshot) {
-                if (snapshot.hasError) {
-                  return Center(
-                    child: Text('Error: ${snapshot.error}'),
-                  );
-                } else {
-                  Wallet selectedWallet = snapshot.data!['wallet'];
-                  List<Transaction> transactions = snapshot.data!['transactions'];
-
-                  // Calcoliamo i dati per il grafico
-                  _calculateChartData(transactions, selectedWallet);
-
-                  return LineChart(
-                    LineChartData(
-                      gridData: FlGridData(show: false),
-                      titlesData: FlTitlesData(show: false),
-                      borderData: FlBorderData(show: false),
-                      lineBarsData: [
-                        LineChartBarData(
-                          spots: _chartData, // Utilizziamo i dati calcolati per il grafico
-                          isCurved: true,
-                          barWidth: 4,
-                          isStrokeCapRound: true,
-                          belowBarData: BarAreaData(show: false),
+                        SizedBox(
+                          width: 90,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                _selectedButton = 'Weekly';
+                              });
+                            },
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all<
+                                  RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                              ),
+                              elevation: MaterialStateProperty.all(0),
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (states) {
+                                return _selectedButton == 'Weekly'
+                                    ? Color(0xffE63C3A)
+                                    : Colors.transparent;
+                              }),
+                            ),
+                            child: Text('Weekly',
+                                style: TextStyle(
+                                    fontSize: 12,
+                                    color: _selectedButton == 'Weekly'
+                                        ? Colors.black
+                                        : Color(0xffb3b3b3))),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 95,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                _selectedButton = 'Monthly';
+                              });
+                            },
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all<
+                                  RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                              ),
+                              elevation: MaterialStateProperty.all(0),
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (states) {
+                                return _selectedButton == 'Monthly'
+                                    ? Color(0xffE63C3A)
+                                    : Colors.transparent;
+                              }),
+                            ),
+                            child: Text('Monthly',
+                                style: TextStyle(
+                                    fontSize: 12,
+                                    color: _selectedButton == 'Monthly'
+                                        ? Colors.black
+                                        : Color(0xffb3b3b3))),
+                          ),
+                        ),
+                        SizedBox(
+                          width: 85,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              setState(() {
+                                _selectedButton = 'Yearly';
+                              });
+                            },
+                            style: ButtonStyle(
+                              shape: MaterialStateProperty.all<
+                                  RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(10.0),
+                                ),
+                              ),
+                              elevation: MaterialStateProperty.all(0),
+                              backgroundColor:
+                                  MaterialStateProperty.resolveWith<Color>(
+                                      (states) {
+                                return _selectedButton == 'Yearly'
+                                    ? Color(0xffE63C3A)
+                                    : Colors.transparent;
+                              }),
+                            ),
+                            child: Text('Yearly',
+                                style: TextStyle(
+                                    fontSize: 12,
+                                    color: _selectedButton == 'Yearly'
+                                        ? Colors.black
+                                        : Color(0xffb3b3b3))),
+                          ),
                         ),
                       ],
                     ),
-                  );
-                }
-              },
-            ),
-          ),
+                    Container(
+                      height: 200,
+                      padding: EdgeInsets.symmetric(
+                          vertical: 20.0, horizontal: 16.0),
+                      child: FutureBuilder<Map<String, dynamic>>(
+                        future: _fetchTransactions(selectedWallet.id!),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasError) {
+                            return Center(
+                              child: Text('Error: ${snapshot.error}'),
+                            );
+                          } else {
+                            Wallet selectedWallet = snapshot.data!['wallet'];
+                            List<Transaction> transactions =
+                                snapshot.data!['transactions'];
+
+                            // Calcoliamo i dati per il grafico
+                            _calculateChartData(transactions, selectedWallet);
+
+                            return LineChart(
+                              LineChartData(
+                                gridData: FlGridData(show: false),
+                                titlesData: FlTitlesData(show: false),
+                                borderData: FlBorderData(show: false),
+                                lineBarsData: [
+                                  LineChartBarData(
+                                    spots:
+                                        _chartData, // Utilizziamo i dati calcolati per il grafico
+                                    isCurved: true,
+                                    barWidth: 4,
+                                    isStrokeCapRound: true,
+                                    belowBarData: BarAreaData(show: false),
+                                  ),
+                                ],
+                              ),
+                            );
+                          }
+                        },
+                      ),
+                    ),
                   ],
                 ),
               );
@@ -412,111 +404,6 @@ class _HomeListState extends State<ChartsList> {
         "${_twoDigits(dateTime.hour)}:${_twoDigits(dateTime.minute)}";
     return "$formattedDate";
   }
-
-  Map<String, double> _calculateCategoryAmounts(
-    List<Transaction> transactions,
-  ) {
-    Map<String, double> categoryAmounts = {};
-
-    transactions.forEach((transaction) {
-      final categoryId = transaction.categoryId.toString();
-      final value = transaction.value ?? 0.0;
-      if (categoryAmounts.containsKey(categoryId)) {
-        categoryAmounts[categoryId] =
-            (categoryAmounts[categoryId] ?? 0) + value;
-      } else {
-        categoryAmounts[categoryId] = value;
-      }
-    });
-
-    return categoryAmounts;
-  }
-
-  List<PieChartSectionData> _createPieChartSections(
-    Map<String, double> categoryAmounts,
-  ) {
-    List<Color> fixedColors = [
-      Colors.red,
-      Colors.blue,
-      Colors.green,
-      Colors.orange,
-      Colors.purple,
-      Colors.yellow,
-      Colors.brown,
-    ];
-
-    List<PieChartSectionData> sections = [];
-    int index = 0;
-
-    categoryAmounts.forEach((category, amount) {
-      bool isSelected = _selectedCategory == category;
-      sections.add(PieChartSectionData(
-        color: fixedColors[int.parse(category)],
-        value: amount,
-        title: '',
-        radius: isSelected ? 100 : 90,
-      ));
-
-      index++;
-    });
-
-    return sections;
-  }
-
-
-
-  void _handlePieChartTap(
-      TapUpDetails details, Map<String, double> categoryAmounts) {
-    final touchPos = details.localPosition;
-    final touchAngle = _getAngle(touchPos);
-    final categoryIndex = _getTouchedCategoryIndex(touchAngle, categoryAmounts);
-
-    setState(() {
-      String tappedCategory = categoryAmounts.keys.elementAt(categoryIndex);
-      if (_selectedCategory == tappedCategory) {
-        _selectedCategory = null;
-      } else {
-        _selectedCategory = tappedCategory;
-        nomeCategoria = categories[int.parse(tappedCategory) - 1].name;
-        valoreCategoria = categoryAmounts[tappedCategory]!;
-      }
-    });
-  }
-
-  double _getAngle(Offset position) {
-    final centerX = 75.0;
-    final centerY = 75.0;
-    final dx = position.dx - centerX;
-    final dy = position.dy - centerY;
-    final angle = (Math.atan2(dy, dx) * 180 / Math.pi + 360) % 360;
-    return angle;
-  }
-
-  int _getTouchedCategoryIndex(
-      double angle, Map<String, double> categoryAmounts) {
-    final totalAmount = _getTotalAmount(categoryAmounts);
-    double currentAngle = 0.0;
-
-    int index = 0;
-    for (var amount in categoryAmounts.values) {
-      final sweepAngle = (amount / totalAmount) * 360;
-      if (angle >= currentAngle && angle <= currentAngle + sweepAngle) {
-        return index;
-      }
-      currentAngle += sweepAngle;
-      index++;
-    }
-    return -1;
-  }
-
-  double _getTotalAmount(Map<String, double> categoryAmounts) {
-    double total = 0;
-    categoryAmounts.values.forEach((amount) {
-      total += amount;
-    });
-    return total;
-  }
-
 
   void _calculateChartData(List<Transaction> transactions, Wallet wallet) {
     // Resetta la lista dei dati del grafico
