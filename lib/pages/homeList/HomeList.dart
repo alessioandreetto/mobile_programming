@@ -16,6 +16,7 @@ class _HomeListState extends State<HomeList> {
   double valoreCategoria = 0;
   String nomeCategoria = '';
   String? _selectedCategory;
+    bool _showExpenses = true; // Mostra le uscite per impostazione predefinita
 
   List<Category> categories = [
     Category(id: 1, name: 'Auto'),
@@ -65,7 +66,7 @@ class _HomeListState extends State<HomeList> {
                       ],
                     ),
                     FutureBuilder<List<Transaction>>(
-                      future: _fetchNegativeTransactions(selectedWallet.id!),
+                      future: _fetchTransactions(selectedWallet.id!),
                       builder: (context, snapshot) {
                         if (snapshot.hasError) {
                           return Center(
@@ -167,11 +168,37 @@ class _HomeListState extends State<HomeList> {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Transazioni per ${selectedWallet.name}:"),
+                    Padding(
+                      padding: const EdgeInsets.only(left:8.0, right: 8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("Transazioni per ${selectedWallet.name}:"),
+                           DropdownButton<bool>(
+                        value: _showExpenses,
+                        onChanged: (value) {
+                          setState(() {
+                            _showExpenses = value!;
+                          });
+                        },
+                        items: [
+                          DropdownMenuItem<bool>(
+                            value: true,
+                            child: Text('Mostra Uscite'),
+                          ),
+                          DropdownMenuItem<bool>(
+                            value: false,
+                            child: Text('Mostra Entrate'),
+                          ),
+                        ],
+                      ),
+                        ],
+                      ),
+                    ),
                     SizedBox(height: 10),
                     Expanded(
                       child: FutureBuilder<List<Transaction>>(
-                        future: _fetchNegativeTransactions(selectedWallet.id!),
+                        future: _fetchTransactions(selectedWallet.id!),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
@@ -241,11 +268,14 @@ class _HomeListState extends State<HomeList> {
     );
   }
 
-  Future<List<Transaction>> _fetchNegativeTransactions(int walletId) async {
-    List<Transaction> transactions =
-        await DatabaseHelper().getTransactionsForWallet(walletId);
-    return transactions.where((transaction) => transaction.value! < 0).toList();
+Future<List<Transaction>> _fetchTransactions(int walletId) async {
+  List<Transaction> transactions = await DatabaseHelper().getTransactionsForWallet(walletId);
+  if (!_showExpenses) {
+    transactions = transactions.where((transaction) => transaction.value! < 0).toList();
   }
+  return transactions;
+}
+
 
   String _twoDigits(int n) {
     if (n >= 10) return "$n";
