@@ -14,6 +14,7 @@ class ChartsList extends StatefulWidget {
 class _ChartsPageState extends State<ChartsList> {
   late String _selectedButton;
   late int _selectedWalletIndex;
+  List<FlSpot> _chartData = []; // Lista per i dati del grafico
 
   @override
   void initState() {
@@ -173,15 +174,8 @@ class _ChartsPageState extends State<ChartsList> {
                 borderData: FlBorderData(show: false),
                 lineBarsData: [
                   LineChartBarData(
-                    spots: [
-                      FlSpot(0, 1),
-                      FlSpot(1, 1.5),
-                      FlSpot(2, 1.4),
-                      FlSpot(3, 2.2),
-                      FlSpot(4, 1.8),
-                    ],
+                    spots: _chartData, // Utilizziamo i dati calcolati per il grafico
                     isCurved: true,
-                   
                     barWidth: 4,
                     isStrokeCapRound: true,
                     belowBarData: BarAreaData(show: false),
@@ -266,6 +260,10 @@ class _ChartsPageState extends State<ChartsList> {
                       );
                     } else {
                       List<Transaction> transactions = snapshot.data!;
+                      
+                      // Calcoliamo i dati per il grafico
+                      _calculateChartData(transactions);
+
                       return ListView.builder(
                         itemCount: transactions.length,
                         itemBuilder: (context, index) {
@@ -335,4 +333,15 @@ class _ChartsPageState extends State<ChartsList> {
       ),
     );
   }
+
+  void _calculateChartData(List<Transaction> transactions) {
+    // Resetta la lista dei dati del grafico
+    _chartData = [];
+
+    // Aggiunge i dati delle transazioni alla lista dei dati del grafico
+    for (int i = 0; i < transactions.length; i++) {
+      _chartData.add(FlSpot(i.toDouble(), transactions[i].value!));
+    }
+  }
 }
+
