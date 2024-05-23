@@ -322,7 +322,7 @@ class _HomeListState extends State<HomeList> {
         _selectedCategory = null;
       } else {
         _selectedCategory = tappedCategory;
-        nomeCategoria = categories[int.parse(tappedCategory) - 1].name;
+        nomeCategoria = categories[int.parse(tappedCategory) ].name;
         valoreCategoria = categoryAmounts[tappedCategory]!;
       }
     });

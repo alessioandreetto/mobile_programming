@@ -42,13 +42,13 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
   bool _deleteButtonVisible = false;
 
   List<Category> categories = [
-    Category(id: 1, name: 'Auto'),
-    Category(id: 2, name: 'Banca'),
-    Category(id: 3, name: 'Casa'),
-    Category(id: 4, name: 'Intrattenimento'),
-    Category(id: 5, name: 'Shopping'),
-    Category(id: 6, name: 'Viaggio'),
-    Category(id: 7, name: 'Varie'),
+    Category(id: 0, name: 'Auto'),
+    Category(id: 1, name: 'Banca'),
+    Category(id: 2, name: 'Casa'),
+    Category(id: 3, name: 'Intrattenimento'),
+    Category(id: 4, name: 'Shopping'),
+    Category(id: 5, name: 'Viaggio'),
+    Category(id: 6, name: 'Varie'),
   ];
   List<String> actionTypes = ['Entrata', 'Uscita', 'Exchange'];
 
