@@ -15,13 +15,22 @@ class _ChartsPageState extends State<ChartsList> {
   late String _selectedButton;
   late int _selectedWalletIndex;
   List<FlSpot> _chartData = []; // Lista per i dati del grafico
+  late Future<Map<String, dynamic>> _transactionsFuture;
 
-  @override
-  void initState() {
-    super.initState();
-    _selectedButton = 'Today'; // Inizialmente selezionato 'Today'
-    _selectedWalletIndex = 0;
-  }
+@override
+void initState() {
+  super.initState();
+  _selectedButton = 'Today'; // Inizialmente selezionato 'Today'
+  _selectedWalletIndex = 0;
+
+  // Carica i portafogli e assegna il primo portafoglio come predefinito
+  Provider.of<WalletProvider>(context, listen: false).loadWallets().then((_) {
+    setState(() {
+      _transactionsFuture = _fetchTransactions(Provider.of<WalletProvider>(context, listen: false).wallets.first.id!);
+    });
+  });
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -167,21 +176,38 @@ class _ChartsPageState extends State<ChartsList> {
           Container(
             height: 200,
             padding: EdgeInsets.symmetric(horizontal: 16.0),
-            child: LineChart(
-              LineChartData(
-                gridData: FlGridData(show: false),
-                titlesData: FlTitlesData(show: false),
-                borderData: FlBorderData(show: false),
-                lineBarsData: [
-                  LineChartBarData(
-                    spots: _chartData, // Utilizziamo i dati calcolati per il grafico
-                    isCurved: true,
-                    barWidth: 4,
-                    isStrokeCapRound: true,
-                    belowBarData: BarAreaData(show: false),
-                  ),
-                ],
-              ),
+            child: FutureBuilder<Map<String, dynamic>>(
+              future: _transactionsFuture,
+              builder: (context, snapshot) {
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Text('Error: ${snapshot.error}'),
+                  );
+                } else {
+                  Wallet selectedWallet = snapshot.data!['wallet'];
+                  List<Transaction> transactions = snapshot.data!['transactions'];
+
+                  // Calcoliamo i dati per il grafico
+                  _calculateChartData(transactions, selectedWallet);
+
+                  return LineChart(
+                    LineChartData(
+                      gridData: FlGridData(show: false),
+                      titlesData: FlTitlesData(show: false),
+                      borderData: FlBorderData(show: false),
+                      lineBarsData: [
+                        LineChartBarData(
+                          spots: _chartData, // Utilizziamo i dati calcolati per il grafico
+                          isCurved: true,
+                          barWidth: 4,
+                          isStrokeCapRound: true,
+                          belowBarData: BarAreaData(show: false),
+                        ),
+                      ],
+                    ),
+                  );
+                }
+              },
             ),
           ),
           // Aggiungi qui i pulsanti per selezionare il portafoglio
@@ -201,6 +227,7 @@ class _ChartsPageState extends State<ChartsList> {
                         onPressed: () {
                           setState(() {
                             _selectedWalletIndex = index;
+                            _transactionsFuture = _fetchTransactions(wallets[index].id!);
                           });
                         },
                         style: ButtonStyle(
@@ -244,8 +271,7 @@ class _ChartsPageState extends State<ChartsList> {
                 Wallet selectedWallet =
                     walletProvider.wallets[_selectedWalletIndex];
                 return FutureBuilder<Map<String, dynamic>>(
-                 
-future: _fetchTransactions(selectedWallet.id!),
+                  future: _transactionsFuture,
                   builder: (context, snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
                       return Center(
@@ -260,11 +286,7 @@ future: _fetchTransactions(selectedWallet.id!),
                         child: Text('No transactions found'),
                       );
                     } else {
-                      Wallet selectedWallet = snapshot.data!['wallet'];
                       List<Transaction> transactions = snapshot.data!['transactions'];
-
-                      // Calcoliamo i dati per il grafico
-                      _calculateChartData(transactions, selectedWallet);
 
                       return ListView.builder(
                         itemCount: transactions.length,
@@ -343,30 +365,27 @@ future: _fetchTransactions(selectedWallet.id!),
     );
   }
 
-void _calculateChartData(List<Transaction> transactions, Wallet wallet) {
-  // Resetta la lista dei dati del grafico
-  _chartData = [];
+  void _calculateChartData(List<Transaction> transactions, Wallet wallet) {
+    // Resetta la lista dei dati del grafico
+    _chartData = [];
 
-  // Inizializza il saldo con il saldo attuale del portafoglio
-  double balance = wallet.balance ?? 0;
+    // Inizializza il saldo con il saldo attuale del portafoglio
+    double balance = wallet.balance ?? 0;
 
-  // Inizializza la somma cumulativa delle transazioni a zero
-  double cumulativeSum = 0;
+    // Inizializza la somma cumulativa delle transazioni a zero
+    double cumulativeSum = 0;
 
-  // Aggiunge il saldo attuale come ultimo punto nel grafico
-  _chartData.add(FlSpot(transactions.length.toDouble(), balance));
+    // Aggiunge il saldo attuale come ultimo punto nel grafico
+    _chartData.add(FlSpot(transactions.length.toDouble(), balance));
 
-  // Calcola il saldo retroattivamente partendo dal saldo attuale
-  for (int i = transactions.length - 1; i >= 0; i--) {
-    // Aggiunge il valore della transazione alla somma cumulativa
-    cumulativeSum += transactions[i].value!;
-    // Calcola il saldo retroattivo sottraendo la somma cumulativa dal saldo attuale
-    double currentBalance = balance - cumulativeSum;
-    // Aggiunge il saldo retroattivo come punto nel grafico
-    _chartData.insert(0, FlSpot(i.toDouble(), currentBalance));
+    // Calcola il saldo retroattivamente partendo dal saldo attuale
+    for (int i = transactions.length - 1; i >= 0; i--) {
+      // Aggiunge il valore della transazione alla somma cumulativa
+      cumulativeSum += transactions[i].value!;
+      // Calcola il saldo retroattivo sottraendo la somma cumulativa dal saldo attuale
+      double currentBalance = balance - cumulativeSum;
+      // Aggiunge il saldo retroattivo come punto nel grafico
+      _chartData.insert(0, FlSpot(i.toDouble(), currentBalance));
+    }
   }
-}
-
-
-
 }
