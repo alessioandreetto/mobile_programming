@@ -58,9 +58,24 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
     _loadWallets();
     _deleteButtonVisible = widget.transaction != null;
 
-    if (widget.transaction != null && widget.transaction!.value! < 0) {
-      _selectedActionIndex = 1; // Uscita
-      widget.valueController.text = (widget.transaction!.value! * -1).toString();
+    if (widget.transaction != null) {
+      _selectedCategoryId = widget.transaction!.categoryId!;
+      _selectedDate = DateTime.parse(widget.transaction!.date!);
+
+      if (widget.transaction!.value! < 0) {
+        _selectedActionIndex = 1; // Uscita
+        widget.valueController.text = (widget.transaction!.value! * -1).toString();
+      }
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          _selectedWallet = _wallets
+              .firstWhere((wallet) => wallet.id == widget.transaction!.transactionId)
+              .name!;
+          _selectedWalletForExchangeOut = _selectedWallet;
+          _selectedWalletForExchangeIn = _selectedWallet;
+        });
+      });
     }
   }
 
@@ -69,9 +84,11 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
     setState(() {
       _wallets = wallets;
       if (_wallets.isNotEmpty) {
-        _selectedWallet = _wallets[0].name!;
-        _selectedWalletForExchangeOut = _wallets[0].name!;
-        _selectedWalletForExchangeIn = _wallets[0].name!;
+        _selectedWallet = widget.transaction != null
+            ? _wallets.firstWhere((wallet) => wallet.id == widget.transaction!.transactionId).name!
+            : _wallets[0].name!;
+        _selectedWalletForExchangeOut = _selectedWallet;
+        _selectedWalletForExchangeIn = _selectedWallet;
       }
     });
   }
