@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/pages/new_operation.dart';
 import 'dart:math' as Math;
 import '../../model/database_model.dart';
 import '../../providers/wallet_provider.dart';
