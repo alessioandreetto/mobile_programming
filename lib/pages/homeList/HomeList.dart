@@ -16,7 +16,7 @@ class _HomeListState extends State<HomeList> {
   double valoreCategoria = 0;
   String nomeCategoria = '';
   String? _selectedCategory;
-    bool _showExpenses = true; // Mostra le uscite per impostazione predefinita
+  bool _showExpenses = true; // Mostra le uscite per impostazione predefinita
 
   List<Category> categories = [
     Category(id: 1, name: 'Auto'),
@@ -33,13 +33,21 @@ class _HomeListState extends State<HomeList> {
     super.initState();
     _selectedWalletIndex = 0;
     _selectedCategory = null;
+    Provider.of<WalletProvider>(context, listen: false).loadAccountName();
+    Provider.of<WalletProvider>(context, listen: false).loadValuta();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Welcome User'),
+        title: Consumer<WalletProvider>(
+          builder: (context, walletProvider, _) {
+            String userName = walletProvider.name;
+
+            return Text('Welcome $userName!');
+          },
+        ),
         elevation: 0,
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
@@ -51,6 +59,7 @@ class _HomeListState extends State<HomeList> {
             builder: (context, walletProvider, _) {
               Wallet selectedWallet =
                   walletProvider.wallets[_selectedWalletIndex];
+              String valuta = walletProvider.valuta;
               return Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Row(
@@ -60,9 +69,9 @@ class _HomeListState extends State<HomeList> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text("Nome Wallet: ${selectedWallet.name}"),
-                        Text("Bilancio: ${selectedWallet.balance} €"),
+                        Text('Bilancio : ${selectedWallet.balance} $valuta'),
                         if (_selectedCategory != null)
-                          Text("$nomeCategoria :  $valoreCategoria €"),
+                          Text("$nomeCategoria :  $valoreCategoria $valuta"),
                       ],
                     ),
                     FutureBuilder<List<Transaction>>(
@@ -169,29 +178,29 @@ class _HomeListState extends State<HomeList> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(left:8.0, right: 8),
+                      padding: const EdgeInsets.only(left: 8.0, right: 8),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Text("Transazioni per ${selectedWallet.name}:"),
-                           DropdownButton<bool>(
-                        value: _showExpenses,
-                        onChanged: (value) {
-                          setState(() {
-                            _showExpenses = value!;
-                          });
-                        },
-                        items: [
-                          DropdownMenuItem<bool>(
-                            value: true,
-                            child: Text('Mostra Uscite'),
+                          DropdownButton<bool>(
+                            value: _showExpenses,
+                            onChanged: (value) {
+                              setState(() {
+                                _showExpenses = value!;
+                              });
+                            },
+                            items: [
+                              DropdownMenuItem<bool>(
+                                value: true,
+                                child: Text('Mostra Uscite'),
+                              ),
+                              DropdownMenuItem<bool>(
+                                value: false,
+                                child: Text('Mostra Entrate'),
+                              ),
+                            ],
                           ),
-                          DropdownMenuItem<bool>(
-                            value: false,
-                            child: Text('Mostra Entrate'),
-                          ),
-                        ],
-                      ),
                         ],
                       ),
                     ),
@@ -248,7 +257,7 @@ class _HomeListState extends State<HomeList> {
                                     child: ListTile(
                                       title: Text(transaction.name ?? ''),
                                       subtitle: Text(
-                                          "Data: $formattedDate, Valore: ${transaction.value} €"),
+                                          "Data: $formattedDate, Valore: ${transaction.value} ${walletProvider.valuta}"),
                                     ),
                                   ),
                                 );
@@ -268,17 +277,18 @@ class _HomeListState extends State<HomeList> {
     );
   }
 
-Future<List<Transaction>> _fetchTransactions(int walletId) async {
-  List<Transaction> transactions = await DatabaseHelper().getTransactionsForWallet(walletId);
-  if (_showExpenses) {
-    transactions = transactions.where((transaction) => transaction.value! < 0).toList();
+  Future<List<Transaction>> _fetchTransactions(int walletId) async {
+    List<Transaction> transactions =
+        await DatabaseHelper().getTransactionsForWallet(walletId);
+    if (_showExpenses) {
+      transactions =
+          transactions.where((transaction) => transaction.value! < 0).toList();
+    } else if (!_showExpenses) {
+      transactions =
+          transactions.where((transaction) => transaction.value! > 0).toList();
+    }
+    return transactions;
   }
-  else if (!_showExpenses) {
-    transactions = transactions.where((transaction) => transaction.value! > 0).toList();
-  }
-  return transactions;
-}
-
 
   String _twoDigits(int n) {
     if (n >= 10) return "$n";
@@ -355,7 +365,7 @@ Future<List<Transaction>> _fetchTransactions(int walletId) async {
         _selectedCategory = null;
       } else {
         _selectedCategory = tappedCategory;
-        nomeCategoria = categories[int.parse(tappedCategory) ].name;
+        nomeCategoria = categories[int.parse(tappedCategory)].name;
         valoreCategoria = categoryAmounts[tappedCategory]!;
       }
     });

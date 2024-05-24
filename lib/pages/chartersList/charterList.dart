@@ -37,13 +37,14 @@ class _HomeListState extends State<ChartsList> {
     _selectedButton = 'Today';
     _selectedWalletIndex = 0;
     _selectedCategory = null;
+    Provider.of<WalletProvider>(context, listen: false).loadValuta();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Welcome User'),
+        title: Text('Charts page'),
         elevation: 0,
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
@@ -55,6 +56,7 @@ class _HomeListState extends State<ChartsList> {
             builder: (context, walletProvider, _) {
               Wallet selectedWallet =
                   walletProvider.wallets[_selectedWalletIndex];
+              String valuta = walletProvider.valuta;
               return Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
@@ -201,7 +203,8 @@ class _HomeListState extends State<ChartsList> {
                       padding: EdgeInsets.symmetric(
                           vertical: 20.0, horizontal: 16.0),
                       child: FutureBuilder<Map<String, dynamic>>(
-                        future: _fetchTransactions(selectedWallet.id!, _selectedButton),
+                        future: _fetchTransactions(
+                            selectedWallet.id!, _selectedButton),
                         builder: (context, snapshot) {
                           if (snapshot.hasError) {
                             return Center(
@@ -301,6 +304,7 @@ class _HomeListState extends State<ChartsList> {
               builder: (context, walletProvider, _) {
                 Wallet selectedWallet =
                     walletProvider.wallets[_selectedWalletIndex];
+                String valuta = walletProvider.valuta;
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -308,7 +312,8 @@ class _HomeListState extends State<ChartsList> {
                     SizedBox(height: 10),
                     Expanded(
                       child: FutureBuilder<List<Transaction>>(
-                        future: _fetchNegativeTransactions(selectedWallet.id!, _selectedButton),
+                        future: _fetchNegativeTransactions(
+                            selectedWallet.id!, _selectedButton),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
@@ -358,7 +363,7 @@ class _HomeListState extends State<ChartsList> {
                                     child: ListTile(
                                       title: Text(transaction.name ?? ''),
                                       subtitle: Text(
-                                          "Data: $formattedDate, Valore: ${transaction.value} €"),
+                                          "Data: $formattedDate, Valore: ${transaction.value} $valuta"),
                                     ),
                                   ),
                                 );
@@ -378,7 +383,8 @@ class _HomeListState extends State<ChartsList> {
     );
   }
 
-  Future<Map<String, dynamic>> _fetchTransactions(int walletId, String selectedButton) async {
+  Future<Map<String, dynamic>> _fetchTransactions(
+      int walletId, String selectedButton) async {
     Map<String, dynamic> result = {};
 
     Wallet wallet = await DatabaseHelper().getWalletById(walletId);
@@ -391,37 +397,38 @@ class _HomeListState extends State<ChartsList> {
     return result;
   }
 
-Future<List<Transaction>> _fetchNegativeTransactions(int walletId, String selectedButton) async {
-  // Recupera il periodo selezionato
-  DateTime startDate = DateTime.now();
-  DateTime now = DateTime.now();
-  if (selectedButton == 'Today') {
-    startDate = DateTime(now.year, now.month, now.day);
-  } else if (selectedButton == 'Weekly') {
-    startDate = now.subtract(Duration(days: now.weekday - 1));
-  } else if (selectedButton == 'Monthly') {
-    startDate = DateTime(now.year, now.month, 1);
-  } else if (selectedButton == 'Yearly') {
-    startDate = DateTime(now.year, 1, 1);
+  Future<List<Transaction>> _fetchNegativeTransactions(
+      int walletId, String selectedButton) async {
+    // Recupera il periodo selezionato
+    DateTime startDate = DateTime.now();
+    DateTime now = DateTime.now();
+    if (selectedButton == 'Today') {
+      startDate = DateTime(now.year, now.month, now.day);
+    } else if (selectedButton == 'Weekly') {
+      startDate = now.subtract(Duration(days: now.weekday - 1));
+    } else if (selectedButton == 'Monthly') {
+      startDate = DateTime(now.year, now.month, 1);
+    } else if (selectedButton == 'Yearly') {
+      startDate = DateTime(now.year, 1, 1);
+    }
+
+    // Recupera le transazioni in base al periodo selezionato
+    List<Transaction> transactions =
+        await DatabaseHelper().getTransactionsForWallet(walletId);
+
+    // Filtra le transazioni in base alla data e al periodo selezionato
+    transactions = transactions.where((transaction) {
+      DateTime transactionDate = DateTime.parse(transaction.date!);
+      return transactionDate.isAfter(startDate.subtract(Duration(days: 1))) &&
+          transactionDate.isBefore(now.add(Duration(days: 1)));
+    }).toList();
+
+    // Ordina le transazioni per data
+    transactions.sort(
+        (a, b) => DateTime.parse(a.date!).compareTo(DateTime.parse(b.date!)));
+
+    return transactions;
   }
-
-  // Recupera le transazioni in base al periodo selezionato
-  List<Transaction> transactions =
-      await DatabaseHelper().getTransactionsForWallet(walletId);
-
-  // Filtra le transazioni in base alla data e al periodo selezionato
-  transactions = transactions.where((transaction) {
-    DateTime transactionDate = DateTime.parse(transaction.date!);
-    return transactionDate.isAfter(startDate.subtract(Duration(days: 1))) &&
-        transactionDate.isBefore(now.add(Duration(days: 1)));
-  }).toList();
-
-  // Ordina le transazioni per data
-  transactions.sort((a, b) => DateTime.parse(a.date!).compareTo(DateTime.parse(b.date!)));
-
-  return transactions;
-}
-
 
   String _twoDigits(int n) {
     if (n >= 10) return "$n";

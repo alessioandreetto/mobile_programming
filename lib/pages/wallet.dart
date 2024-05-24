@@ -45,13 +45,13 @@ class _WalletPageState extends State<WalletPage> {
   @override
   void initState() {
     super.initState();
+    Provider.of<WalletProvider>(context, listen: false).loadValuta();
     // Non è necessario chiamare _loadNotes() qui, lo chiameremo in didChangeDependencies().
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    print('Prova');
     // Chiamiamo _loadNotes() qui per essere sicuri che venga chiamato quando il Provider notifica i cambiamenti.
     _loadNotes();
   }
@@ -59,8 +59,6 @@ class _WalletPageState extends State<WalletPage> {
 
   void _loadNotes() async {
         List<Wallet> wallets = await Provider.of<WalletProvider>(context, listen: false).loadWallets();
-
-    print("wallets" + wallets.toString());
 
     setState(() {
       data = wallets.map((wallet) => Note(
@@ -163,6 +161,8 @@ class _WalletPageState extends State<WalletPage> {
       ),
  body: Consumer<WalletProvider>(
         builder: (context, walletProvider, _) {
+  String valuta = walletProvider.valuta;
+
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
@@ -177,7 +177,7 @@ class _WalletPageState extends State<WalletPage> {
                   crossAxisCount: 2,
                   children: walletProvider.wallets.map((wallet) {
                     final index = walletProvider.wallets.indexOf(wallet);
-                    return buildItem(context, index, wallet.balance!, wallet.name!);
+                    return buildItem(context, index, wallet.balance!, wallet.name!, valuta);
                   }).toList(),
                   onReorder: (oldIndex, newIndex) {
                     // Implement reorder functionality
@@ -242,7 +242,7 @@ class _WalletPageState extends State<WalletPage> {
     );
   }
 
-  Widget buildItem(BuildContext context, int index, double title, String body) {
+  Widget buildItem(BuildContext context, int index, double title, String body, String valuta) {
     final isSelected = selectedIndices.contains(index);
 
     return GestureDetector(
@@ -332,7 +332,7 @@ class _WalletPageState extends State<WalletPage> {
                         ),
                       ),
                       Text(
-                        "$title €",
+                        "$title $valuta",
                         style: TextStyle(
                           fontFamily: 'RobotoThin',
                           fontSize: 20,
