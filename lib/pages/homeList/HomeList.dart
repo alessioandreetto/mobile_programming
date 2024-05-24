@@ -270,8 +270,11 @@ class _HomeListState extends State<HomeList> {
 
 Future<List<Transaction>> _fetchTransactions(int walletId) async {
   List<Transaction> transactions = await DatabaseHelper().getTransactionsForWallet(walletId);
-  if (!_showExpenses) {
+  if (_showExpenses) {
     transactions = transactions.where((transaction) => transaction.value! < 0).toList();
+  }
+  else if (!_showExpenses) {
+    transactions = transactions.where((transaction) => transaction.value! > 0).toList();
   }
   return transactions;
 }
