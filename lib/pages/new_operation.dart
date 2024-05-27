@@ -116,8 +116,15 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
 
   void _showSnackbar(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+      SnackBar(
+        content: Text(message),
+        duration: Duration(seconds: 2),
+      ),
     );
+  }
+
+  void _navigateToHome(BuildContext context) {
+    Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
   @override
@@ -258,26 +265,30 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
             SizedBox(height: 16.0),
             ElevatedButton(
               onPressed: () async {
-                if (_selectedActionIndex == 2) {
-                  await _performExchangeTransaction(
-                      double.parse(widget.valueController.text));
+                if (_validateFields()) {
+                  if (_selectedActionIndex == 2) {
+                    await _performExchangeTransaction(
+                        double.parse(widget.valueController.text));
+                  } else {
+                    await _performRegularTransaction();
+                  }
+
+                  Provider.of<WalletProvider>(context, listen: false)
+                      .loadWallets();
+
+                  _showSnackbar(
+                      context,
+                      widget.transaction == null
+                          ? 'Transazione aggiunta con successo!'
+                          : 'Transazione modificata con successo!');
+                  _navigateToHome(context);
                 } else {
-                  await _performRegularTransaction();
+                  _showSnackbar(context, 'Inserisci tutti i campi');
                 }
-
-                widget.nameController.clear();
-                widget.valueController.clear();
-                widget.dateController.clear();
-
-                Provider.of<WalletProvider>(context, listen: false)
-                    .loadWallets();
-
-                // Rimani sulla stessa pagina
-                //_navigator.pop(context); // Questo è stato rimosso
               },
-              child: widget.transaction == null
-                  ? Text('Aggiungi Transazione')
-                  : Text('Modifica Transazione'),
+              child: Text(widget.transaction == null
+                  ? 'Aggiungi Transazione'
+                  : 'Modifica Transazione'),
             ),
           ],
         ),
@@ -285,14 +296,13 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
     );
   }
 
-  Future<void> _performRegularTransaction() async {
-    if (widget.nameController.text.isEmpty ||
-        widget.valueController.text.isEmpty ||
-        widget.dateController.text.isEmpty) {
-      _showSnackbar(context, 'Inserisci tutti i campi');
-      return;
-    }
+  bool _validateFields() {
+    return widget.nameController.text.isNotEmpty &&
+        widget.valueController.text.isNotEmpty &&
+        widget.dateController.text.isNotEmpty;
+  }
 
+  Future<void> _performRegularTransaction() async {
     double transactionValue = double.parse(widget.valueController.text);
     if (_selectedActionIndex == 1) {
       transactionValue = -transactionValue;
@@ -348,13 +358,6 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
   }
 
   Future<void> _performExchangeTransaction(double value) async {
-    if (widget.nameController.text.isEmpty ||
-        widget.valueController.text.isEmpty ||
-        widget.dateController.text.isEmpty) {
-      _showSnackbar(context, 'Inserisci tutti i campi');
-      return;
-    }
-
     double outValue = -value;
 
     Transaction outgoingTransaction = Transaction(
