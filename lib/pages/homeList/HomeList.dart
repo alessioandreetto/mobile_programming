@@ -239,25 +239,43 @@ class _HomeListState extends State<HomeList> {
                                     transactions.reversed.toList()[index];
                                 final date = DateTime.parse(transaction.date!);
                                 final formattedDate = _formatDateTime(date);
-                                return GestureDetector(
-                                  onTap: () {
-                                    _navigateToTransactionDetail(
-                                        context, transaction);
+                                return Dismissible(
+                                  key: Key(transaction.id.toString()),
+                                  onDismissed: (direction) {
+                                    _deleteTransaction(transaction.id!);
+                                    setState(() {
+                                      transactions.removeAt(index);
+                                    });
                                   },
-                                  child: Container(
-                                    margin: EdgeInsets.only(
-                                        bottom: 10, left: 10, right: 10),
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: Color(0xffb3b3b3),
-                                      ),
-                                      borderRadius: BorderRadius.circular(10),
+                                  background: Container(
+                                    color: Colors.red,
+                                    alignment: Alignment.centerRight,
+                                    padding: EdgeInsets.only(right: 20.0),
+                                    child: Icon(
+                                      Icons.delete,
                                       color: Colors.white,
                                     ),
-                                    child: ListTile(
-                                      title: Text(transaction.name ?? ''),
-                                      subtitle: Text(
-                                          "Data: $formattedDate, Valore: ${transaction.value} ${walletProvider.valuta}"),
+                                  ),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      _navigateToTransactionDetail(
+                                          context, transaction);
+                                    },
+                                    child: Container(
+                                      margin: EdgeInsets.only(
+                                          bottom: 10, left: 10, right: 10),
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          color: Color(0xffb3b3b3),
+                                        ),
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: Colors.white,
+                                      ),
+                                      child: ListTile(
+                                        title: Text(transaction.name ?? ''),
+                                        subtitle: Text(
+                                            "Data: $formattedDate, Valore: ${transaction.value} ${walletProvider.valuta}"),
+                                      ),
                                     ),
                                   ),
                                 );
@@ -356,6 +374,7 @@ class _HomeListState extends State<HomeList> {
   void _handlePieChartTap(
       TapUpDetails details, Map<String, double> categoryAmounts) {
     final touchPos = details.localPosition;
+
     final touchAngle = _getAngle(touchPos);
     final categoryIndex = _getTouchedCategoryIndex(touchAngle, categoryAmounts);
 
@@ -413,5 +432,9 @@ class _HomeListState extends State<HomeList> {
         builder: (context) => NewTransactionPage(transaction: transaction),
       ),
     );
+  }
+
+  Future<int> _deleteTransaction(int id) async {
+    return await DatabaseHelper().deleteTransaction(id);
   }
 }

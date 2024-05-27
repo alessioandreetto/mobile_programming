@@ -447,9 +447,33 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
 
     if (confirmed) {
       if (widget.transaction != null) {
+        // Ottieni il valore della transazione eliminata
+        double deletedTransactionValue = widget.transaction!.value!;
+
+        // Elimina la transazione
         Provider.of<WalletProvider>(context, listen: false)
             .deleteTransaction(widget.transaction!.id!);
         Navigator.of(context).pop();
+
+        // Aggiorna il saldo del wallet
+        Wallet wallet = _wallets.firstWhere(
+          (wallet) => wallet.name == _selectedWallet,
+          orElse: () => Wallet(
+              id: -1,
+              name: '',
+              balance: 0), // Wallet fittizio nel caso non trovi il wallet
+        );
+
+        if (wallet.id != -1) {
+          // Se il wallet è stato trovato, aggiorna il saldo
+          double newBalance = wallet.balance! - deletedTransactionValue;
+          Wallet updatedWallet = Wallet(
+            id: wallet.id,
+            name: wallet.name,
+            balance: newBalance,
+          );
+          await dbHelper.updateWallet(updatedWallet);
+        }
       }
     }
   }
