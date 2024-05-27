@@ -64,13 +64,15 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
 
       if (widget.transaction!.value! < 0) {
         _selectedActionIndex = 1; // Uscita
-        widget.valueController.text = (widget.transaction!.value! * -1).toString();
+        widget.valueController.text =
+            (widget.transaction!.value! * -1).toString();
       }
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
         setState(() {
           _selectedWallet = _wallets
-              .firstWhere((wallet) => wallet.id == widget.transaction!.transactionId)
+              .firstWhere(
+                  (wallet) => wallet.id == widget.transaction!.transactionId)
               .name!;
           _selectedWalletForExchangeOut = _selectedWallet;
           _selectedWalletForExchangeIn = _selectedWallet;
@@ -85,7 +87,10 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
       _wallets = wallets;
       if (_wallets.isNotEmpty) {
         _selectedWallet = widget.transaction != null
-            ? _wallets.firstWhere((wallet) => wallet.id == widget.transaction!.transactionId).name!
+            ? _wallets
+                .firstWhere(
+                    (wallet) => wallet.id == widget.transaction!.transactionId)
+                .name!
             : _wallets[0].name!;
         _selectedWalletForExchangeOut = _selectedWallet;
         _selectedWalletForExchangeIn = _selectedWallet;
@@ -107,6 +112,12 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
             "${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}";
       });
     }
+  }
+
+  void _showSnackbar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
   }
 
   @override
@@ -261,7 +272,8 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                 Provider.of<WalletProvider>(context, listen: false)
                     .loadWallets();
 
-                Navigator.pop(context);
+                // Rimani sulla stessa pagina
+                //_navigator.pop(context); // Questo è stato rimosso
               },
               child: widget.transaction == null
                   ? Text('Aggiungi Transazione')
@@ -273,64 +285,76 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
     );
   }
 
-Future<void> _performRegularTransaction() async {
-  double transactionValue = double.parse(widget.valueController.text);
-  if (_selectedActionIndex == 1) {
-    transactionValue = -transactionValue;
+  Future<void> _performRegularTransaction() async {
+    if (widget.nameController.text.isEmpty ||
+        widget.valueController.text.isEmpty ||
+        widget.dateController.text.isEmpty) {
+      _showSnackbar(context, 'Inserisci tutti i campi');
+      return;
+    }
+
+    double transactionValue = double.parse(widget.valueController.text);
+    if (_selectedActionIndex == 1) {
+      transactionValue = -transactionValue;
+    }
+
+    if (widget.transaction != null) {
+      Transaction updatedTransaction = Transaction(
+        id: widget.transaction!.id,
+        name: widget.nameController.text,
+        categoryId: _selectedCategoryId,
+        date: _selectedDate?.toIso8601String() ??
+            DateTime.now().toIso8601String(),
+        value: transactionValue,
+        transactionId:
+            _wallets.firstWhere((wallet) => wallet.name == _selectedWallet).id,
+      );
+
+      await dbHelper.updateTransaction(updatedTransaction);
+
+      Wallet existingWallet =
+          _wallets.firstWhere((wallet) => wallet.name == _selectedWallet);
+      double newBalance = existingWallet.balance! +
+          (updatedTransaction.value! - widget.transaction!.value!);
+      Wallet updatedWallet = Wallet(
+        id: existingWallet.id,
+        name: existingWallet.name,
+        balance: newBalance,
+      );
+      await dbHelper.updateWallet(updatedWallet);
+    } else {
+      Transaction newTransaction = Transaction(
+        name: widget.nameController.text,
+        categoryId: _selectedCategoryId,
+        date: _selectedDate?.toIso8601String() ??
+            DateTime.now().toIso8601String(),
+        value: transactionValue,
+        transactionId:
+            _wallets.firstWhere((wallet) => wallet.name == _selectedWallet).id,
+      );
+
+      await dbHelper.insertTransaction(newTransaction);
+
+      Wallet existingWallet =
+          _wallets.firstWhere((wallet) => wallet.name == _selectedWallet);
+      double newBalance = existingWallet.balance! + newTransaction.value!;
+      Wallet updatedWallet = Wallet(
+        id: existingWallet.id,
+        name: existingWallet.name,
+        balance: newBalance,
+      );
+      await dbHelper.updateWallet(updatedWallet);
+    }
   }
-
-  // Verifica se c'è una transazione da modificare anziché inserire una nuova
-  if (widget.transaction != null) {
-    // Aggiorna la transazione esistente invece di inserirne una nuova
-    Transaction updatedTransaction = Transaction(
-      id: widget.transaction!.id, // Manteniamo lo stesso ID
-      name: widget.nameController.text,
-      categoryId: _selectedCategoryId,
-      date: _selectedDate?.toIso8601String() ?? DateTime.now().toIso8601String(),
-      value: transactionValue,
-      transactionId: _wallets.firstWhere((wallet) => wallet.name == _selectedWallet).id,
-    );
-
-    // Utilizza il metodo updateTransaction del modello del database per aggiornare la transazione
-    await dbHelper.updateTransaction(updatedTransaction);
-    
-    // Aggiorna il saldo del portafoglio
-    Wallet existingWallet = _wallets.firstWhere((wallet) => wallet.name == _selectedWallet);
-    double newBalance = existingWallet.balance! + (updatedTransaction.value! - widget.transaction!.value!);
-    Wallet updatedWallet = Wallet(
-      id: existingWallet.id,
-      name: existingWallet.name,
-      balance: newBalance,
-    );
-    await dbHelper.updateWallet(updatedWallet);
-  } else {
-    // Se non c'è una transazione da modificare, inserisci una nuova transazione
-    Transaction newTransaction = Transaction(
-      name: widget.nameController.text,
-      categoryId: _selectedCategoryId,
-      date: _selectedDate?.toIso8601String() ?? DateTime.now().toIso8601String(),
-      value: transactionValue,
-      transactionId: _wallets.firstWhere((wallet) => wallet.name == _selectedWallet).id,
-    );
-
-    // Utilizza il metodo insertTransaction del modello del database per inserire la nuova transazione
-    await dbHelper.insertTransaction(newTransaction);
-
-    // Aggiorna il saldo del portafoglio
-    Wallet existingWallet = _wallets.firstWhere((wallet) => wallet.name == _selectedWallet);
-    double newBalance = existingWallet.balance! + newTransaction.value!;
-    Wallet updatedWallet = Wallet(
-      id: existingWallet.id,
-      name: existingWallet.name,
-      balance: newBalance,
-    );
-    await dbHelper.updateWallet(updatedWallet);
-  }
-}
-
-
 
   Future<void> _performExchangeTransaction(double value) async {
+    if (widget.nameController.text.isEmpty ||
+        widget.valueController.text.isEmpty ||
+        widget.dateController.text.isEmpty) {
+      _showSnackbar(context, 'Inserisci tutti i campi');
+      return;
+    }
+
     double outValue = -value;
 
     Transaction outgoingTransaction = Transaction(
