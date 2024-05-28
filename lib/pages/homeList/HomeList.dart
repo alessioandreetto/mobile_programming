@@ -16,7 +16,7 @@ class _HomeListState extends State<HomeList> {
   double valoreCategoria = 0;
   String nomeCategoria = '';
   String? _selectedCategory;
-  bool _showExpenses = true; // Mostra le uscite per impostazione predefinita
+  bool _showExpenses = true;
 
   List<Category> categories = [
     Category(id: 1, name: 'Auto'),
@@ -44,7 +44,6 @@ class _HomeListState extends State<HomeList> {
         title: Consumer<WalletProvider>(
           builder: (context, walletProvider, _) {
             String userName = walletProvider.name;
-
             return Text('Welcome $userName!');
           },
         ),
@@ -239,25 +238,41 @@ class _HomeListState extends State<HomeList> {
                                     transactions.reversed.toList()[index];
                                 final date = DateTime.parse(transaction.date!);
                                 final formattedDate = _formatDateTime(date);
-                                return GestureDetector(
-                                  onTap: () {
-                                    _navigateToTransactionDetail(
-                                        context, transaction);
+                                return Dismissible(
+                                  key: Key(transaction.id.toString()),
+                                  direction: DismissDirection.endToStart,
+                                  onDismissed: (direction) {
+                                    _deleteTransaction(
+                                        transaction, walletProvider);
                                   },
-                                  child: Container(
-                                    margin: EdgeInsets.only(
-                                        bottom: 10, left: 10, right: 10),
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: Color(0xffb3b3b3),
+                                  background: Container(
+                                    color: Colors.red,
+                                    alignment: Alignment.centerRight,
+                                    padding:
+                                        EdgeInsets.symmetric(horizontal: 10),
+                                    child:
+                                        Icon(Icons.delete, color: Colors.white),
+                                  ),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      _navigateToTransactionDetail(
+                                          context, transaction);
+                                    },
+                                    child: Container(
+                                      margin: EdgeInsets.only(
+                                          bottom: 10, left: 10, right: 10),
+                                      decoration: BoxDecoration(
+                                        border: Border.all(
+                                          color: Color(0xffb3b3b3),
+                                        ),
+                                        borderRadius: BorderRadius.circular(10),
+                                        color: Colors.white,
                                       ),
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: Colors.white,
-                                    ),
-                                    child: ListTile(
-                                      title: Text(transaction.name ?? ''),
-                                      subtitle: Text(
-                                          "Data: $formattedDate, Valore: ${transaction.value} ${walletProvider.valuta}"),
+                                      child: ListTile(
+                                        title: Text(transaction.name ?? ''),
+                                        subtitle: Text(
+                                            "Data: $formattedDate, Valore: ${transaction.value} ${walletProvider.valuta}"),
+                                      ),
                                     ),
                                   ),
                                 );
@@ -413,5 +428,13 @@ class _HomeListState extends State<HomeList> {
         builder: (context) => NewTransactionPage(transaction: transaction),
       ),
     );
+  }
+
+  void _deleteTransaction(
+      Transaction transaction, WalletProvider walletProvider) {
+    walletProvider
+        .deleteTransaction(transaction.id!); // Assuming id is not nullable
+    walletProvider
+        .reloadWalletBalance(); // Aggiorna il saldo del wallet dopo l'eliminazione della transazione
   }
 }

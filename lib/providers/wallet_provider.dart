@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
-import '../model/database_model.dart'; // Assicurati che il percorso sia corretto
 import 'package:shared_preferences/shared_preferences.dart';
+import '../model/database_model.dart'; // Assicurati che il percorso sia corretto
 
 class WalletProvider with ChangeNotifier {
   List<Wallet> _wallets = [];
@@ -11,28 +11,38 @@ class WalletProvider with ChangeNotifier {
 
   String get name => _name;
   String get valuta => _valuta;
+
   Future<List<Wallet>> loadWallets() async {
     _wallets = await DatabaseHelper().getWallets();
     notifyListeners();
-    return _wallets; // Aggiungi questa riga per restituire la lista di wallet
+    return _wallets;
   }
 
   void deleteTransaction(int transactionId) async {
     await DatabaseHelper().deleteTransaction(transactionId);
-    // Ricarica i portafogli dopo l'eliminazione della transazione
-    await loadWallets();
+    reloadWalletBalance(); // Aggiorna il saldo del wallet dopo l'eliminazione della transazione
   }
 
   void updateTransaction(Transaction transaction) async {
     await DatabaseHelper().updateTransaction(transaction);
-    // Ricarica i portafogli dopo l'aggiornamento della transazione
-    await loadWallets();
+    reloadWalletBalance(); // Aggiorna il saldo del wallet dopo l'aggiornamento della transazione
   }
 
   void insertTransaction(Transaction transaction) async {
     await DatabaseHelper().insertTransaction(transaction);
-    // Ricarica i portafogli dopo l'inserimento della transazione
-    await loadWallets();
+    reloadWalletBalance(); // Aggiorna il saldo del wallet dopo l'inserimento della transazione
+  }
+
+  Future<void> reloadWalletBalance() async {
+    List<Wallet> wallets = await loadWallets();
+    for (Wallet wallet in wallets) {
+      List<Transaction> transactions =
+          await DatabaseHelper().getTransactionsForWallet(wallet.id!);
+      double updatedBalance = transactions.fold(
+          0, (prev, transaction) => prev + transaction.value!);
+      wallet.balance = updatedBalance;
+    }
+    notifyListeners();
   }
 
   Future<void> updateAccountName(String newName) async {
