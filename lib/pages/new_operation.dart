@@ -447,33 +447,25 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
 
     if (confirmed) {
       if (widget.transaction != null) {
-        // Ottieni il valore della transazione eliminata
-        double deletedTransactionValue = widget.transaction!.value!;
+        Transaction transactionToDelete = widget.transaction!;
+        Wallet associatedWallet = _wallets.firstWhere(
+            (wallet) => wallet.id == transactionToDelete.transactionId);
 
-        // Elimina la transazione
-        Provider.of<WalletProvider>(context, listen: false)
-            .deleteTransaction(widget.transaction!.id!);
-        Navigator.of(context).pop();
-
-        // Aggiorna il saldo del wallet
-        Wallet wallet = _wallets.firstWhere(
-          (wallet) => wallet.name == _selectedWallet,
-          orElse: () => Wallet(
-              id: -1,
-              name: '',
-              balance: 0), // Wallet fittizio nel caso non trovi il wallet
+        double updatedBalance =
+            associatedWallet.balance! - transactionToDelete.value!;
+        Wallet updatedWallet = Wallet(
+          id: associatedWallet.id,
+          name: associatedWallet.name,
+          balance: updatedBalance,
         );
 
-        if (wallet.id != -1) {
-          // Se il wallet è stato trovato, aggiorna il saldo
-          double newBalance = wallet.balance! - deletedTransactionValue;
-          Wallet updatedWallet = Wallet(
-            id: wallet.id,
-            name: wallet.name,
-            balance: newBalance,
-          );
-          await dbHelper.updateWallet(updatedWallet);
-        }
+        await dbHelper.updateWallet(updatedWallet);
+        await dbHelper.deleteTransaction(transactionToDelete.id!);
+
+        Provider.of<WalletProvider>(context, listen: false).loadWallets();
+
+        _showSnackbar(context, 'Transazione eliminata con successo!');
+        _navigateToHome(context);
       }
     }
   }

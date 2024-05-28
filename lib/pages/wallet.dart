@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:reorderable_grid_view/reorderable_grid_view.dart';
 import '../model/database_model.dart';
 import 'new_wallet.dart';
@@ -47,11 +46,13 @@ class _WalletPageState extends State<WalletPage> {
   void initState() {
     super.initState();
     Provider.of<WalletProvider>(context, listen: false).loadValuta();
+    // Non è necessario chiamare _loadNotes() qui, lo chiameremo in didChangeDependencies().
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    // Chiamiamo _loadNotes() qui per essere sicuri che venga chiamato quando il Provider notifica i cambiamenti.
     _loadNotes();
   }
 
@@ -94,6 +95,7 @@ class _WalletPageState extends State<WalletPage> {
     required String body,
   }) async {
     if (index >= 0 && index < data.length) {
+      // Update existing wallet
       Wallet existingWallet =
           await DatabaseHelper().getWalletById(data[index].id!);
       Wallet updatedWallet = Wallet(
@@ -111,6 +113,7 @@ class _WalletPageState extends State<WalletPage> {
       });
       Provider.of<WalletProvider>(context, listen: false).loadWallets();
     } else {
+      // Insert new wallet
       Wallet newWallet = Wallet(
         name: body,
         balance: title,
@@ -134,16 +137,32 @@ class _WalletPageState extends State<WalletPage> {
       data.removeAt(index);
     });
     Provider.of<WalletProvider>(context, listen: false).loadWallets();
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Wallet eliminato')),
-    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Wallets'),
+        title: Row(
+          children: [
+            Expanded(
+              child: Text(
+                'Wallets',
+                textAlign: TextAlign.start,
+              ),
+            ),
+          ],
+        ),
+        elevation: 0,
+        actions: [
+          if (selectedIndices.isNotEmpty)
+            IconButton(
+              icon: Icon(Icons.delete),
+              onPressed: () {
+                // Implement delete functionality
+              },
+            ),
+        ],
       ),
       body: Consumer<WalletProvider>(
         builder: (context, walletProvider, _) {
@@ -234,15 +253,15 @@ class _WalletPageState extends State<WalletPage> {
     final isSelected = selectedIndices.contains(index);
 
     return GestureDetector(
+      //per eliminazione multipla di wallet, manca la funzione del db
       onLongPress: () {
-        HapticFeedback.vibrate();
-        setState(() {
+/*         setState(() {
           if (isSelected) {
             selectedIndices.remove(index);
           } else {
             selectedIndices.add(index);
           }
-        });
+        }); */
       },
       onTap: () {
         if (selectedIndices.isNotEmpty) {
@@ -254,138 +273,87 @@ class _WalletPageState extends State<WalletPage> {
             }
           });
         } else {
-          // Verifica se l'elemento è selezionato per la modifica o per la creazione di un nuovo wallet
-          if (index == data.length) {
-            // Toccare l'elemento per creare un nuovo wallet
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => AddNotePage(
-                  onSave: (newTitle, newBody) {
-                    addOrEditNote(
-                      context: context,
-                      index: index,
-                      title: newTitle,
-                      body: newBody,
-                    );
-                    Navigator.pop(context);
-                  },
-                  initialTitle: title,
-                  initialBody: body,
-                  onDelete: () {
-                    deleteNote(index);
-                    Navigator.pop(context);
-                  },
-                ),
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AddNotePage(
+                onSave: (newTitle, newBody) {
+                  addOrEditNote(
+                    context: context,
+                    index: index,
+                    title: newTitle,
+                    body: newBody,
+                  );
+                  Navigator.pop(
+                      context); // Chiudi AddNotePage dopo il salvataggio
+                },
+                initialTitle: title,
+                initialBody: body,
+                onDelete: () {
+                  deleteNote(
+                      index); // Chiama deleteNote quando viene attivato onDelete
+                  Navigator.pop(
+                      context); // Chiudi AddNotePage dopo la cancellazione
+                },
               ),
-            );
-          } else {
-            // Toccare l'elemento per modificare un wallet esistente
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => AddNotePage(
-                  onSave: (newTitle, newBody) {
-                    addOrEditNote(
-                      context: context,
-                      index: index,
-                      title: newTitle,
-                      body: newBody,
-                    );
-                    Navigator.pop(context);
-                  },
-                  initialTitle: title,
-                  initialBody: body,
-                  onDelete: () {
-                    deleteNote(index);
-                    Navigator.pop(context);
-                  },
-                ),
-              ),
-            );
-          }
+            ),
+          );
         }
       },
       key: ValueKey(index),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
-        child: Stack(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: isSelected ? Colors.red : Color(0xffb3b3b3),
-                  width: 1,
+        child: Container(
+          decoration: BoxDecoration(
+            border: Border.all(
+              color: isSelected ? Colors.red : Color(0xffb3b3b3),
+              width: 1,
+            ),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Expanded(
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Text(
+                    body,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontFamily: 'RobotoThin',
+                      fontSize: 40,
+                    ),
+                  ),
                 ),
-                borderRadius: BorderRadius.circular(10),
               ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Expanded(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Text(
-                        body,
-                        maxLines: 2,
-                        overflow: TextOverflow.ellipsis,
+              Container(
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Text(
+                        "Balance: ",
                         style: TextStyle(
                           fontFamily: 'RobotoThin',
-                          fontSize: 40,
+                          fontSize: 10,
                         ),
                       ),
-                    ),
-                  ),
-                  Container(
-                    child: Padding(
-                      padding: const EdgeInsets.all(8),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          Text(
-                            "Balance: ",
-                            style: TextStyle(
-                              fontFamily: 'RobotoThin',
-                              fontSize: 10,
-                            ),
-                          ),
-                          Text(
-                            "$title $valuta",
-                            style: TextStyle(
-                              fontFamily: 'RobotoThin',
-                              fontSize: 20,
-                            ),
-                          ),
-                        ],
+                      Text(
+                        "$title $valuta",
+                        style: TextStyle(
+                          fontFamily: 'RobotoThin',
+                          fontSize: 20,
+                        ),
                       ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            if (isSelected)
-              Positioned(
-                top: 0,
-                right: 0,
-                child: GestureDetector(
-                  onTap: () {
-                    deleteNote(index);
-                  },
-                  child: Container(
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.red,
-                    ),
-                    padding: EdgeInsets.all(4),
-                    child: Icon(
-                      Icons.remove,
-                      color: Colors.white,
-                      size: 20,
-                    ),
+                    ],
                   ),
                 ),
               ),
-          ],
+            ],
+          ),
         ),
       ),
     );

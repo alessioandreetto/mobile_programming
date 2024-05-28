@@ -33,7 +33,8 @@ class WalletProvider with ChangeNotifier {
     await DatabaseHelper().insertTransaction(transaction);
     // Ricarica i portafogli dopo l'inserimento della transazione
     await loadWallets();
-  }   
+  }
+
   Future<void> updateAccountName(String newName) async {
     _name = newName;
     notifyListeners();
@@ -47,20 +48,18 @@ class WalletProvider with ChangeNotifier {
     notifyListeners();
   }
 
-    Future<void> updateValuta (String newValuta) async {
+  Future<void> updateValuta(String newValuta) async {
     _valuta = newValuta;
     notifyListeners();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('valuta', newValuta);
-        print('valuta' + _valuta);
+    print('valuta' + _valuta);
   }
 
-Future<void> loadValuta() async {
-  SharedPreferences prefs = await SharedPreferences.getInstance();
-  _valuta = prefs.getString('valuta') ?? '€';
-  print('Valuta caricata: $_valuta');
-  notifyListeners();
-}
-
-
+  Future<void> loadValuta() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    _valuta = prefs.getString('valuta') ?? '€';
+    print('Valuta caricata: $_valuta');
+    notifyListeners();
+  }
 }

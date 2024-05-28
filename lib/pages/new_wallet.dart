@@ -15,7 +15,8 @@ class AddNotePage extends StatefulWidget {
     this.onDelete,
     this.initialTitle,
     this.initialBody,
-  })  : titleController = TextEditingController(text: initialTitle != null ? initialTitle.toString() : null),
+  })  : titleController = TextEditingController(
+            text: initialTitle != null ? initialTitle.toString() : null),
         bodyController = TextEditingController(text: initialBody);
 
   @override
@@ -28,7 +29,8 @@ class _AddNotePageState extends State<AddNotePage> {
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop: _onWillPop, // Utilizza la funzione _onWillPop per gestire la navigazione all'indietro
+      onWillPop:
+          _onWillPop, // Utilizza la funzione _onWillPop per gestire la navigazione all'indietro
       child: GestureDetector(
         onTap: () {
           FocusScope.of(context).unfocus();
@@ -158,7 +160,8 @@ class _AddNotePageState extends State<AddNotePage> {
   void _saveNote() {
     if (widget.titleController.text.isNotEmpty &&
         widget.bodyController.text.isNotEmpty) {
-      widget.onSave(double.parse(widget.titleController.text), widget.bodyController.text);
+      widget.onSave(double.parse(widget.titleController.text),
+          widget.bodyController.text);
       setState(() {
         _isDirty = false; // Le modifiche sono state salvate
       });

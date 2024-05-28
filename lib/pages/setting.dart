@@ -22,7 +22,8 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> _loadValutaFromSharedPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      _selectedValuta = prefs.getString('valuta') ?? '\$'; // Valore predefinito se non c'è nessun valore salvato
+      _selectedValuta = prefs.getString('valuta') ??
+          '\$'; // Valore predefinito se non c'è nessun valore salvato
     });
   }
 
@@ -109,6 +110,7 @@ class _SettingsPageState extends State<SettingsPage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('valuta', newValuta);
     _selectedValuta = newValuta; // Aggiornamento locale del valore selezionato
-    Provider.of<WalletProvider>(context, listen: false).updateValuta(newValuta); // Avviso del cambio di valuta al provider
+    Provider.of<WalletProvider>(context, listen: false)
+        .updateValuta(newValuta); // Avviso del cambio di valuta al provider
   }
 }
