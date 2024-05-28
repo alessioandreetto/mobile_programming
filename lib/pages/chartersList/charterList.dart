@@ -18,7 +18,7 @@ class _HomeListState extends State<ChartsList> {
   double valoreCategoria = 0;
   String nomeCategoria = '';
   String? _selectedCategory;
-  List<FlSpot> _chartData = []; // Lista per i dati del grafico
+  List<FlSpot> _chartData = [];
   late Future<Map<String, dynamic>> _transactionsFuture;
 
   List<Category> categories = [
@@ -38,13 +38,57 @@ class _HomeListState extends State<ChartsList> {
     _selectedWalletIndex = 0;
     _selectedCategory = null;
     Provider.of<WalletProvider>(context, listen: false).loadValuta();
+    _transactionsFuture = _fetchTransactions(
+      Provider.of<WalletProvider>(context, listen: false)
+          .wallets[_selectedWalletIndex]
+          .id!,
+      _selectedButton,
+    );
+  }
+
+  void _onSwipeLeft() {
+    setState(() {
+      switch (_selectedButton) {
+        case 'Today':
+          _selectedButton = 'Weekly';
+          break;
+        case 'Weekly':
+          _selectedButton = 'Monthly';
+          break;
+        case 'Monthly':
+          _selectedButton = 'Yearly';
+          break;
+      }
+    });
+    _fetchAndUpdateChartData(Provider.of<WalletProvider>(context, listen: false)
+        .wallets[_selectedWalletIndex]
+        .id!);
+  }
+
+  void _onSwipeRight() {
+    setState(() {
+      switch (_selectedButton) {
+        case 'Yearly':
+          _selectedButton = 'Monthly';
+          break;
+        case 'Monthly':
+          _selectedButton = 'Weekly';
+          break;
+        case 'Weekly':
+          _selectedButton = 'Today';
+          break;
+      }
+    });
+    _fetchAndUpdateChartData(Provider.of<WalletProvider>(context, listen: false)
+        .wallets[_selectedWalletIndex]
+        .id!);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Charts page'),
+        title: Text('Pagina dei Grafici'),
         elevation: 0,
         backgroundColor: Colors.transparent,
         surfaceTintColor: Colors.transparent,
@@ -198,45 +242,55 @@ class _HomeListState extends State<ChartsList> {
                         ),
                       ],
                     ),
-                    Container(
-                      height: 200,
-                      padding: EdgeInsets.symmetric(
-                          vertical: 20.0, horizontal: 16.0),
-                      child: FutureBuilder<Map<String, dynamic>>(
-                        future: _fetchTransactions(
-                            selectedWallet.id!, _selectedButton),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasError) {
-                            return Center(
-                              child: Text('Error: ${snapshot.error}'),
-                            );
-                          } else {
-                            Wallet selectedWallet = snapshot.data!['wallet'];
-                            List<Transaction> transactions =
-                                snapshot.data!['transactions'];
+                    GestureDetector(
+                      onHorizontalDragEnd: (details) {
+                        if (details.primaryVelocity! < 0) {
+                          _onSwipeLeft();
+                        } else if (details.primaryVelocity! > 0) {
+                          _onSwipeRight();
+                        }
+                      },
+                      child: Container(
+                        height: 200,
+                        padding: EdgeInsets.symmetric(
+                            vertical: 20.0, horizontal: 16.0),
+                        child: FutureBuilder<Map<String, dynamic>>(
+                          future: _transactionsFuture,
+                          builder: (context, snapshot) {
+                            if (snapshot.hasError) {
+                              return Center(
+                                child: Text('Errore: ${snapshot.error}'),
+                              );
+                            } else if (!snapshot.hasData) {
+                              return Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            } else {
+                              Wallet selectedWallet = snapshot.data!['wallet'];
+                              List<Transaction> transactions =
+                                  snapshot.data!['transactions'];
 
-                            // Calcoliamo i dati per il grafico
-                            _calculateChartData(transactions, selectedWallet);
+                              _calculateChartData(transactions, selectedWallet);
 
-                            return LineChart(
-                              LineChartData(
-                                gridData: FlGridData(show: false),
-                                titlesData: FlTitlesData(show: false),
-                                borderData: FlBorderData(show: false),
-                                lineBarsData: [
-                                  LineChartBarData(
-                                    spots:
-                                        _chartData, // Utilizziamo i dati calcolati per il grafico
-                                    isCurved: true,
-                                    barWidth: 4,
-                                    isStrokeCapRound: true,
-                                    belowBarData: BarAreaData(show: false),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }
-                        },
+                              return LineChart(
+                                LineChartData(
+                                  gridData: FlGridData(show: false),
+                                  titlesData: FlTitlesData(show: false),
+                                  borderData: FlBorderData(show: false),
+                                  lineBarsData: [
+                                    LineChartBarData(
+                                      spots: _chartData,
+                                      isCurved: true,
+                                      barWidth: 4,
+                                      isStrokeCapRound: true,
+                                      belowBarData: BarAreaData(show: false),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }
+                          },
+                        ),
                       ),
                     ),
                   ],
@@ -255,13 +309,11 @@ class _HomeListState extends State<ChartsList> {
                   itemCount: wallets.length,
                   itemBuilder: (context, index) {
                     return Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 8.0, horizontal: 8.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: ElevatedButton(
                         onPressed: () {
                           setState(() {
                             _selectedWalletIndex = index;
-                            _selectedCategory = null;
                           });
                           _fetchAndUpdateChartData(wallets[index].id!);
                         },
@@ -269,10 +321,11 @@ class _HomeListState extends State<ChartsList> {
                           elevation: MaterialStateProperty.all(0),
                           shape:
                               MaterialStateProperty.all<RoundedRectangleBorder>(
-                                  RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20.0),
-                            side: BorderSide(color: Colors.black),
-                          )),
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20.0),
+                              side: BorderSide(color: Colors.black),
+                            ),
+                          ),
                           foregroundColor:
                               MaterialStateProperty.resolveWith<Color>(
                             (Set<MaterialState> states) {
@@ -322,12 +375,12 @@ class _HomeListState extends State<ChartsList> {
                             );
                           } else if (snapshot.hasError) {
                             return Center(
-                              child: Text('Error: ${snapshot.error}'),
+                              child: Text('Errore: ${snapshot.error}'),
                             );
                           } else if (!snapshot.hasData ||
                               snapshot.data!.isEmpty) {
                             return Center(
-                              child: Text('No transactions found'),
+                              child: Text('Nessuna transazione trovata'),
                             );
                           } else {
                             List<Transaction> transactions = snapshot.data!;
