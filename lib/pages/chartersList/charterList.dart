@@ -175,12 +175,6 @@ class _HomeListState extends State<ChartsList> {
                               return Center(
                                 child: Text('Error: ${snapshot.error}'),
                               );
-                            } else if (!snapshot.hasData ||
-                                snapshot.connectionState ==
-                                    ConnectionState.waiting) {
-                              return Center(
-                                child: CircularProgressIndicator(),
-                              );
                             } else {
                               Wallet selectedWallet = snapshot.data!['wallet'];
                               List<Transaction> transactions =
