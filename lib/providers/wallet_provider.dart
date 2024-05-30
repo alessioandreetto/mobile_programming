@@ -72,4 +72,9 @@ class WalletProvider with ChangeNotifier {
     print('Valuta caricata: $_valuta');
     notifyListeners();
   }
+
+    Future<void> refreshWallets() async {
+    _wallets = await loadWallets(); // Ricarica i portafogli
+    notifyListeners();
+  }
 }
