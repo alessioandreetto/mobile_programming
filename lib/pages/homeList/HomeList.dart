@@ -17,6 +17,7 @@ class _HomeListState extends State<HomeList> {
   String nomeCategoria = '';
   String? _selectedCategory;
   bool _showExpenses = true;
+  bool _swipedLeft = true;
 
   List<Category> categories = [
     Category(id: 1, name: 'Auto'),
@@ -47,6 +48,7 @@ class _HomeListState extends State<HomeList> {
         setState(() {
           _selectedWalletIndex++;
           _selectedCategory = null;
+          _swipedLeft = true;
         });
       }
     } else if (details.primaryVelocity! > 0) {
@@ -55,6 +57,7 @@ class _HomeListState extends State<HomeList> {
         setState(() {
           _selectedWalletIndex--;
           _selectedCategory = null;
+          _swipedLeft = false;
         });
       }
     }
@@ -89,12 +92,12 @@ class _HomeListState extends State<HomeList> {
                   transitionBuilder:
                       (Widget child, Animation<double> animation) {
                     final inAnimation = Tween<Offset>(
-                      begin: Offset(1.0, 0.0),
+                      begin: _swipedLeft ? Offset(1.0, 0.0) : Offset(-1.0, 0.0),
                       end: Offset(0.0, 0.0),
                     ).animate(animation);
 
                     final outAnimation = Tween<Offset>(
-                      begin: Offset(-1.0, 0.0),
+                      begin: _swipedLeft ? Offset(-1.0, 0.0) : Offset(1.0, 0.0),
                       end: Offset(0.0, 0.0),
                     ).animate(animation);
 
