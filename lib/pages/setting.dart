@@ -1,9 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/main.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../providers/wallet_provider.dart';
 import 'SettingsPage/change_name.dart'; // Assicurati che il percorso sia corretto
+import 'initialPage/welcome_page.dart';
+import 'initialPage/demo.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -87,7 +90,8 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ),
           ),
-          Container(
+        
+            Container(
             margin: EdgeInsets.only(bottom: 10, left: 10, right: 10),
             decoration: BoxDecoration(
               border: Border.all(
@@ -97,8 +101,13 @@ class _SettingsPageState extends State<SettingsPage> {
               color: Colors.white,
             ),
             child: ListTile(
-              title: Text('Item 3'),
-              onTap: () {},
+              title: Text('test tutorial iniziale'),
+              onTap: () {
+                 Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => PageIndicatorDemo()),
+                );
+              },
             ),
           ),
         ],
