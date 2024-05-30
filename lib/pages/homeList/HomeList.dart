@@ -171,8 +171,7 @@ class _HomeListState extends State<HomeList> {
                                         sections: _createPieChartSections(
                                             categoryAmounts),
                                         sectionsSpace: 2,
-                                        centerSpaceRadius
-: 0,
+                                        centerSpaceRadius: 0,
                                       ),
                                     ),
                                   ),
@@ -311,19 +310,18 @@ class _HomeListState extends State<HomeList> {
                                       transactions.reversed.toList()[index];
                                   final date =
                                       DateTime.parse(transaction.date!);
-                                  final formattedDate =
-                                      _formatDateTime(date);
+                                  final formattedDate = _formatDateTime(date);
 
                                   return Slidable(
-                            
                                     key: ValueKey(index),
                                     startActionPane: ActionPane(
                                       extentRatio: 0.25,
                                       motion: ScrollMotion(),
                                       children: [
                                         SlidableAction(
-                                          borderRadius: BorderRadius.circular(10),
-                                          padding : EdgeInsets.all(10),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          padding: EdgeInsets.all(10),
                                           onPressed: (context) {
                                             _deleteTransaction(
                                                 transaction, walletProvider);
@@ -347,7 +345,8 @@ class _HomeListState extends State<HomeList> {
                                           border: Border.all(
                                             color: Color(0xffb3b3b3),
                                           ),
-                                          borderRadius: BorderRadius.circular(10),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
                                           color: Colors.white,
                                         ),
                                         child: ListTile(
@@ -452,11 +451,10 @@ class _HomeListState extends State<HomeList> {
   }
 
   void _handlePieChartTap(
-    TapUpDetails details, Map<String, double> categoryAmounts) {
+      TapUpDetails details, Map<String, double> categoryAmounts) {
     final touchPos = details.localPosition;
     final touchAngle = _getAngle(touchPos);
-    final categoryIndex =
-        _getTouchedCategoryIndex(touchAngle, categoryAmounts);
+    final categoryIndex = _getTouchedCategoryIndex(touchAngle, categoryAmounts);
 
     setState(() {
       String tappedCategory = categoryAmounts.keys.elementAt(categoryIndex);
@@ -480,7 +478,7 @@ class _HomeListState extends State<HomeList> {
   }
 
   int _getTouchedCategoryIndex(
-    double angle, Map<String, double> categoryAmounts) {
+      double angle, Map<String, double> categoryAmounts) {
     final totalAmount = _getTotalAmount(categoryAmounts);
     double currentAngle = 0.0;
 
@@ -504,58 +502,31 @@ class _HomeListState extends State<HomeList> {
     return total;
   }
 
-void _deleteTransaction(Transaction transaction, WalletProvider walletProvider) async {
-  // Recupera il valore della transazione eliminata
-  double deletedTransactionValue = transaction.value ?? 0.0;
+  void _deleteTransaction(
+      Transaction transaction, WalletProvider walletProvider) async {
+    // Recupera il valore della transazione eliminata
+    double deletedTransactionValue = transaction.value ?? 0.0;
 
-  // Elimina la transazione dal database
-  await DatabaseHelper().deleteTransaction(transaction.id!);
+    // Elimina la transazione dal database
+    await DatabaseHelper().deleteTransaction(transaction.id!);
 
-  // Aggiorna il bilancio del wallet corrispondente
-  Wallet selectedWallet = walletProvider.wallets[_selectedWalletIndex];
-  selectedWallet.balance = selectedWallet.balance! - deletedTransactionValue;
+    // Aggiorna il bilancio del wallet corrispondente
+    Wallet selectedWallet = walletProvider.wallets[_selectedWalletIndex];
+    selectedWallet.balance = selectedWallet.balance! - deletedTransactionValue;
 
-  // Aggiorna il bilancio del wallet nel database
-  await DatabaseHelper().updateWallet(selectedWallet);
+    // Aggiorna il bilancio del wallet nel database
+    await DatabaseHelper().updateWallet(selectedWallet);
 
-  // Aggiorna i wallet nel WalletProvider
-  walletProvider.refreshWallets();
-}
+    // Aggiorna i wallet nel WalletProvider
+    walletProvider.refreshWallets();
+  }
 
-
-
-  void _navigateToTransactionDetail(BuildContext context, Transaction transaction) {
+  void _navigateToTransactionDetail(
+      BuildContext context, Transaction transaction) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => TransactionDetail(transaction: transaction)),
-    );
-  }
-}
-
-class TransactionDetail extends StatelessWidget {
-  final Transaction transaction;
-
-  const TransactionDetail({Key? key, required this.transaction}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Dettaglio Transazione'),
-      ),
-      body: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text('Nome: ${transaction.name}'),
-            Text('Data: ${transaction.date}'),
-            Text('Valore: ${transaction.value}'),
-            Text('Categoria: ${transaction.categoryId}'),
-            Text('Wallet: ${transaction.id}'),
-          ],
-        ),
-      ),
+      MaterialPageRoute(
+          builder: (context) => NewTransactionPage(transaction: transaction)),
     );
   }
 }
