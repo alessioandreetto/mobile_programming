@@ -37,6 +37,28 @@ class _HomeListState extends State<HomeList> {
     Provider.of<WalletProvider>(context, listen: false).loadValuta();
   }
 
+  void _handleSwipe(DragEndDetails details) {
+    if (details.primaryVelocity! < 0) {
+      // Swipe sinistra
+      setState(() {
+        _selectedWalletIndex = (_selectedWalletIndex + 1) %
+            Provider.of<WalletProvider>(context, listen: false).wallets.length;
+        _selectedCategory = null;
+      });
+    } else if (details.primaryVelocity! > 0) {
+      // Swipe destra
+      setState(() {
+        _selectedWalletIndex = (_selectedWalletIndex -
+                1 +
+                Provider.of<WalletProvider>(context, listen: false)
+                    .wallets
+                    .length) %
+            Provider.of<WalletProvider>(context, listen: false).wallets.length;
+        _selectedCategory = null;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -59,57 +81,60 @@ class _HomeListState extends State<HomeList> {
               Wallet selectedWallet =
                   walletProvider.wallets[_selectedWalletIndex];
               String valuta = walletProvider.valuta;
-              return Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text("Nome Wallet: ${selectedWallet.name}"),
-                        Text('Bilancio : ${selectedWallet.balance} $valuta'),
-                        if (_selectedCategory != null)
-                          Text("$nomeCategoria :  $valoreCategoria $valuta"),
-                      ],
-                    ),
-                    FutureBuilder<List<Transaction>>(
-                      future: _fetchTransactions(selectedWallet.id!),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasError) {
-                          return Center(
-                              child: Text('Error: ${snapshot.error}'));
-                        } else if (!snapshot.hasData ||
-                            snapshot.data!.isEmpty) {
-                          return Center(child: Text('No transactions found'));
-                        } else {
-                          List<Transaction> transactions = snapshot.data!;
-                          Map<String, double> categoryAmounts =
-                              _calculateCategoryAmounts(transactions);
-                          return GestureDetector(
-                            onTapUp: (details) {
-                              _handlePieChartTap(details, categoryAmounts);
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.only(right: 35.0),
-                              child: Container(
-                                width: 150,
-                                height: 150,
-                                child: PieChart(
-                                  PieChartData(
-                                    sections: _createPieChartSections(
-                                        categoryAmounts),
-                                    sectionsSpace: 2,
-                                    centerSpaceRadius: 0,
+              return GestureDetector(
+                onHorizontalDragEnd: _handleSwipe,
+                child: Padding(
+                  padding: const EdgeInsets.all(8.0),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text("Nome Wallet: ${selectedWallet.name}"),
+                          Text('Bilancio : ${selectedWallet.balance} $valuta'),
+                          if (_selectedCategory != null)
+                            Text("$nomeCategoria :  $valoreCategoria $valuta"),
+                        ],
+                      ),
+                      FutureBuilder<List<Transaction>>(
+                        future: _fetchTransactions(selectedWallet.id!),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasError) {
+                            return Center(
+                                child: Text('Error: ${snapshot.error}'));
+                          } else if (!snapshot.hasData ||
+                              snapshot.data!.isEmpty) {
+                            return Center(child: Text('No transactions found'));
+                          } else {
+                            List<Transaction> transactions = snapshot.data!;
+                            Map<String, double> categoryAmounts =
+                                _calculateCategoryAmounts(transactions);
+                            return GestureDetector(
+                              onTapUp: (details) {
+                                _handlePieChartTap(details, categoryAmounts);
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 35.0),
+                                child: Container(
+                                  width: 150,
+                                  height: 150,
+                                  child: PieChart(
+                                    PieChartData(
+                                      sections: _createPieChartSections(
+                                          categoryAmounts),
+                                      sectionsSpace: 2,
+                                      centerSpaceRadius: 0,
+                                    ),
                                   ),
                                 ),
                               ),
-                            ),
-                          );
-                        }
-                      },
-                    ),
-                  ],
+                            );
+                          }
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               );
             },
@@ -173,116 +198,121 @@ class _HomeListState extends State<HomeList> {
               builder: (context, walletProvider, _) {
                 Wallet selectedWallet =
                     walletProvider.wallets[_selectedWalletIndex];
-                return Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8.0, right: 8),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text("Transazioni per ${selectedWallet.name}:"),
-                          DropdownButton<bool>(
-                            value: _showExpenses,
-                            onChanged: (value) {
-                              setState(() {
-                                _showExpenses = value!;
-                              });
-                            },
-                            items: [
-                              DropdownMenuItem<bool>(
-                                value: true,
-                                child: Text('Mostra Uscite'),
-                              ),
-                              DropdownMenuItem<bool>(
-                                value: false,
-                                child: Text('Mostra Entrate'),
-                              ),
-                            ],
-                          ),
-                        ],
+                return GestureDetector(
+                  onHorizontalDragEnd: _handleSwipe,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0, right: 8),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text("Transazioni per ${selectedWallet.name}:"),
+                            DropdownButton<bool>(
+                              value: _showExpenses,
+                              onChanged: (value) {
+                                setState(() {
+                                  _showExpenses = value!;
+                                });
+                              },
+                              items: [
+                                DropdownMenuItem<bool>(
+                                  value: true,
+                                  child: Text('Mostra Uscite'),
+                                ),
+                                DropdownMenuItem<bool>(
+                                  value: false,
+                                  child: Text('Mostra Entrate'),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    SizedBox(height: 10),
-                    Expanded(
-                      child: FutureBuilder<List<Transaction>>(
-                        future: _fetchTransactions(selectedWallet.id!),
-                        builder: (context, snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          } else if (snapshot.hasError) {
-                            return Center(
-                              child: Text('Error: ${snapshot.error}'),
-                            );
-                          } else if (!snapshot.hasData ||
-                              snapshot.data!.isEmpty) {
-                            return Center(
-                              child: Text('No transactions found'),
-                            );
-                          } else {
-                            List<Transaction> transactions = snapshot.data!;
-                            if (_selectedCategory != null) {
-                              transactions = transactions
-                                  .where((transaction) =>
-                                      transaction.categoryId.toString() ==
-                                      _selectedCategory)
-                                  .toList();
-                            }
-                            return ListView.builder(
-                              itemCount: transactions.length,
-                              itemBuilder: (context, index) {
-                                final transaction =
-                                    transactions.reversed.toList()[index];
-                                final date = DateTime.parse(transaction.date!);
-                                final formattedDate = _formatDateTime(date);
-                                return Dismissible(
-                                  key: Key(transaction.id.toString()),
-                                  direction: DismissDirection.endToStart,
-                                  onDismissed: (direction) {
-                                    _deleteTransaction(
-                                        transaction, walletProvider);
-                                  },
-                                  background: Container(
-                                    color: Colors.red,
-                                    alignment: Alignment.centerRight,
-                                    padding:
-                                        EdgeInsets.symmetric(horizontal: 10),
-                                    child:
-                                        Icon(Icons.delete, color: Colors.white),
-                                  ),
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      _navigateToTransactionDetail(
-                                          context, transaction);
+                      SizedBox(height: 10),
+                      Expanded(
+                        child: FutureBuilder<List<Transaction>>(
+                          future: _fetchTransactions(selectedWallet.id!),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            } else if (snapshot.hasError) {
+                              return Center(
+                                child: Text('Error: ${snapshot.error}'),
+                              );
+                            } else if (!snapshot.hasData ||
+                                snapshot.data!.isEmpty) {
+                              return Center(
+                                child: Text('No transactions found'),
+                              );
+                            } else {
+                              List<Transaction> transactions = snapshot.data!;
+                              if (_selectedCategory != null) {
+                                transactions = transactions
+                                    .where((transaction) =>
+                                        transaction.categoryId.toString() ==
+                                        _selectedCategory)
+                                    .toList();
+                              }
+                              return ListView.builder(
+                                itemCount: transactions.length,
+                                itemBuilder: (context, index) {
+                                  final transaction =
+                                      transactions.reversed.toList()[index];
+                                  final date =
+                                      DateTime.parse(transaction.date!);
+                                  final formattedDate = _formatDateTime(date);
+                                  return Dismissible(
+                                    key: Key(transaction.id.toString()),
+                                    direction: DismissDirection.endToStart,
+                                    onDismissed: (direction) {
+                                      _deleteTransaction(
+                                          transaction, walletProvider);
                                     },
-                                    child: Container(
-                                      margin: EdgeInsets.only(
-                                          bottom: 10, left: 10, right: 10),
-                                      decoration: BoxDecoration(
-                                        border: Border.all(
-                                          color: Color(0xffb3b3b3),
+                                    background: Container(
+                                      color: Colors.red,
+                                      alignment: Alignment.centerRight,
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 10),
+                                      child: Icon(Icons.delete,
+                                          color: Colors.white),
+                                    ),
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        _navigateToTransactionDetail(
+                                            context, transaction);
+                                      },
+                                      child: Container(
+                                        margin: EdgeInsets.only(
+                                            bottom: 10, left: 10, right: 10),
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                            color: Color(0xffb3b3b3),
+                                          ),
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                          color: Colors.white,
                                         ),
-                                        borderRadius: BorderRadius.circular(10),
-                                        color: Colors.white,
-                                      ),
-                                      child: ListTile(
-                                        title: Text(transaction.name ?? ''),
-                                        subtitle: Text(
-                                            "Data: $formattedDate, Valore: ${transaction.value} ${walletProvider.valuta}"),
+                                        child: ListTile(
+                                          title: Text(transaction.name ?? ''),
+                                          subtitle: Text(
+                                              "Data: $formattedDate, Valore: ${transaction.value} ${walletProvider.valuta}"),
+                                        ),
                                       ),
                                     ),
-                                  ),
-                                );
-                              },
-                            );
-                          }
-                        },
+                                  );
+                                },
+                              );
+                            }
+                          },
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 );
               },
             ),
