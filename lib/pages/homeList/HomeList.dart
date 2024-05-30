@@ -37,33 +37,28 @@ class _HomeListState extends State<HomeList> {
     Provider.of<WalletProvider>(context, listen: false).loadValuta();
   }
 
-void _handleSwipe(DragEndDetails details) {
-  final walletProvider = Provider.of<WalletProvider>(context, listen: false);
-  final wallets = walletProvider.wallets;
-  final currentWalletId = wallets[_selectedWalletIndex].id;
+  void _handleSwipe(DragEndDetails details) {
+    int walletCount =
+        Provider.of<WalletProvider>(context, listen: false).wallets.length;
 
-  int nextWalletIndex;
-  if (details.primaryVelocity! < 0) {
-    // Swipe verso sinistra
-    nextWalletIndex = (_selectedWalletIndex + 1);
-  } else if (details.primaryVelocity! > 0) {
-    // Swipe verso destra
-    nextWalletIndex = (_selectedWalletIndex - 1 );
-  } else {
-    return; // Nessuna direzione rilevata
+    if (details.primaryVelocity! < 0) {
+      // Swipe a sinistra
+      if (_selectedWalletIndex < walletCount - 1) {
+        setState(() {
+          _selectedWalletIndex++;
+          _selectedCategory = null;
+        });
+      }
+    } else if (details.primaryVelocity! > 0) {
+      // Swipe a destra
+      if (_selectedWalletIndex > 0) {
+        setState(() {
+          _selectedWalletIndex--;
+          _selectedCategory = null;
+        });
+      }
+    }
   }
-
-  final nextWalletId = wallets[nextWalletIndex].id;
-  
-  if (currentWalletId != null && nextWalletId != null) {
-    setState(() {
-      _selectedWalletIndex = nextWalletIndex;
-      _selectedCategory = null;
-    });
-  }
-}
-
-
 
   @override
   Widget build(BuildContext context) {
@@ -72,7 +67,7 @@ void _handleSwipe(DragEndDetails details) {
         title: Consumer<WalletProvider>(
           builder: (context, walletProvider, _) {
             String userName = walletProvider.name;
-            return Text('Welcome $userName!');
+            return Text('Benvenuto $userName!');
           },
         ),
         elevation: 0,
@@ -84,11 +79,11 @@ void _handleSwipe(DragEndDetails details) {
         children: [
           Consumer<WalletProvider>(
             builder: (context, walletProvider, _) {
-              final selectedWallet = walletProvider.wallets[_selectedWalletIndex];
-              final valuta = walletProvider.valuta;
-              final wallets = walletProvider.wallets;
+              Wallet selectedWallet =
+                  walletProvider.wallets[_selectedWalletIndex];
+              String valuta = walletProvider.valuta;
               return GestureDetector(
-                onHorizontalDragEnd: wallets.length > 1 ? _handleSwipe : null,
+                onHorizontalDragEnd: _handleSwipe,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Row(
@@ -108,10 +103,11 @@ void _handleSwipe(DragEndDetails details) {
                         builder: (context, snapshot) {
                           if (snapshot.hasError) {
                             return Center(
-                              child: Text('Error: ${snapshot.error}'),
-                            );
-                          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                            return Center(child: Text('No transactions found'));
+                                child: Text('Errore: ${snapshot.error}'));
+                          } else if (!snapshot.hasData ||
+                              snapshot.data!.isEmpty) {
+                            return Center(
+                                child: Text('Nessuna transazione trovata'));
                           } else {
                             List<Transaction> transactions = snapshot.data!;
                             Map<String, double> categoryAmounts =
@@ -167,20 +163,22 @@ void _handleSwipe(DragEndDetails details) {
                         },
                         style: ButtonStyle(
                           elevation: MaterialStateProperty.all(0),
-                          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(20.0),
-                              side: BorderSide(color: Colors.black),
-                            ),
-                          ),
-                          foregroundColor: MaterialStateProperty.resolveWith<Color>(
+                          shape:
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.0),
+                            side: BorderSide(color: Colors.black),
+                          )),
+                          foregroundColor:
+                              MaterialStateProperty.resolveWith<Color>(
                             (Set<MaterialState> states) {
                               return _selectedWalletIndex == index
                                   ? Colors.white
                                   : Colors.black;
                             },
                           ),
-                          backgroundColor: MaterialStateProperty.resolveWith<Color>(
+                          backgroundColor:
+                              MaterialStateProperty.resolveWith<Color>(
                             (Set<MaterialState> states) {
                               return _selectedWalletIndex == index
                                   ? Colors.black
@@ -200,9 +198,10 @@ void _handleSwipe(DragEndDetails details) {
           Expanded(
             child: Consumer<WalletProvider>(
               builder: (context, walletProvider, _) {
-                final selectedWallet = walletProvider.wallets[_selectedWalletIndex];
+                Wallet selectedWallet =
+                    walletProvider.wallets[_selectedWalletIndex];
                 return GestureDetector(
-                  onHorizontalDragEnd: walletProvider.wallets.length > 1 ? _handleSwipe : null,
+                  onHorizontalDragEnd: _handleSwipe,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -236,8 +235,7 @@ void _handleSwipe(DragEndDetails details) {
                       SizedBox(height: 10),
                       Expanded(
                         child: FutureBuilder<List<Transaction>>(
-                          future
-: _fetchTransactions(selectedWallet.id!),
+                          future: _fetchTransactions(selectedWallet.id!),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
@@ -246,12 +244,12 @@ void _handleSwipe(DragEndDetails details) {
                               );
                             } else if (snapshot.hasError) {
                               return Center(
-                                child: Text('Error: ${snapshot.error}'),
+                                child: Text('Errore: ${snapshot.error}'),
                               );
                             } else if (!snapshot.hasData ||
                                 snapshot.data!.isEmpty) {
                               return Center(
-                                child: Text('No transactions found'),
+                                child: Text('Nessuna transazione trovata'),
                               );
                             } else {
                               List<Transaction> transactions = snapshot.data!;
@@ -388,16 +386,15 @@ void _handleSwipe(DragEndDetails details) {
     int index = 0;
 
     categoryAmounts.forEach((category, amount) {
-      if (amount > 0) {
-        bool isSelected = _selectedCategory == category;
-        sections.add(PieChartSectionData(
-          color: fixedColors[index % fixedColors.length], // Utilizza colori fissi ciclicamente
-          value: amount,
-          title: '',
-          radius: isSelected ? 100 : 90,
-        ));
-        index++;
-      }
+      bool isSelected = _selectedCategory == category;
+      sections.add(PieChartSectionData(
+        color: fixedColors[int.parse(category)],
+        value: amount,
+        title: '',
+        radius: isSelected ? 100 : 90,
+      ));
+
+      index++;
     });
 
     return sections;
@@ -410,15 +407,13 @@ void _handleSwipe(DragEndDetails details) {
     final categoryIndex = _getTouchedCategoryIndex(touchAngle, categoryAmounts);
 
     setState(() {
-      if (categoryIndex != -1) {
-        String tappedCategory = categoryAmounts.keys.elementAt(categoryIndex);
-        if (_selectedCategory == tappedCategory) {
-          _selectedCategory = null;
-        } else {
-          _selectedCategory = tappedCategory;
-          nomeCategoria = categories[int.parse(tappedCategory)].name;
-          valoreCategoria = categoryAmounts[tappedCategory]!;
-        }
+      String tappedCategory = categoryAmounts.keys.elementAt(categoryIndex);
+      if (_selectedCategory == tappedCategory) {
+        _selectedCategory = null;
+      } else {
+        _selectedCategory = tappedCategory;
+        nomeCategoria = categories[int.parse(tappedCategory)].name;
+        valoreCategoria = categoryAmounts[tappedCategory]!;
       }
     });
   }
