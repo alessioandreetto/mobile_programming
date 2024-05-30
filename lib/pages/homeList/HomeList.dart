@@ -85,16 +85,30 @@ class _HomeListState extends State<HomeList> {
               return GestureDetector(
                 onHorizontalDragEnd: _handleSwipe,
                 child: AnimatedSwitcher(
-                  duration: Duration(milliseconds: 500), // Durata aumentata
+                  duration: Duration(milliseconds: 500),
                   transitionBuilder:
                       (Widget child, Animation<double> animation) {
-                    return ScaleTransition(
-                      scale: animation,
-                      child: FadeTransition(
-                        opacity: animation,
+                    final inAnimation = Tween<Offset>(
+                      begin: Offset(1.0, 0.0),
+                      end: Offset(0.0, 0.0),
+                    ).animate(animation);
+
+                    final outAnimation = Tween<Offset>(
+                      begin: Offset(-1.0, 0.0),
+                      end: Offset(0.0, 0.0),
+                    ).animate(animation);
+
+                    if (child.key == ValueKey<int>(_selectedWalletIndex)) {
+                      return SlideTransition(
+                        position: inAnimation,
                         child: child,
-                      ),
-                    );
+                      );
+                    } else {
+                      return SlideTransition(
+                        position: outAnimation,
+                        child: child,
+                      );
+                    }
                   },
                   child: Padding(
                     key: ValueKey<int>(_selectedWalletIndex),
@@ -284,21 +298,24 @@ class _HomeListState extends State<HomeList> {
                                   final date =
                                       DateTime.parse(transaction.date!);
                                   final formattedDate = _formatDateTime(date);
+
                                   return Dismissible(
-                                    key: Key(transaction.id.toString()),
-                                    direction: DismissDirection.endToStart,
-                                    onDismissed: (direction) {
-                                      _deleteTransaction(
-                                          transaction, walletProvider);
-                                    },
+                                    key: ValueKey<int>(transaction.id!),
                                     background: Container(
                                       color: Colors.red,
                                       alignment: Alignment.centerRight,
                                       padding:
                                           EdgeInsets.symmetric(horizontal: 10),
-                                      child: Icon(Icons.delete,
-                                          color: Colors.white),
+                                      child: Icon(
+                                        Icons.delete,
+                                        color: Colors.white,
+                                      ),
                                     ),
+                                    direction: DismissDirection.endToStart,
+                                    onDismissed: (direction) {
+                                      _deleteTransaction(
+                                          transaction, walletProvider);
+                                    },
                                     child: GestureDetector(
                                       onTap: () {
                                         _navigateToTransactionDetail(
