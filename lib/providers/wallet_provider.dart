@@ -20,22 +20,22 @@ class WalletProvider with ChangeNotifier {
 
   void deleteTransaction(int transactionId) async {
     await DatabaseHelper().deleteTransaction(transactionId);
-    reloadWalletBalance(); // Aggiorna il saldo del wallet dopo l'eliminazione della transazione
+    await reloadWalletBalance(); // Aggiorna il saldo del wallet dopo l'eliminazione della transazione
   }
 
   void updateTransaction(Transaction transaction) async {
     await DatabaseHelper().updateTransaction(transaction);
-    reloadWalletBalance(); // Aggiorna il saldo del wallet dopo l'aggiornamento della transazione
+    await reloadWalletBalance(); // Aggiorna il saldo del wallet dopo l'aggiornamento della transazione
   }
 
   void insertTransaction(Transaction transaction) async {
     await DatabaseHelper().insertTransaction(transaction);
-    reloadWalletBalance(); // Aggiorna il saldo del wallet dopo l'inserimento della transazione
+    await reloadWalletBalance(); // Aggiorna il saldo del wallet dopo l'inserimento della transazione
   }
 
   Future<void> reloadWalletBalance() async {
-    List<Wallet> wallets = await loadWallets();
-    for (Wallet wallet in wallets) {
+    _wallets = await loadWallets();
+    for (Wallet wallet in _wallets) {
       List<Transaction> transactions =
           await DatabaseHelper().getTransactionsForWallet(wallet.id!);
       double updatedBalance = transactions.fold(
@@ -73,7 +73,7 @@ class WalletProvider with ChangeNotifier {
     notifyListeners();
   }
 
-    Future<void> refreshWallets() async {
+  Future<void> refreshWallets() async {
     _wallets = await loadWallets(); // Ricarica i portafogli
     notifyListeners();
   }

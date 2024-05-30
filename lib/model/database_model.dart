@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:sqflite/sqflite.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
+import '../providers/wallet_provider.dart'; // Importa il WalletProvider per poter chiamare reloadWalletBalance()
 
 class DatabaseHelper {
   static Database? _database;
@@ -107,7 +108,10 @@ class DatabaseHelper {
   // Inserimento di una nuova transazione
   Future<int> insertTransaction(Transaction transaction) async {
     Database db = await this.database;
-    return await db.insert(transactionsTable, transaction.toMap());
+    int result = await db.insert(transactionsTable, transaction.toMap());
+    // Dopo l'inserimento della transazione, aggiorna il saldo del wallet
+    await WalletProvider().reloadWalletBalance();
+    return result;
   }
 
   // Ottenimento di tutte le transazioni di un certo portafoglio
@@ -121,19 +125,25 @@ class DatabaseHelper {
   // Eliminazione di una transazione
   Future<int> deleteTransaction(int id) async {
     Database db = await this.database;
-    return await db
+    int result = await db
         .delete(transactionsTable, where: '$colId = ?', whereArgs: [id]);
+    // Dopo l'eliminazione della transazione, aggiorna il saldo del wallet
+    await WalletProvider().reloadWalletBalance();
+    return result;
   }
 
   // Aggiorna una transazione esistente nel database
   Future<int> updateTransaction(Transaction transaction) async {
     Database db = await this.database;
-    return await db.update(
+    int result = await db.update(
       transactionsTable,
       transaction.toMap(),
       where: '$colId = ?',
       whereArgs: [transaction.id],
     );
+    // Dopo l'aggiornamento della transazione, aggiorna il saldo del wallet
+    await WalletProvider().reloadWalletBalance();
+    return result;
   }
 }
 
@@ -169,13 +179,14 @@ class Transaction {
   double? value;
   int? transactionId;
 
-  Transaction(
-      {this.id,
-      this.name,
-      this.categoryId,
-      this.date,
-      this.value,
-      this.transactionId});
+  Transaction({
+    this.id,
+    this.name,
+    this.categoryId,
+    this.date,
+    this.value,
+    this.transactionId,
+  });
 
   Map<String, dynamic> toMap() {
     return {
