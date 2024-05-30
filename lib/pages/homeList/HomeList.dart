@@ -41,9 +41,18 @@ void _handleSwipe(DragEndDetails details) {
   final walletProvider = Provider.of<WalletProvider>(context, listen: false);
   final wallets = walletProvider.wallets;
   final currentWalletId = wallets[_selectedWalletIndex].id;
-  final nextWalletIndex = details.primaryVelocity! < 0
-      ? (_selectedWalletIndex + 1) % wallets.length
-      : (_selectedWalletIndex - 1 + wallets.length) % wallets.length;
+
+  int nextWalletIndex;
+  if (details.primaryVelocity! < 0) {
+    // Swipe verso sinistra
+    nextWalletIndex = (_selectedWalletIndex + 1);
+  } else if (details.primaryVelocity! > 0) {
+    // Swipe verso destra
+    nextWalletIndex = (_selectedWalletIndex - 1 );
+  } else {
+    return; // Nessuna direzione rilevata
+  }
+
   final nextWalletId = wallets[nextWalletIndex].id;
   
   if (currentWalletId != null && nextWalletId != null) {
@@ -53,6 +62,7 @@ void _handleSwipe(DragEndDetails details) {
     });
   }
 }
+
 
 
   @override
