@@ -84,58 +84,74 @@ class _HomeListState extends State<HomeList> {
               String valuta = walletProvider.valuta;
               return GestureDetector(
                 onHorizontalDragEnd: _handleSwipe,
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("Nome Wallet: ${selectedWallet.name}"),
-                          Text('Bilancio : ${selectedWallet.balance} $valuta'),
-                          if (_selectedCategory != null)
-                            Text("$nomeCategoria :  $valoreCategoria $valuta"),
-                        ],
+                child: AnimatedSwitcher(
+                  duration: Duration(milliseconds: 500), // Durata aumentata
+                  transitionBuilder:
+                      (Widget child, Animation<double> animation) {
+                    return ScaleTransition(
+                      scale: animation,
+                      child: FadeTransition(
+                        opacity: animation,
+                        child: child,
                       ),
-                      FutureBuilder<List<Transaction>>(
-                        future: _fetchTransactions(selectedWallet.id!),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasError) {
-                            return Center(
-                                child: Text('Errore: ${snapshot.error}'));
-                          } else if (!snapshot.hasData ||
-                              snapshot.data!.isEmpty) {
-                            return Center(
-                                child: Text('Nessuna transazione trovata'));
-                          } else {
-                            List<Transaction> transactions = snapshot.data!;
-                            Map<String, double> categoryAmounts =
-                                _calculateCategoryAmounts(transactions);
-                            return GestureDetector(
-                              onTapUp: (details) {
-                                _handlePieChartTap(details, categoryAmounts);
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.only(right: 35.0),
-                                child: Container(
-                                  width: 150,
-                                  height: 150,
-                                  child: PieChart(
-                                    PieChartData(
-                                      sections: _createPieChartSections(
-                                          categoryAmounts),
-                                      sectionsSpace: 2,
-                                      centerSpaceRadius: 0,
+                    );
+                  },
+                  child: Padding(
+                    key: ValueKey<int>(_selectedWalletIndex),
+                    padding: const EdgeInsets.all(8.0),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text("Nome Wallet: ${selectedWallet.name}"),
+                            Text(
+                                'Bilancio : ${selectedWallet.balance} $valuta'),
+                            if (_selectedCategory != null)
+                              Text(
+                                  "$nomeCategoria :  $valoreCategoria $valuta"),
+                          ],
+                        ),
+                        FutureBuilder<List<Transaction>>(
+                          future: _fetchTransactions(selectedWallet.id!),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasError) {
+                              return Center(
+                                  child: Text('Errore: ${snapshot.error}'));
+                            } else if (!snapshot.hasData ||
+                                snapshot.data!.isEmpty) {
+                              return Center(
+                                  child: Text('Nessuna transazione trovata'));
+                            } else {
+                              List<Transaction> transactions = snapshot.data!;
+                              Map<String, double> categoryAmounts =
+                                  _calculateCategoryAmounts(transactions);
+                              return GestureDetector(
+                                onTapUp: (details) {
+                                  _handlePieChartTap(details, categoryAmounts);
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.only(right: 35.0),
+                                  child: Container(
+                                    width: 150,
+                                    height: 150,
+                                    child: PieChart(
+                                      PieChartData(
+                                        sections: _createPieChartSections(
+                                            categoryAmounts),
+                                        sectionsSpace: 2,
+                                        centerSpaceRadius: 0,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            );
-                          }
-                        },
-                      ),
-                    ],
+                              );
+                            }
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               );
