@@ -63,6 +63,18 @@ class _HomeListState extends State<HomeList> {
     }
   }
 
+  void _handleButtonPress(int index) {
+    setState(() {
+      if (index > _selectedWalletIndex) {
+        _swipedLeft = true;
+      } else {
+        _swipedLeft = false;
+      }
+      _selectedWalletIndex = index;
+      _selectedCategory = null;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -189,10 +201,7 @@ class _HomeListState extends State<HomeList> {
                           vertical: 8.0, horizontal: 8.0),
                       child: ElevatedButton(
                         onPressed: () {
-                          setState(() {
-                            _selectedWalletIndex = index;
-                            _selectedCategory = null;
-                          });
+                          _handleButtonPress(index);
                         },
                         style: ButtonStyle(
                           elevation: MaterialStateProperty.all(0),
