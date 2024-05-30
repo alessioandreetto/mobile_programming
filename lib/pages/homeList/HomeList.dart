@@ -37,27 +37,23 @@ class _HomeListState extends State<HomeList> {
     Provider.of<WalletProvider>(context, listen: false).loadValuta();
   }
 
-  void _handleSwipe(DragEndDetails details) {
-    if (details.primaryVelocity! < 0) {
-      // Swipe sinistra
-      setState(() {
-        _selectedWalletIndex = (_selectedWalletIndex + 1) %
-            Provider.of<WalletProvider>(context, listen: false).wallets.length;
-        _selectedCategory = null;
-      });
-    } else if (details.primaryVelocity! > 0) {
-      // Swipe destra
-      setState(() {
-        _selectedWalletIndex = (_selectedWalletIndex -
-                1 +
-                Provider.of<WalletProvider>(context, listen: false)
-                    .wallets
-                    .length) %
-            Provider.of<WalletProvider>(context, listen: false).wallets.length;
-        _selectedCategory = null;
-      });
-    }
+void _handleSwipe(DragEndDetails details) {
+  final walletProvider = Provider.of<WalletProvider>(context, listen: false);
+  final wallets = walletProvider.wallets;
+  final currentWalletId = wallets[_selectedWalletIndex].id;
+  final nextWalletIndex = details.primaryVelocity! < 0
+      ? (_selectedWalletIndex + 1) % wallets.length
+      : (_selectedWalletIndex - 1 + wallets.length) % wallets.length;
+  final nextWalletId = wallets[nextWalletIndex].id;
+  
+  if (currentWalletId != null && nextWalletId != null) {
+    setState(() {
+      _selectedWalletIndex = nextWalletIndex;
+      _selectedCategory = null;
+    });
   }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -78,11 +74,11 @@ class _HomeListState extends State<HomeList> {
         children: [
           Consumer<WalletProvider>(
             builder: (context, walletProvider, _) {
-              Wallet selectedWallet =
-                  walletProvider.wallets[_selectedWalletIndex];
-              String valuta = walletProvider.valuta;
+              final selectedWallet = walletProvider.wallets[_selectedWalletIndex];
+              final valuta = walletProvider.valuta;
+              final wallets = walletProvider.wallets;
               return GestureDetector(
-                onHorizontalDragEnd: _handleSwipe,
+                onHorizontalDragEnd: wallets.length > 1 ? _handleSwipe : null,
                 child: Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Row(
@@ -102,9 +98,9 @@ class _HomeListState extends State<HomeList> {
                         builder: (context, snapshot) {
                           if (snapshot.hasError) {
                             return Center(
-                                child: Text('Error: ${snapshot.error}'));
-                          } else if (!snapshot.hasData ||
-                              snapshot.data!.isEmpty) {
+                              child: Text('Error: ${snapshot.error}'),
+                            );
+                          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
                             return Center(child: Text('No transactions found'));
                           } else {
                             List<Transaction> transactions = snapshot.data!;
@@ -161,22 +157,20 @@ class _HomeListState extends State<HomeList> {
                         },
                         style: ButtonStyle(
                           elevation: MaterialStateProperty.all(0),
-                          shape:
-                              MaterialStateProperty.all<RoundedRectangleBorder>(
-                                  RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20.0),
-                            side: BorderSide(color: Colors.black),
-                          )),
-                          foregroundColor:
-                              MaterialStateProperty.resolveWith<Color>(
+                          shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(20.0),
+                              side: BorderSide(color: Colors.black),
+                            ),
+                          ),
+                          foregroundColor: MaterialStateProperty.resolveWith<Color>(
                             (Set<MaterialState> states) {
                               return _selectedWalletIndex == index
                                   ? Colors.white
                                   : Colors.black;
                             },
                           ),
-                          backgroundColor:
-                              MaterialStateProperty.resolveWith<Color>(
+                          backgroundColor: MaterialStateProperty.resolveWith<Color>(
                             (Set<MaterialState> states) {
                               return _selectedWalletIndex == index
                                   ? Colors.black
@@ -196,10 +190,9 @@ class _HomeListState extends State<HomeList> {
           Expanded(
             child: Consumer<WalletProvider>(
               builder: (context, walletProvider, _) {
-                Wallet selectedWallet =
-                    walletProvider.wallets[_selectedWalletIndex];
+                final selectedWallet = walletProvider.wallets[_selectedWalletIndex];
                 return GestureDetector(
-                  onHorizontalDragEnd: _handleSwipe,
+                  onHorizontalDragEnd: walletProvider.wallets.length > 1 ? _handleSwipe : null,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -233,7 +226,8 @@ class _HomeListState extends State<HomeList> {
                       SizedBox(height: 10),
                       Expanded(
                         child: FutureBuilder<List<Transaction>>(
-                          future: _fetchTransactions(selectedWallet.id!),
+                          future
+: _fetchTransactions(selectedWallet.id!),
                           builder: (context, snapshot) {
                             if (snapshot.connectionState ==
                                 ConnectionState.waiting) {
@@ -384,15 +378,16 @@ class _HomeListState extends State<HomeList> {
     int index = 0;
 
     categoryAmounts.forEach((category, amount) {
-      bool isSelected = _selectedCategory == category;
-      sections.add(PieChartSectionData(
-        color: fixedColors[int.parse(category)],
-        value: amount,
-        title: '',
-        radius: isSelected ? 100 : 90,
-      ));
-
-      index++;
+      if (amount > 0) {
+        bool isSelected = _selectedCategory == category;
+        sections.add(PieChartSectionData(
+          color: fixedColors[index % fixedColors.length], // Utilizza colori fissi ciclicamente
+          value: amount,
+          title: '',
+          radius: isSelected ? 100 : 90,
+        ));
+        index++;
+      }
     });
 
     return sections;
@@ -405,13 +400,15 @@ class _HomeListState extends State<HomeList> {
     final categoryIndex = _getTouchedCategoryIndex(touchAngle, categoryAmounts);
 
     setState(() {
-      String tappedCategory = categoryAmounts.keys.elementAt(categoryIndex);
-      if (_selectedCategory == tappedCategory) {
-        _selectedCategory = null;
-      } else {
-        _selectedCategory = tappedCategory;
-        nomeCategoria = categories[int.parse(tappedCategory)].name;
-        valoreCategoria = categoryAmounts[tappedCategory]!;
+      if (categoryIndex != -1) {
+        String tappedCategory = categoryAmounts.keys.elementAt(categoryIndex);
+        if (_selectedCategory == tappedCategory) {
+          _selectedCategory = null;
+        } else {
+          _selectedCategory = tappedCategory;
+          nomeCategoria = categories[int.parse(tappedCategory)].name;
+          valoreCategoria = categoryAmounts[tappedCategory]!;
+        }
       }
     });
   }
