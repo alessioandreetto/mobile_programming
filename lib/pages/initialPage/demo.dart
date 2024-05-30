@@ -60,6 +60,7 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
                         ),
                         child: TextButton(
                           onPressed: () {
+                            Navigator.of(context).pop(true); 
                             // Azione da eseguire quando viene premuto il pulsante "Fine tutorial"
                           },
                           child: Text(
