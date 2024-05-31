@@ -74,7 +74,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
         });
       });
     } else {
-      // Imposta la data di default selezionata come quella di oggi per una nuova transazione
+      // Set the default selected date to today for a new transaction
       _selectedDate = DateTime.now();
       widget.dateController.text =
           "${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}";
@@ -86,12 +86,16 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
     setState(() {
       _wallets = wallets;
       if (_wallets.isNotEmpty) {
+        final walletProvider =
+            Provider.of<WalletProvider>(context, listen: false);
+        final selectedWallet =
+            walletProvider.wallets[walletProvider.selectedWalletIndex];
         _selectedWallet = widget.transaction != null
             ? _wallets
                 .firstWhere(
                     (wallet) => wallet.id == widget.transaction!.transactionId)
                 .name!
-            : _wallets[0].name!;
+            : selectedWallet.name!;
       }
     });
   }
@@ -227,7 +231,6 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
             ElevatedButton(
               onPressed: () async {
                 if (_validateFields()) {
-                 
                   await _performRegularTransaction();
 
                   Provider.of<WalletProvider>(context, listen: false)
@@ -243,10 +246,9 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                   _showSnackbar(context, 'Inserisci tutti i campi');
                 }
               },
-              child: Text(
-                  widget.transaction == null
-                      ? 'Aggiungi Transazione'
-                      : 'Modifica Transazione'),
+              child: Text(widget.transaction == null
+                  ? 'Aggiungi Transazione'
+                  : 'Modifica Transazione'),
             ),
           ],
         ),
@@ -284,7 +286,8 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
           (wallet) => wallet.id == widget.transaction!.transactionId);
 
       // Rimuovi la transazione dal portafoglio originale
-      originalWallet.balance = originalWallet.balance! - widget.transaction!.value!;
+      originalWallet.balance =
+          originalWallet.balance! - widget.transaction!.value!;
       await dbHelper.updateWallet(originalWallet);
 
       // Aggiungi la transazione al nuovo portafoglio selezionato
@@ -297,8 +300,8 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
       // Aggiorna la transazione nel database
       widget.transaction!.name = widget.nameController.text;
       widget.transaction!.categoryId = _selectedCategoryId;
-      widget.transaction!.date = _selectedDate?.toIso8601String() ??
-          DateTime.now().toIso8601String();
+      widget.transaction!.date =
+          _selectedDate?.toIso8601String() ?? DateTime.now().toIso8601String();
       widget.transaction!.value = transactionValue;
       await dbHelper.updateTransaction(widget.transaction!);
     } else {
@@ -327,8 +330,8 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
 
   Future<void> _deleteTransaction(BuildContext context) async {
     if (widget.transaction != null) {
-      Wallet wallet = _wallets
-          .firstWhere((wallet) => wallet.id == widget.transaction!.transactionId);
+      Wallet wallet = _wallets.firstWhere(
+          (wallet) => wallet.id == widget.transaction!.transactionId);
 
       wallet.balance = wallet.balance! - widget.transaction!.value!;
 
