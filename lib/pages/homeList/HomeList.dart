@@ -151,8 +151,11 @@ class _HomeListState extends State<HomeList> {
                                   child: Text('Errore: ${snapshot.error}'));
                             } else if (!snapshot.hasData ||
                                 snapshot.data!.isEmpty) {
-                              return Center(
-                                  child: Text('Nessuna transazione trovata'));
+                              return Container(
+                                width: 150,
+                                height: 150,
+                          
+                              );
                             } else {
                               List<Transaction> transactions = snapshot.data!;
                               Map<String, double> categoryAmounts =
