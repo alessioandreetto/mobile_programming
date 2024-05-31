@@ -6,11 +6,15 @@ class WalletProvider with ChangeNotifier {
   List<Wallet> _wallets = [];
   String _name = 'User';
   String _valuta = '€';
+    int _selectedWalletIndex = 0; // Aggiunta della variabile per l'indice del wallet selezionato
+
 
   List<Wallet> get wallets => _wallets;
 
   String get name => _name;
   String get valuta => _valuta;
+    int get selectedWalletIndex => _selectedWalletIndex; // Getter per l'indice del wallet selezionato
+
 
   Future<List<Wallet>> loadWallets() async {
     _wallets = await DatabaseHelper().getWallets();
@@ -75,6 +79,12 @@ class WalletProvider with ChangeNotifier {
 
   Future<void> refreshWallets() async {
     _wallets = await loadWallets(); // Ricarica i portafogli
+    notifyListeners();
+  }
+
+
+    void updateSelectedWalletIndex(int index) {
+    _selectedWalletIndex = index;
     notifyListeners();
   }
 }

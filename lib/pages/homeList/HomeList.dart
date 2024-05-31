@@ -64,7 +64,7 @@ class _HomeListState extends State<HomeList> {
     }
   }
 
-  void _handleButtonPress(int index) {
+ void _handleButtonPress(int index) {
     setState(() {
       if (index > _selectedWalletIndex) {
         _swipedLeft = true;
@@ -73,6 +73,10 @@ class _HomeListState extends State<HomeList> {
       }
       _selectedWalletIndex = index;
       _selectedCategory = null;
+
+      // Notifica al provider l'indice del wallet selezionato
+      Provider.of<WalletProvider>(context, listen: false)
+          .updateSelectedWalletIndex(index);
     });
   }
 
