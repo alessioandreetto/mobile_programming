@@ -73,6 +73,11 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
           _selectedWallet = originalWallet.name!;
         });
       });
+    } else {
+      // Imposta la data di default selezionata come quella di oggi per una nuova transazione
+      _selectedDate = DateTime.now();
+      widget.dateController.text =
+          "${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}";
     }
   }
 
@@ -92,9 +97,10 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
+    DateTime selectedDate = _selectedDate ?? DateTime.now();
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: _selectedDate ?? DateTime.now(),
+      initialDate: selectedDate,
       firstDate: DateTime(2000),
       lastDate: DateTime(2101),
     );
@@ -221,6 +227,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
             ElevatedButton(
               onPressed: () async {
                 if (_validateFields()) {
+                 
                   await _performRegularTransaction();
 
                   Provider.of<WalletProvider>(context, listen: false)
@@ -236,8 +243,8 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                   _showSnackbar(context, 'Inserisci tutti i campi');
                 }
               },
-              child: Text
-(widget.transaction == null
+              child: Text(
+                  widget.transaction == null
                       ? 'Aggiungi Transazione'
                       : 'Modifica Transazione'),
             ),
@@ -262,64 +269,61 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
     }).toList();
   }
 
-Future<void> _performRegularTransaction() async {
-  double transactionValue = double.parse(widget.valueController.text);
-  if (_selectedActionIndex == 1) {
-    transactionValue = -transactionValue;
+  Future<void> _performRegularTransaction() async {
+    double transactionValue = double.parse(widget.valueController.text);
+    if (_selectedActionIndex == 1) {
+      transactionValue = -transactionValue;
+    }
+
+    Wallet selectedWallet =
+        _wallets.firstWhere((wallet) => wallet.name == _selectedWallet);
+
+    if (widget.transaction != null) {
+      // Ottieni il portafoglio originale della transazione
+      Wallet originalWallet = _wallets.firstWhere(
+          (wallet) => wallet.id == widget.transaction!.transactionId);
+
+      // Rimuovi la transazione dal portafoglio originale
+      originalWallet.balance = originalWallet.balance! - widget.transaction!.value!;
+      await dbHelper.updateWallet(originalWallet);
+
+      // Aggiungi la transazione al nuovo portafoglio selezionato
+      selectedWallet.balance = selectedWallet.balance! + transactionValue;
+      await dbHelper.updateWallet(selectedWallet);
+
+      // Aggiorna l'ID del portafoglio per la transazione
+      widget.transaction!.transactionId = selectedWallet.id;
+
+      // Aggiorna la transazione nel database
+      widget.transaction!.name = widget.nameController.text;
+      widget.transaction!.categoryId = _selectedCategoryId;
+      widget.transaction!.date = _selectedDate?.toIso8601String() ??
+          DateTime.now().toIso8601String();
+      widget.transaction!.value = transactionValue;
+      await dbHelper.updateTransaction(widget.transaction!);
+    } else {
+      // Logica per aggiungere una nuova transazione
+      Transaction newTransaction = Transaction(
+        name: widget.nameController.text,
+        categoryId: _selectedCategoryId,
+        date: _selectedDate?.toIso8601String() ??
+            DateTime.now().toIso8601String(),
+        value: transactionValue,
+        transactionId: selectedWallet.id,
+      );
+
+      await dbHelper.insertTransaction(newTransaction);
+
+      // Aggiorna il bilancio del nuovo portafoglio
+      double newBalance = selectedWallet.balance! + transactionValue;
+      Wallet updatedWallet = Wallet(
+        id: selectedWallet.id,
+        name: selectedWallet.name,
+        balance: newBalance,
+      );
+      await dbHelper.updateWallet(updatedWallet);
+    }
   }
-
-  Wallet selectedWallet =
-      _wallets.firstWhere((wallet) => wallet.name == _selectedWallet);
-
-  if (widget.transaction != null) {
-    // Ottieni il portafoglio originale della transazione
-    Wallet originalWallet = _wallets.firstWhere(
-        (wallet) => wallet.id == widget.transaction!.transactionId);
-
-    // Rimuovi la transazione dal portafoglio originale
-    originalWallet.balance = originalWallet.balance! - widget.transaction!.value!;
-    await dbHelper.updateWallet(originalWallet);
-
-    // Aggiungi la transazione al nuovo portafoglio selezionato
-    selectedWallet.balance = selectedWallet.balance! + transactionValue;
-    await dbHelper.updateWallet(selectedWallet);
-
-    // Aggiorna l'ID del portafoglio per la transazione
-    widget.transaction!.transactionId = selectedWallet.id;
-
-    // Aggiorna la transazione nel database
-    widget.transaction!.name = widget.nameController.text;
-    widget.transaction!.categoryId = _selectedCategoryId;
-    widget.transaction!.date = _selectedDate?.toIso8601String() ??
-        DateTime.now().toIso8601String();
-    widget.transaction!.value = transactionValue;
-    await dbHelper.updateTransaction(widget.transaction!);
-  } else {
-    // Logica per aggiungere una nuova transazione
-    Transaction newTransaction = Transaction(
-      name: widget.nameController.text,
-      categoryId: _selectedCategoryId,
-      date: _selectedDate?.toIso8601String() ??
-          DateTime.now().toIso8601String(),
-      value: transactionValue,
-      transactionId: selectedWallet.id,
-    );
-
-    await dbHelper.insertTransaction(newTransaction);
-
-    // Aggiorna il bilancio del nuovo portafoglio
-    double newBalance = selectedWallet.balance! + transactionValue;
-    Wallet updatedWallet = Wallet(
-      id: selectedWallet.id,
-      name: selectedWallet.name,
-      balance: newBalance,
-    );
-    await dbHelper.updateWallet(updatedWallet);
-  }
-}
-
-
-  
 
   Future<void> _deleteTransaction(BuildContext context) async {
     if (widget.transaction != null) {
