@@ -184,16 +184,111 @@ class _HomeListState extends State<ChartsList> {
 
                               return LineChart(
                                 LineChartData(
-                                  gridData: FlGridData(show: false),
-                                  titlesData: FlTitlesData(show: false),
-                                  borderData: FlBorderData(show: false),
+                                  gridData: FlGridData(
+                                    show: true,
+                                    getDrawingHorizontalLine: (value) {
+                                      return FlLine(
+                                        color: Color(0xffe7e8ec),
+                                        strokeWidth: 1,
+                                      );
+                                    },
+                                    getDrawingVerticalLine: (value) {
+                                      return FlLine(
+                                        color: Color(0xffe7e8ec),
+                                        strokeWidth: 1,
+                                      );
+                                    },
+                                  ),
+                                  titlesData: FlTitlesData(
+                                    show: true,
+                                    bottomTitles: AxisTitles(
+                                      sideTitles: SideTitles(
+                                        showTitles: true,
+                                        getTitlesWidget: (value, meta) {
+                                          return Padding(
+                                            padding:
+                                                const EdgeInsets.only(top: 8.0),
+                                            child: Text(
+                                              value.toInt().toString(),
+                                              style: TextStyle(
+                                                color: Color(0xff939393),
+                                                fontSize: 10,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                    leftTitles: AxisTitles(
+                                      sideTitles: SideTitles(
+                                        showTitles: true,
+                                        getTitlesWidget: (value, meta) {
+                                          return Padding(
+                                            padding: const EdgeInsets.only(
+                                                right: 8.0),
+                                            child: Text(
+                                              value.toInt().toString(),
+                                              style: TextStyle(
+                                                color: Color(0xff939393),
+                                                fontSize: 10,
+                                              ),
+                                            ),
+                                          );
+                                        },
+                                      ),
+                                    ),
+                                    rightTitles: AxisTitles(
+                                      sideTitles: SideTitles(
+                                        showTitles: false,
+                                      ),
+                                    ),
+                                    topTitles: AxisTitles(
+                                      sideTitles: SideTitles(
+                                        showTitles: false,
+                                      ),
+                                    ),
+                                  ),
+                                  borderData: FlBorderData(
+                                    show: true,
+                                    border: Border.all(
+                                        color: const Color(0xffe7e8ec),
+                                        width: 1),
+                                  ),
+                                  minX: 0,
+                                  maxX: transactions.length.toDouble(),
+                                  minY: _chartData
+                                      .map((spot) => spot.y)
+                                      .reduce(Math.min)
+                                      .floorToDouble(),
+                                  maxY: _chartData
+                                      .map((spot) => spot.y)
+                                      .reduce(Math.max)
+                                      .ceilToDouble(),
                                   lineBarsData: [
                                     LineChartBarData(
                                       spots: _chartData,
                                       isCurved: true,
+                                      gradient: LinearGradient(
+                                        colors: [
+                                          Color(0xff4af699),
+                                          Color(0xff23b6e6),
+                                        ],
+                                        begin: Alignment.centerLeft,
+                                        end: Alignment.centerRight,
+                                      ),
                                       barWidth: 4,
                                       isStrokeCapRound: true,
-                                      belowBarData: BarAreaData(show: false),
+                                      belowBarData: BarAreaData(
+                                        show: true,
+                                        gradient: LinearGradient(
+                                          colors: [
+                                            Color(0xff4af699).withOpacity(0.4),
+                                            Color(0xff23b6e6).withOpacity(0.4),
+                                          ],
+                                          begin: Alignment.centerLeft,
+                                          end: Alignment.centerRight,
+                                        ),
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -207,65 +302,6 @@ class _HomeListState extends State<ChartsList> {
                 ),
               );
             },
-          ),
-          SizedBox(height: 20),
-          Container(
-            height: 50,
-            child: Consumer<WalletProvider>(
-              builder: (context, walletProvider, _) {
-                if (walletProvider.wallets.isEmpty) {
-                  return Center(
-                    child: Text('No wallets available.'),
-                  );
-                }
-                List<Wallet> wallets = walletProvider.wallets;
-                return ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: wallets.length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 8.0, horizontal: 8.0),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          setState(() {
-                            _selectedWalletIndex = index;
-                            _selectedCategory = null;
-                          });
-                          _fetchAndUpdateChartData(wallets[index].id!);
-                        },
-                        style: ButtonStyle(
-                          elevation: MaterialStateProperty.all(0),
-                          shape:
-                              MaterialStateProperty.all<RoundedRectangleBorder>(
-                                  RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20.0),
-                            side: BorderSide(color: Colors.black),
-                          )),
-                          foregroundColor:
-                              MaterialStateProperty.resolveWith<Color>(
-                            (Set<MaterialState> states) {
-                              return _selectedWalletIndex == index
-                                  ? Colors.white
-                                  : Colors.black;
-                            },
-                          ),
-                          backgroundColor:
-                              MaterialStateProperty.resolveWith<Color>(
-                            (Set<MaterialState> states) {
-                              return _selectedWalletIndex == index
-                                  ? Colors.black
-                                  : Colors.white;
-                            },
-                          ),
-                        ),
-                        child: Text(wallets[index].name!),
-                      ),
-                    );
-                  },
-                );
-              },
-            ),
           ),
           SizedBox(height: 20),
           Expanded(
