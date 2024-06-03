@@ -43,11 +43,14 @@ class _HomeListState extends State<ChartsList> {
 
   void _loadInitialData() async {
     await Provider.of<WalletProvider>(context, listen: false).loadWallets();
-    if (Provider.of<WalletProvider>(context, listen: false).wallets.isNotEmpty) {
+    if (Provider.of<WalletProvider>(context, listen: false)
+        .wallets
+        .isNotEmpty) {
       setState(() {
         _selectedWalletIndex = 0;
       });
-      _fetchAndUpdateChartData(Provider.of<WalletProvider>(context, listen: false).wallets[0].id!);
+      _fetchAndUpdateChartData(
+          Provider.of<WalletProvider>(context, listen: false).wallets[0].id!);
     }
   }
 
@@ -81,8 +84,13 @@ class _HomeListState extends State<ChartsList> {
       }
     }
 
-    if (Provider.of<WalletProvider>(context, listen: false).wallets.isNotEmpty) {
-      _fetchAndUpdateChartData(Provider.of<WalletProvider>(context, listen: false).wallets[_selectedWalletIndex].id!);
+    if (Provider.of<WalletProvider>(context, listen: false)
+        .wallets
+        .isNotEmpty) {
+      _fetchAndUpdateChartData(
+          Provider.of<WalletProvider>(context, listen: false)
+              .wallets[_selectedWalletIndex]
+              .id!);
     }
   }
 
@@ -102,64 +110,82 @@ class _HomeListState extends State<ChartsList> {
             builder: (context, walletProvider, _) {
               if (walletProvider.wallets.isEmpty) {
                 return Center(
-                  child: Text('No wallets available.'),
+                  child: Text(''),
                 );
               }
-              Wallet selectedWallet = walletProvider.wallets[_selectedWalletIndex];
+              Wallet selectedWallet =
+                  walletProvider.wallets[_selectedWalletIndex];
               String valuta = walletProvider.valuta;
               return Padding(
                 padding: const EdgeInsets.all(8.0),
                 child: Column(
                   children: [
-
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        ...['Today', 'Weekly', 'Monthly', 'Yearly'].map((period) => SizedBox(
-                              width: 93,
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  setState(() {
-                                    _selectedButton = period;
-                                  });
-                                  _fetchAndUpdateChartData(selectedWallet.id!);
-                                },
-                                style: ButtonStyle(
-                                  shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                                    RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(10.0),
+                        ...['Today', 'Weekly', 'Monthly', 'Yearly']
+                            .map((period) => SizedBox(
+                                  width: 93,
+                                  child: ElevatedButton(
+                                    onPressed: () {
+                                      setState(() {
+                                        _selectedButton = period;
+                                      });
+                                      _fetchAndUpdateChartData(
+                                          selectedWallet.id!);
+                                    },
+                                    style: ButtonStyle(
+                                      shape: MaterialStateProperty.all<
+                                          RoundedRectangleBorder>(
+                                        RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
+                                        ),
+                                      ),
+                                      elevation: MaterialStateProperty.all(0),
+                                      backgroundColor: MaterialStateProperty
+                                          .resolveWith<Color>((states) {
+                                        return _selectedButton == period
+                                            ? Color(0xffE63C3A)
+                                            : Colors.transparent;
+                                      }),
                                     ),
+                                    child: Text(period,
+                                        style: TextStyle(
+                                            fontSize: 12,
+                                            color: _selectedButton == period
+                                                ? Colors.black
+                                                : Color(0xffb3b3b3))),
                                   ),
-                                  elevation: MaterialStateProperty.all(0),
-                                  backgroundColor: MaterialStateProperty.resolveWith<Color>((states) {
-                                    return _selectedButton == period ? Color(0xffE63C3A) : Colors.transparent;
-                                  }),
-                                ),
-                                child: Text(period, style: TextStyle(fontSize: 12, color: _selectedButton == period ? Colors.black : Color(0xffb3b3b3))),
-                              ),
-                            )).toList(),
+                                ))
+                            .toList(),
                       ],
                     ),
                     GestureDetector(
                       onHorizontalDragEnd: _handleSwipe,
                       child: Container(
                         height: 200,
-                        padding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),
+                        padding: EdgeInsets.symmetric(
+                            vertical: 20.0, horizontal: 16.0),
                         child: FutureBuilder<Map<String, dynamic>>(
-                          future: _fetchTransactions(selectedWallet.id!, _selectedButton),
+                          future: _fetchTransactions(
+                              selectedWallet.id!, _selectedButton),
                           builder: (context, snapshot) {
                             if (snapshot.hasError) {
                               return Center(
                                 child: Text('Error: ${snapshot.error}'),
                               );
                             } else {
-                              if (!snapshot.hasData || snapshot.connectionState == ConnectionState.waiting) {
+                              if (!snapshot.hasData ||
+                                  snapshot.connectionState ==
+                                      ConnectionState.waiting) {
                                 return Center(
                                   child: CircularProgressIndicator(),
                                 );
                               }
                               Wallet selectedWallet = snapshot.data!['wallet'];
-                              List<Transaction> transactions = snapshot.data!['transactions'];
+                              List<Transaction> transactions =
+                                  snapshot.data!['transactions'];
 
                               _calculateChartData(transactions, selectedWallet);
 
@@ -187,7 +213,8 @@ class _HomeListState extends State<ChartsList> {
                                         showTitles: true,
                                         getTitlesWidget: (value, meta) {
                                           return Padding(
-                                            padding: const EdgeInsets.only(top: 8.0),
+                                            padding:
+                                                const EdgeInsets.only(top: 8.0),
                                             child: Text(
                                               value.toInt().toString(),
                                               style: TextStyle(
@@ -204,7 +231,8 @@ class _HomeListState extends State<ChartsList> {
                                         showTitles: true,
                                         getTitlesWidget: (value, meta) {
                                           return Padding(
-                                            padding: const EdgeInsets.only(right: 8.0),
+                                            padding: const EdgeInsets.only(
+                                                right: 8.0),
                                             child: Text(
                                               value.toInt().toString(),
                                               style: TextStyle(
@@ -229,12 +257,20 @@ class _HomeListState extends State<ChartsList> {
                                   ),
                                   borderData: FlBorderData(
                                     show: true,
-                                    border: Border.all(color: const Color(0xffe7e8ec), width: 1),
+                                    border: Border.all(
+                                        color: const Color(0xffe7e8ec),
+                                        width: 1),
                                   ),
                                   minX: 0,
                                   maxX: transactions.length.toDouble(),
-                                  minY: _chartData.map((spot) => spot.y).reduce(Math.min).floorToDouble(),
-                                  maxY: _chartData.map((spot) => spot.y).reduce(Math.max).ceilToDouble(),
+                                  minY: _chartData
+                                      .map((spot) => spot.y)
+                                      .reduce(Math.min)
+                                      .floorToDouble(),
+                                  maxY: _chartData
+                                      .map((spot) => spot.y)
+                                      .reduce(Math.max)
+                                      .ceilToDouble(),
                                   lineBarsData: [
                                     LineChartBarData(
                                       spots: _chartData,
@@ -269,53 +305,50 @@ class _HomeListState extends State<ChartsList> {
                         ),
                       ),
                     ),
-
-
-             Container(
-                height: 50,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: walletProvider.wallets.length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 8.0, horizontal: 8.0),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          _handleButtonPress(index);
+                    Container(
+                      height: 50,
+                      child: ListView.builder(
+                        scrollDirection: Axis.horizontal,
+                        itemCount: walletProvider.wallets.length,
+                        itemBuilder: (context, index) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 8.0, horizontal: 8.0),
+                            child: ElevatedButton(
+                              onPressed: () {
+                                _handleButtonPress(index);
+                              },
+                              style: ButtonStyle(
+                                elevation: MaterialStateProperty.all(0),
+                                shape: MaterialStateProperty.all<
+                                        RoundedRectangleBorder>(
+                                    RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(20.0),
+                                  side: BorderSide(color: Colors.black),
+                                )),
+                                foregroundColor:
+                                    MaterialStateProperty.resolveWith<Color>(
+                                  (Set<MaterialState> states) {
+                                    return _selectedWalletIndex == index
+                                        ? Colors.white
+                                        : Colors.black;
+                                  },
+                                ),
+                                backgroundColor:
+                                    MaterialStateProperty.resolveWith<Color>(
+                                  (Set<MaterialState> states) {
+                                    return _selectedWalletIndex == index
+                                        ? Colors.black
+                                        : Colors.white;
+                                  },
+                                ),
+                              ),
+                              child: Text(walletProvider.wallets[index].name!),
+                            ),
+                          );
                         },
-                        style: ButtonStyle(
-                          elevation: MaterialStateProperty.all(0),
-                          shape:
-                              MaterialStateProperty.all<RoundedRectangleBorder>(
-                                  RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20.0),
-                            side: BorderSide(color: Colors.black),
-                          )),
-                          foregroundColor:
-                              MaterialStateProperty.resolveWith<Color>(
-                            (Set<MaterialState> states) {
-                              return _selectedWalletIndex == index
-                                  ? Colors.white
-                                  : Colors.black;
-                            },
-                          ),
-                          backgroundColor:
-                              MaterialStateProperty.resolveWith<Color>(
-                            (Set<MaterialState> states) {
-                              return _selectedWalletIndex == index
-                                  ? Colors.black
-                                  : Colors.white;
-                            },
-                          ),
-                        ),
-                        child: Text(walletProvider.wallets[index].name!),
                       ),
-                    );
-                  },
-                ),
-              ),
-
+                    ),
                   ],
                 ),
               );
@@ -327,10 +360,11 @@ class _HomeListState extends State<ChartsList> {
               builder: (context, walletProvider, _) {
                 if (walletProvider.wallets.isEmpty) {
                   return Center(
-                    child: Text('No wallets available.'),
+                    child: Text('Nessun portafoglio disponibile'),
                   );
                 }
-                Wallet selectedWallet = walletProvider.wallets[_selectedWalletIndex];
+                Wallet selectedWallet =
+                    walletProvider.wallets[_selectedWalletIndex];
                 String valuta = walletProvider.valuta;
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -339,13 +373,16 @@ class _HomeListState extends State<ChartsList> {
                     SizedBox(height: 10),
                     Expanded(
                       child: FutureBuilder<List<Transaction>>(
-                        future: _fetchNegativeTransactions(selectedWallet.id!, _selectedButton),
+                        future: _fetchNegativeTransactions(
+                            selectedWallet.id!, _selectedButton),
                         builder: (context, snapshot) {
                           if (snapshot.hasError) {
                             return Center(
                               child: Text('Error: ${snapshot.error}'),
                             );
-                          } else if (!snapshot.hasData || snapshot.connectionState == ConnectionState.waiting) {
+                          } else if (!snapshot.hasData ||
+                              snapshot.connectionState ==
+                                  ConnectionState.waiting) {
                             return Center(
                               child: CircularProgressIndicator(),
                             );
@@ -359,15 +396,18 @@ class _HomeListState extends State<ChartsList> {
                             return ListView.builder(
                               itemCount: transactions.length,
                               itemBuilder: (context, index) {
-                                final transaction = transactions.reversed.toList()[index];
+                                final transaction =
+                                    transactions.reversed.toList()[index];
                                 final date = DateTime.parse(transaction.date!);
                                 final formattedDate = _formatDateTime(date);
                                 return GestureDetector(
                                   onTap: () {
-                                    _navigateToTransactionDetail(context, transaction);
+                                    _navigateToTransactionDetail(
+                                        context, transaction);
                                   },
                                   child: Container(
-                                    margin: EdgeInsets.only(bottom: 10, left: 10, right: 10),
+                                    margin: EdgeInsets.only(
+                                        bottom: 10, left: 10, right: 10),
                                     decoration: BoxDecoration(
                                       border: Border.all(
                                         color: Color(0xffb3b3b3),
@@ -377,7 +417,8 @@ class _HomeListState extends State<ChartsList> {
                                     ),
                                     child: ListTile(
                                       title: Text(transaction.name ?? ''),
-                                      subtitle: Text("Data: $formattedDate, Valore: ${transaction.value} $valuta"),
+                                      subtitle: Text(
+                                          "Data: $formattedDate, Valore: ${transaction.value} $valuta"),
                                     ),
                                   ),
                                 );
@@ -397,19 +438,22 @@ class _HomeListState extends State<ChartsList> {
     );
   }
 
-  Future<Map<String, dynamic>> _fetchTransactions(int walletId, String selectedButton) async {
+  Future<Map<String, dynamic>> _fetchTransactions(
+      int walletId, String selectedButton) async {
     Map<String, dynamic> result = {};
 
     Wallet wallet = await DatabaseHelper().getWalletById(walletId);
     result['wallet'] = wallet;
 
-    List<Transaction> transactions = await _fetchNegativeTransactions(walletId, selectedButton);
+    List<Transaction> transactions =
+        await _fetchNegativeTransactions(walletId, selectedButton);
     result['transactions'] = transactions;
 
     return result;
   }
 
-  Future<List<Transaction>> _fetchNegativeTransactions(int walletId, String selectedButton) async {
+  Future<List<Transaction>> _fetchNegativeTransactions(
+      int walletId, String selectedButton) async {
     DateTime startDate = DateTime.now();
     DateTime now = DateTime.now();
     if (selectedButton == 'Today') {
@@ -422,7 +466,8 @@ class _HomeListState extends State<ChartsList> {
       startDate = DateTime(now.year, 1, 1);
     }
 
-    List<Transaction> transactions = await DatabaseHelper().getTransactionsForWallet(walletId);
+    List<Transaction> transactions =
+        await DatabaseHelper().getTransactionsForWallet(walletId);
 
     transactions = transactions.where((transaction) {
       DateTime transactionDate = DateTime.parse(transaction.date!);
@@ -430,7 +475,8 @@ class _HomeListState extends State<ChartsList> {
           transactionDate.isBefore(now.add(Duration(days: 1)));
     }).toList();
 
-    transactions.sort((a, b) => DateTime.parse(a.date!).compareTo(DateTime.parse(b.date!)));
+    transactions.sort(
+        (a, b) => DateTime.parse(a.date!).compareTo(DateTime.parse(b.date!)));
 
     return transactions;
   }
@@ -441,8 +487,10 @@ class _HomeListState extends State<ChartsList> {
   }
 
   String _formatDateTime(DateTime dateTime) {
-    final formattedDate = "${dateTime.year}-${_twoDigits(dateTime.month)}-${_twoDigits(dateTime.day)}";
-    final formattedTime = "${_twoDigits(dateTime.hour)}:${_twoDigits(dateTime.minute)}";
+    final formattedDate =
+        "${dateTime.year}-${_twoDigits(dateTime.month)}-${_twoDigits(dateTime.day)}";
+    final formattedTime =
+        "${_twoDigits(dateTime.hour)}:${_twoDigits(dateTime.minute)}";
     return "$formattedDate";
   }
 
@@ -462,7 +510,8 @@ class _HomeListState extends State<ChartsList> {
     }
   }
 
-  void _navigateToTransactionDetail(BuildContext context, Transaction transaction) {
+  void _navigateToTransactionDetail(
+      BuildContext context, Transaction transaction) {
     Navigator.push(
       context,
       MaterialPageRoute(
@@ -478,10 +527,10 @@ class _HomeListState extends State<ChartsList> {
   }
 
   void _handleButtonPress(int index) {
-  setState(() {
-    _selectedWalletIndex = index;
-  });
-  _fetchAndUpdateChartData(Provider.of<WalletProvider>(context, listen: false).wallets[index].id!);
-}
-
+    setState(() {
+      _selectedWalletIndex = index;
+    });
+    _fetchAndUpdateChartData(
+        Provider.of<WalletProvider>(context, listen: false).wallets[index].id!);
+  }
 }

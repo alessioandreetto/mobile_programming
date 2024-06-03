@@ -25,8 +25,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> _loadValutaFromSharedPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
-      _selectedValuta = prefs.getString('valuta') ??
-          '\$'; // Valore predefinito se non c'è nessun valore salvato
+      _selectedValuta = prefs.getString('valuta') ?? '€';
     });
   }
 
@@ -34,7 +33,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Settings'),
+        title: Text('Impostazioni'),
         backgroundColor: Colors.transparent,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
@@ -51,7 +50,7 @@ class _SettingsPageState extends State<SettingsPage> {
               color: Colors.white,
             ),
             child: ListTile(
-              title: Text('Change Account name'),
+              title: Text('Modifica nome account'),
               onTap: () {
                 Navigator.push(
                   context,
@@ -90,8 +89,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ),
           ),
-        
-            Container(
+          Container(
             margin: EdgeInsets.only(bottom: 10, left: 10, right: 10),
             decoration: BoxDecoration(
               border: Border.all(
@@ -103,7 +101,7 @@ class _SettingsPageState extends State<SettingsPage> {
             child: ListTile(
               title: Text('test tutorial iniziale'),
               onTap: () {
-                 Navigator.push(
+                Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => PageIndicatorDemo()),
                 );

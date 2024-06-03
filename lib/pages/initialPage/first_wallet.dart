@@ -3,8 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
 class FirstWallet extends StatefulWidget {
-
-
   FirstWallet();
 
   @override
@@ -25,20 +23,19 @@ class _FirstWalletState extends State<FirstWallet> {
           FocusScope.of(context).unfocus();
         },
         child: Scaffold(
-
           body: SingleChildScrollView(
-            child:
-             Column(
+            child: Column(
               children: [
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Crea qui il tuo primo wallet!', style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      )),
+                      Text('Crea qui il tuo primo wallet!',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          )),
                       SizedBox(height: 20),
                       Text(
                         'Inserisci qui sotto un nome significativo per il portafoglio che andrai a creare:',
@@ -128,7 +125,6 @@ class _FirstWalletState extends State<FirstWallet> {
               ],
             ),
           ),
-       
         ),
       ),
     );
@@ -141,10 +137,7 @@ class _FirstWalletState extends State<FirstWallet> {
     return true;
   }
 
-  void _saveNote() {
-    
-    print(titleController.text);
-  }
+  void _saveNote() {}
 
   @override
   void dispose() {

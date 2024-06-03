@@ -68,13 +68,11 @@ class WalletProvider with ChangeNotifier {
     notifyListeners();
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('valuta', newValuta);
-    print('valuta' + _valuta);
   }
 
   Future<void> loadValuta() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _valuta = prefs.getString('valuta') ?? '€';
-    print('Valuta caricata: $_valuta');
     notifyListeners();
   }
 
