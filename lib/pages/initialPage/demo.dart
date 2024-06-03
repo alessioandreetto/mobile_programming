@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_1/pages/initialPage/first_wallet.dart';
 import 'package:flutter_application_1/pages/initialPage/welcome_page.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import '../../page-selector.dart';
 
 class PageIndicatorDemo extends StatefulWidget {
   @override
@@ -49,7 +51,8 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
                     children: [
                       Text(
                         'Bene, è tutto pronto\nIniziamo!',
-                        style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 24, fontWeight: FontWeight.bold),
                         textAlign: TextAlign.center,
                       ),
                       SizedBox(height: 20),
@@ -59,10 +62,7 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
                           borderRadius: BorderRadius.circular(30),
                         ),
                         child: TextButton(
-                          onPressed: () {
-                            Navigator.of(context).pop(true); 
-                            // Azione da eseguire quando viene premuto il pulsante "Fine tutorial"
-                          },
+                          onPressed: _onTutorialCompleted,
                           child: Text(
                             'Fine tutorial',
                             style: TextStyle(color: Colors.black),
@@ -91,7 +91,8 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
                     },
                   )
                 else
-                  SizedBox(width: 48), // Lascia lo spazio se siamo alla prima pagina
+                  SizedBox(
+                      width: 48), // Lascia lo spazio se siamo alla prima pagina
                 SmoothPageIndicator(
                   controller: _pageController,
                   count: 4, // Numero totale di pagine
@@ -108,12 +109,27 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
                     },
                   )
                 else
-                  SizedBox(width: 48), // Lascia lo spazio se siamo all'ultima pagina
+                  SizedBox(
+                      width: 48), // Lascia lo spazio se siamo all'ultima pagina
               ],
             ),
           ),
         ],
       ),
     );
+  }
+
+  void _saveTutorialCompletion() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('firstTimeUser', false);
+  }
+
+  // Chiamato quando viene premuto il pulsante "Fine tutorial"
+  void _onTutorialCompleted() {
+    _saveTutorialCompletion();
+    Navigator.of(context).pushReplacement(MaterialPageRoute(
+      builder: (context) =>
+          BottomBarDemo(), // Cambia "HomePage()" con il nome della tua home page
+    ));
   }
 }
