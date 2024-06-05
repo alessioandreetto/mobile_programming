@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
-
+import 'package:provider/provider.dart';
 import 'pages/home.dart';
 import 'pages/charts.dart';
 import 'pages/wallet.dart';
 import 'pages/setting.dart';
 import 'providers/wallet_provider.dart';
 import 'pages/new_operation.dart';
-
-import 'fab.dart';
 
 class BottomBarDemo extends StatefulWidget {
   @override
@@ -54,19 +52,33 @@ class _BottomBarDemoState extends State<BottomBarDemo> {
         ),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
-      // floatingActionButton: FabPieMenu(),
-      floatingActionButton: FloatingActionButton(
-          child: Icon(Icons.add),
-          shape: CircleBorder(),
-          elevation: 0,
-          onPressed: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                  builder: (context) =>
-                      NewTransactionPage()), 
-            );
-          }),
+      floatingActionButton: Consumer<WalletProvider>(
+        builder: (context, walletProvider, child) {
+          bool hasWallets = walletProvider.wallets.isNotEmpty;
+          return FloatingActionButton(
+            onPressed: hasWallets
+                ? () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => NewTransactionPage()),
+                    );
+                  }
+                : () {
+                    _showSnackbar(context);
+                  },
+            child: Icon(
+              Icons.add,
+              color: Colors.white,
+            ),
+            backgroundColor: Colors.grey, // Cambiato da blue a grey
+            elevation: 5.0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(30.0),
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -95,5 +107,14 @@ class _BottomBarDemoState extends State<BottomBarDemo> {
         ),
       ),
     );
+  }
+
+  void _showSnackbar(BuildContext context) {
+    final snackBar = SnackBar(
+      content: Text(
+          'Impossibile aggiungere nuova transazione!\nCreare prima un nuovo wallet!'),
+      duration: Duration(seconds: 2), // Imposta la durata della snackbar
+    );
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }
