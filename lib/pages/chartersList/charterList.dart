@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/pages/charts.dart';
+import 'package:alessio_frocio/pages/charts.dart';
 import 'dart:math' as math;
 import '../../model/database_model.dart';
 import '../../providers/wallet_provider.dart';

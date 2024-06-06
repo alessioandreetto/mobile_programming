@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/pages/initialPage/first_wallet.dart';
-import 'package:flutter_application_1/pages/initialPage/welcome_page.dart';
+import 'package:alessio_frocio/pages/initialPage/first_wallet.dart';
+import 'package:alessio_frocio/pages/initialPage/welcome_page.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../page-selector.dart';

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/pages/chartersList/charterList.dart';
+import 'package:alessio_frocio/pages/chartersList/charterList.dart';
 
 import 'chartersList/charterList.dart';
 
