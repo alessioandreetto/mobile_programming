@@ -37,6 +37,13 @@ class WalletProvider with ChangeNotifier {
     await reloadWalletBalance(); // Aggiorna il saldo del wallet dopo l'inserimento della transazione
   }
 
+  void addWallet(String name, double initialBalance) {
+    final newWallet = Wallet(name: name, balance: initialBalance);
+    _wallets.add(newWallet);
+    notifyListeners();
+    DatabaseHelper().insertWallet(newWallet);
+  }
+
   Future<void> reloadWalletBalance() async {
     _wallets = await loadWallets();
     for (Wallet wallet in _wallets) {
