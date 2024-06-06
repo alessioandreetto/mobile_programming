@@ -1,3 +1,5 @@
+// ...
+
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/pages/charts.dart';
 import 'dart:math' as math;
@@ -78,7 +80,6 @@ class _ChartsListState extends State<ChartsList> {
               );
             }).toList(),
           ),
-         
           Expanded(
             child: PageView(
               controller: _pageController,
@@ -113,54 +114,55 @@ class _ChartsListState extends State<ChartsList> {
                   children: [
                     Text("Transazioni per ${selectedWallet.name}:"),
                     SizedBox(height: 10),
-                     Consumer<WalletProvider>(
-            builder: (context, walletProvider, _) {
-              return Container(
-                height: 50,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: walletProvider.wallets.length,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(
-                          vertical: 8.0, horizontal: 8.0),
-                      child: ElevatedButton(
-                        onPressed: () {
-                          _handleButtonPress(index);
-                        },
-                        style: ButtonStyle(
-                          elevation: MaterialStateProperty.all(0),
-                          shape: MaterialStateProperty.all<
-                                  RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(20.0),
-                            side: BorderSide(color: Colors.black),
-                          )),
-                          foregroundColor:
-                              MaterialStateProperty.resolveWith<Color>(
-                            (Set<MaterialState> states) {
-                              return _selectedWalletIndex == index
-                                  ? Colors.white
-                                  : Colors.black;
+                    Consumer<WalletProvider>(
+                      builder: (context, walletProvider, _) {
+                        return Container(
+                          height: 50,
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: walletProvider.wallets.length,
+                            itemBuilder: (context, index) {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 8.0, horizontal: 8.0),
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    _handleButtonPress(index);
+                                  },
+                                  style: ButtonStyle(
+                                    elevation: MaterialStateProperty.all(0),
+                                    shape: MaterialStateProperty.all<
+                                            RoundedRectangleBorder>(
+                                        RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(20.0),
+                                      side: BorderSide(color: Colors.black),
+                                    )),
+                                    foregroundColor: MaterialStateProperty
+                                        .resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                        return _selectedWalletIndex == index
+                                            ? Colors.white
+                                            : Colors.black;
+                                      },
+                                    ),
+                                    backgroundColor: MaterialStateProperty
+                                        .resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                        return _selectedWalletIndex == index
+                                            ? Colors.black
+                                            : Colors.white;
+                                      },
+                                    ),
+                                  ),
+                                  child:
+                                      Text(walletProvider.wallets[index].name!),
+                                ),
+                              );
                             },
                           ),
-                          backgroundColor:
-                              MaterialStateProperty.resolveWith<Color>(
-                            (Set<MaterialState> states) {
-                              return _selectedWalletIndex == index
-                                  ? Colors.black
-                                  : Colors.white;
-                            },
-                          ),
-                        ),
-                        child: Text(walletProvider.wallets[index].name!),
-                      ),
-                    );
-                  },
-                ),
-              );
-            },
-          ),
+                        );
+                      },
+                    ),
                     Expanded(
                       child: FutureBuilder<List<Transaction>>(
                         future: _fetchNegativeTransactions(
@@ -183,15 +185,14 @@ class _ChartsListState extends State<ChartsList> {
                                 child: Text('No transactions available.'),
                               );
                             }
-                            
+
                             return ListView.builder(
                               itemCount: transactions.length,
                               itemBuilder: (context, index) {
                                 final transaction =
                                     transactions.reversed.toList()[index];
                                 final date = DateTime.parse(transaction.date!);
-                                final formattedDate =
-                                    _formatDateTime(date);
+                                final formattedDate = _formatDateTime(date);
                                 return GestureDetector(
                                   onTap: () {
                                     _navigateToTransactionDetail(
@@ -225,13 +226,11 @@ class _ChartsListState extends State<ChartsList> {
               },
             ),
           ),
-          
         ],
       ),
     );
   }
 
-  // Method to build individual chart widgets
   Widget _buildChart(String period) {
     return Consumer<WalletProvider>(
       builder: (context, walletProvider, _) {
@@ -247,124 +246,129 @@ class _ChartsListState extends State<ChartsList> {
           future: _fetchTransactions(selectedWallet.id!, period),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center();
+              return Center(child: CircularProgressIndicator());
             } else if (snapshot.hasError) {
               return Center(child: Text('Error: ${snapshot.error}'));
             } else {
               List<Transaction> transactions = snapshot.data!['transactions'];
-              List<FlSpot> chartData = _calculateChartData(transactions, selectedWallet);
+              List<FlSpot> chartData =
+                  _calculateChartData(transactions, selectedWallet);
 
-      return        LineChart(
-                                LineChartData(
-                                  gridData: FlGridData(
-                                    show: true,
-                                    getDrawingHorizontalLine: (value) {
-                                      return FlLine(
-                                        color: Color(0xffe7e8ec),
-                                        strokeWidth: 1,
-                                      );
-                                    },
-                                    getDrawingVerticalLine: (value) {
-                                      return FlLine(
-                                        color: Color(0xffe7e8ec),
-                                        strokeWidth: 1,
-                                      );
-                                    },
-                                  ),
-                                  titlesData: FlTitlesData(
-                                    show: true,
-                                    bottomTitles: AxisTitles(
-                                      sideTitles: SideTitles(
-                                        showTitles: true,
-                                        getTitlesWidget: (value, meta) {
-                                          return Padding(
-                                            padding:
-                                                const EdgeInsets.only(top: 8.0),
-                                            child: Text(
-                                              value.toInt().toString(),
-                                              style: TextStyle(
-                                                color: Color(0xff939393),
-                                                fontSize: 10,
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                    leftTitles: AxisTitles(
-                                      sideTitles: SideTitles(
-                                        showTitles: true,
-                                        getTitlesWidget: (value, meta) {
-                                          return Padding(
-                                            padding: const EdgeInsets.only(
-                                                right: 8.0),
-                                            child: Text(
-                                              value.toInt().toString(),
-                                              style: TextStyle(
-                                                color: Color(0xff939393),
-                                                fontSize: 10,
-                                              ),
-                                            ),
-                                          );
-                                        },
-                                      ),
-                                    ),
-                                    rightTitles: AxisTitles(
-                                      sideTitles: SideTitles(
-                                        showTitles: false,
-                                      ),
-                                    ),
-                                    topTitles: AxisTitles(
-                                      sideTitles: SideTitles(
-                                        showTitles: false,
-                                      ),
-                                    ),
-                                  ),
-                                  borderData: FlBorderData(
-                                    show: true,
-                                    border: Border.all(
-                                        color: const Color(0xffe7e8ec),
-                                        width: 1),
-                                  ),
-                                  minX: 0,
-                                  maxX: transactions.length.toDouble(),
-                                  minY: chartData
-                                      .map((spot) => spot.y)
-                                      .reduce(math.min)
-                                      .floorToDouble(),
-                                  maxY: chartData
-                                      .map((spot) => spot.y)
-                                      .reduce(math.max)
-                                      .ceilToDouble(),
-                                  lineBarsData: [
-                                    LineChartBarData(
-                                      spots: chartData,
-                                      isCurved: true,
-                                      gradient: LinearGradient(
-                                        colors: [
-                                          Color(0xff4af699),
-                                          Color(0xff23b6e6),
-                                        ],
-                                        begin: Alignment.centerLeft,
-                                        end: Alignment.centerRight,
-                                      ),
-                                      barWidth: 4,
-                                      isStrokeCapRound: true,
-                                      belowBarData: BarAreaData(
-                                        show: true,
-                                        gradient: LinearGradient(
-                                          colors: [
-                                            Color(0xff4af699).withOpacity(0.4),
-                                            Color(0xff23b6e6).withOpacity(0.4),
-                                          ],
-                                          begin: Alignment.centerLeft,
-                                          end: Alignment.centerRight,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+              return Padding(
+                padding:
+                    const EdgeInsets.all(16.0), // Add padding around the chart
+                child: LineChart(
+                  LineChartData(
+                    gridData: FlGridData(
+                      show: true,
+                      getDrawingHorizontalLine: (value) {
+                        return FlLine(
+                          color: Color(0xffe7e8ec),
+                          strokeWidth: 1,
+                        );
+                      },
+                      getDrawingVerticalLine: (value) {
+                        return FlLine(
+                          color: Color(0xffe7e8ec),
+                          strokeWidth: 1,
+                        );
+                      },
+                    ),
+                    titlesData: FlTitlesData(
+                      show: true,
+                      bottomTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          getTitlesWidget: (value, meta) {
+                            return Padding(
+                              padding: const EdgeInsets.only(top: 8.0),
+                              child: Text(
+                                value.toInt().toString(),
+                                style: TextStyle(
+                                  color: Color(0xff939393),
+                                  fontSize: 10,
                                 ),
-                              );
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      leftTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: true,
+                          reservedSize: 40, // Aumenta la larghezza riservata
+                          getTitlesWidget: (value, meta) {
+                            return Padding(
+                              padding: const EdgeInsets.only(right: 8.0),
+                              child: Text(
+                                value.toInt().toString(),
+                                style: TextStyle(
+                                  color: Color(0xff939393),
+                                  fontSize: 10,
+                                  height: 1.2, // Imposta l'altezza della linea
+                                ),
+                                textAlign: TextAlign.center, // Centra il testo
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      rightTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: false,
+                        ),
+                      ),
+                      topTitles: AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: false,
+                        ),
+                      ),
+                    ),
+                    borderData: FlBorderData(
+                      show: true,
+                      border:
+                          Border.all(color: const Color(0xffe7e8ec), width: 1),
+                    ),
+                    minX: 0,
+                    maxX: transactions.length.toDouble(),
+                    minY: chartData
+                        .map((spot) => spot.y)
+                        .reduce(math.min)
+                        .floorToDouble(),
+                    maxY: chartData
+                        .map((spot) => spot.y)
+                        .reduce(math.max)
+                        .ceilToDouble(),
+                    lineBarsData: [
+                      LineChartBarData(
+                        spots: chartData,
+                        isCurved: true,
+                        gradient: LinearGradient(
+                          colors: [
+                            Color(0xff4af699),
+                            Color(0xff23b6e6),
+                          ],
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                        ),
+                        barWidth: 4,
+                        isStrokeCapRound: true,
+                        belowBarData: BarAreaData(
+                          show: true,
+                          gradient: LinearGradient(
+                            colors: [
+                              Color(0xff4af699).withOpacity(0.4),
+                              Color(0xff23b6e6).withOpacity(0.4),
+                            ],
+                            begin: Alignment.centerLeft,
+                            end: Alignment.centerRight,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              );
             }
           },
         );
@@ -373,7 +377,8 @@ class _ChartsListState extends State<ChartsList> {
   }
 
   // Method to calculate chart data
-  List<FlSpot> _calculateChartData(List<Transaction> transactions, Wallet wallet) {
+  List<FlSpot> _calculateChartData(
+      List<Transaction> transactions, Wallet wallet) {
     List<FlSpot> chartData = [];
 
     double balance = wallet.balance ?? 0;
@@ -474,4 +479,3 @@ class _ChartsListState extends State<ChartsList> {
     super.dispose();
   }
 }
-
