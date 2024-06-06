@@ -1,5 +1,3 @@
-// ...
-
 import 'package:flutter/material.dart';
 import 'package:flutter_application_1/pages/charts.dart';
 import 'dart:math' as math;
@@ -112,7 +110,11 @@ class _ChartsListState extends State<ChartsList> {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text("Transazioni per ${selectedWallet.name}:"),
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          left: 8.0), // Aggiungi il padding a sinistra
+                      child: Text("Transazioni per ${selectedWallet.name}:"),
+                    ),
                     SizedBox(height: 10),
                     Consumer<WalletProvider>(
                       builder: (context, walletProvider, _) {
@@ -180,6 +182,7 @@ class _ChartsListState extends State<ChartsList> {
                             );
                           } else {
                             List<Transaction> transactions = snapshot.data!;
+
                             if (transactions.isEmpty) {
                               return Center(
                                 child: Text('No transactions available.'),
@@ -280,16 +283,21 @@ class _ChartsListState extends State<ChartsList> {
                         sideTitles: SideTitles(
                           showTitles: true,
                           getTitlesWidget: (value, meta) {
-                            return Padding(
-                              padding: const EdgeInsets.only(top: 8.0),
-                              child: Text(
-                                value.toInt().toString(),
-                                style: TextStyle(
-                                  color: Color(0xff939393),
-                                  fontSize: 10,
+                            // Mostra i titoli solo nei punti corrispondenti alle transazioni
+                            if (chartData.any((spot) => spot.x == value)) {
+                              return Padding(
+                                padding: const EdgeInsets.only(top: 8.0),
+                                child: Text(
+                                  value.toInt().toString(),
+                                  style: TextStyle(
+                                    color: Color(0xff939393),
+                                    fontSize: 10,
+                                  ),
                                 ),
-                              ),
-                            );
+                              );
+                            } else {
+                              return Container(); // Non mostrare nulla se non è un punto della transazione
+                            }
                           },
                         ),
                       ),
