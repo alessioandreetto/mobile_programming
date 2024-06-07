@@ -6,37 +6,40 @@ class WalletProvider with ChangeNotifier {
   List<Wallet> _wallets = [];
   String _name = 'User';
   String _valuta = '€';
-  int _selectedWalletIndex =
-      0; // Aggiunta della variabile per l'indice del wallet selezionato
+  int _selectedWalletIndex = 0; // Indice del wallet selezionato
 
+  // Getter per i dati
   List<Wallet> get wallets => _wallets;
-
   String get name => _name;
   String get valuta => _valuta;
-  int get selectedWalletIndex =>
-      _selectedWalletIndex; // Getter per l'indice del wallet selezionato
+  int get selectedWalletIndex => _selectedWalletIndex;
 
+  // Metodo per caricare i wallet dal database
   Future<List<Wallet>> loadWallets() async {
     _wallets = await DatabaseHelper().getWallets();
     notifyListeners();
     return _wallets;
   }
 
+  // Metodo per eliminare una transazione e aggiornare il saldo
   void deleteTransaction(int transactionId) async {
     await DatabaseHelper().deleteTransaction(transactionId);
     await reloadWalletBalance(); // Aggiorna il saldo del wallet dopo l'eliminazione della transazione
   }
 
+  // Metodo per aggiornare una transazione e aggiornare il saldo
   void updateTransaction(Transaction transaction) async {
     await DatabaseHelper().updateTransaction(transaction);
     await reloadWalletBalance(); // Aggiorna il saldo del wallet dopo l'aggiornamento della transazione
   }
 
+  // Metodo per inserire una nuova transazione e aggiornare il saldo
   void insertTransaction(Transaction transaction) async {
     await DatabaseHelper().insertTransaction(transaction);
     await reloadWalletBalance(); // Aggiorna il saldo del wallet dopo l'inserimento della transazione
   }
 
+  // Metodo per ricaricare i bilanci dei wallet
   Future<void> reloadWalletBalance() async {
     _wallets = await loadWallets();
     for (Wallet wallet in _wallets) {
@@ -49,7 +52,7 @@ class WalletProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  // Aggiungi un metodo per aggiornare il nome dell'account
+  // Metodo per aggiornare il nome dell'account
   Future<void> updateAccountName(String newName) async {
     _name = newName;
     notifyListeners();
@@ -57,12 +60,14 @@ class WalletProvider with ChangeNotifier {
     await prefs.setString('account_name', newName);
   }
 
+  // Metodo per caricare il nome dell'account dalle preferenze condivise
   Future<void> loadAccountName() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _name = prefs.getString('account_name') ?? 'User';
     notifyListeners();
   }
 
+  // Metodo per aggiornare la valuta
   Future<void> updateValuta(String newValuta) async {
     _valuta = newValuta;
     notifyListeners();
@@ -70,14 +75,16 @@ class WalletProvider with ChangeNotifier {
     await prefs.setString('valuta', newValuta);
   }
 
+  // Metodo per caricare la valuta dalle preferenze condivise
   Future<void> loadValuta() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     _valuta = prefs.getString('valuta') ?? '€';
     notifyListeners();
   }
 
+  // Metodo per ricaricare i wallet
   Future<void> refreshWallets() async {
-    _wallets = await loadWallets(); // Ricarica i portafogli
+    _wallets = await loadWallets();
     notifyListeners();
   }
 
@@ -88,6 +95,7 @@ class WalletProvider with ChangeNotifier {
     return transactions.isNotEmpty;
   }
 
+  // Metodo per aggiornare l'indice del wallet selezionato
   void updateSelectedWalletIndex(int index) {
     _selectedWalletIndex = index;
     notifyListeners();

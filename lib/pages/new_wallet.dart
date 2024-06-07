@@ -64,11 +64,7 @@ class _AddNotePageState extends State<AddNotePage> {
               if (widget.onDelete != null)
                 IconButton(
                   icon: Icon(Icons.delete),
-                  onPressed: () {
-                    if (widget.onDelete != null) {
-                      widget.onDelete!();
-                    }
-                  },
+                  onPressed: _confirmDelete,
                 ),
             ],
           ),
@@ -216,6 +212,35 @@ class _AddNotePageState extends State<AddNotePage> {
       setState(() {
         _isDirty = false;
       });
+    }
+  }
+
+  Future<void> _confirmDelete() async {
+    bool? confirmed = await showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Eliminare il wallet?'),
+        content: Text(
+            'Sei sicuro di voler eliminare questo wallet? Questa azione non può essere annullata.'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(false);
+            },
+            child: Text('No'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(true);
+            },
+            child: Text('Sì'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmed == true && widget.onDelete != null) {
+      widget.onDelete!();
     }
   }
 
