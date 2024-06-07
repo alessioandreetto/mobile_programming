@@ -1,9 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import '../../providers/wallet_provider.dart';
+import 'package:flutter/services.dart';
 
 class FirstWallet extends StatefulWidget {
+  FirstWallet();
+
   @override
   _FirstWalletState createState() => _FirstWalletState();
 }
@@ -30,13 +31,11 @@ class _FirstWalletState extends State<FirstWallet> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        'Crea qui il tuo primo wallet!',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+                      Text('Crea qui il tuo primo wallet!',
+                          style: TextStyle(
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          )),
                       SizedBox(height: 20),
                       Text(
                         'Inserisci qui sotto un nome significativo per il portafoglio che andrai a creare:',
@@ -123,12 +122,6 @@ class _FirstWalletState extends State<FirstWallet> {
                   ),
                 ),
                 SizedBox(height: 16.0),
-                ElevatedButton(
-                  onPressed: () {
-                    _saveWallet(context);
-                  },
-                  child: Text('Salva Wallet'),
-                ),
               ],
             ),
           ),
@@ -139,23 +132,12 @@ class _FirstWalletState extends State<FirstWallet> {
 
   Future<bool> _onWillPop() async {
     if (_isDirty) {
-      _saveWallet(context);
+      _saveNote();
     }
     return true;
   }
 
-  void _saveWallet(BuildContext context) {
-    final walletName = bodyController.text;
-    final initialBalance = double.tryParse(titleController.text) ?? 0.0;
-
-    if (walletName.isNotEmpty) {
-      Provider.of<WalletProvider>(context, listen: false)
-          .addWallet(walletName, initialBalance);
-      setState(() {
-        _isDirty = false;
-      });
-    }
-  }
+  void _saveNote() {}
 
   @override
   void dispose() {
