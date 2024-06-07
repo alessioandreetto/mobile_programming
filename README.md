@@ -8,7 +8,7 @@ A new Flutter project.
 4. ⁠⁠animazione transizione slide su grafico a linea come su grafico a torta (come page view)
 5. ⁠⁠sliverbar 
 6. ⁠⁠sistemazione grafica
-7. messaggio allert va sopra il fab
+7. sistemare snackbar
 9. ⁠breve relazione che descriva la realizzazione del progetto
 
 
