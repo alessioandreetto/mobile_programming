@@ -149,11 +149,35 @@ class _AddNotePageState extends State<AddNotePage> {
   }
 
   Future<bool> _onWillPop() async {
-    if (_isDirty && widget.initialTitle != null && widget.initialBody != null) {
+    if (_isDirty) {
       // Mostra un dialogo di conferma per chiedere all'utente se desidera salvare
-      _saveNote(); // Salva la nota
+      return await showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text('Salvare le modifiche?'),
+              content: Text(
+                  'Hai delle modifiche non salvate. Vuoi salvarle prima di uscire?'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context)
+                        .pop(false); // L'utente non vuole salvare
+                  },
+                  child: Text('No'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    _saveNote(); // Salva la nota
+                    Navigator.of(context)
+                        .pop(true); // L'utente vuole salvare e uscire
+                  },
+                  child: Text('Sì'),
+                ),
+              ],
+            ),
+          ) ??
+          false;
     }
-
     return true; // Nessuna modifica da salvare, permetti l'uscita
   }
 
