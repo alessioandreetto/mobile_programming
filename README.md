@@ -2,15 +2,18 @@
 
 A new Flutter project.
 
-## Getting Started
+## cose da fare 
+1.⁠ ⁠⁠wallet nel tutorial 
+2.⁠ ⁠saveZone per status bar 
+3.⁠ ⁠⁠errore tastiera su tutorial , sposta invece di andare in overlap 
+4.⁠ ⁠⁠rivedere grafica grafico a linea 
+5.⁠ ⁠⁠animazione transizione slide su grafico a linea come su grafico a torta (come page view)
+6.⁠ ⁠⁠sliverbar 
+7.⁠ ⁠⁠sistemazione grafica
+8. blocco della modifica del bilancio se il wallet ha trasazioni, si può modificare solo nome
+9. Exchange solo con 1 wallet su nuova transazione va sistemato
+10. messaggio allert va sopra il fab 
+11. sistemare la Modifica del wallet anche se freccia indietro
+8.⁠ ⁠breve relazione che descriva la realizzazione del progetto
 
-This project is a starting point for a Flutter application.
 
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
