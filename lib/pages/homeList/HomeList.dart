@@ -212,7 +212,34 @@ class _HomeListState extends State<HomeList> {
                         },
                       ),
                     ),
-                    SizedBox(height: 20),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0, right: 8),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text("Transazioni per ${selectedWallet.name}:"),
+                          DropdownButton<bool>(
+                            value: _showExpenses,
+                            onChanged: (value) {
+                              setState(() {
+                                _showExpenses = value!;
+                              });
+                            },
+                            items: [
+                              DropdownMenuItem<bool>(
+                                value: true,
+                                child: Text('Mostra Uscite'),
+                              ),
+                              DropdownMenuItem<bool>(
+                                value: false,
+                                child: Text('Mostra Entrate'),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 10),
                     Expanded(
                       child: FutureBuilder<List<Transaction>>(
                         future: _fetchTransactions(selectedWallet.id!),
