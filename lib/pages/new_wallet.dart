@@ -1,20 +1,25 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+import '../providers/wallet_provider.dart'; // Assicurati che il percorso sia corretto
 
 class AddNotePage extends StatefulWidget {
   final TextEditingController titleController;
   final TextEditingController bodyController;
   final Function(double title, String body) onSave;
   final VoidCallback? onDelete;
-  final double? initialTitle; // Cambiato il tipo da String? a double?
+  final double? initialTitle;
   final String? initialBody;
+  final int
+      walletId; // Aggiungi walletId per identificare il portafoglio corrente
 
   AddNotePage({
     required this.onSave,
     this.onDelete,
     this.initialTitle,
     this.initialBody,
+    required this.walletId, // Richiesto walletId nel costruttore
   })  : titleController = TextEditingController(
             text: initialTitle != null ? initialTitle.toString() : null),
         bodyController = TextEditingController(text: initialBody);
@@ -24,13 +29,28 @@ class AddNotePage extends StatefulWidget {
 }
 
 class _AddNotePageState extends State<AddNotePage> {
-  bool _isDirty = false; // Flag per indicare se ci sono modifiche non salvate
+  bool _isDirty = false;
+  bool _hasTransactions = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkTransactions();
+  }
+
+  Future<void> _checkTransactions() async {
+    final walletProvider = Provider.of<WalletProvider>(context, listen: false);
+    bool hasTransactions =
+        await walletProvider.hasTransactionsForWallet(widget.walletId);
+    setState(() {
+      _hasTransactions = hasTransactions;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return WillPopScope(
-      onWillPop:
-          _onWillPop, // Utilizza la funzione _onWillPop per gestire la navigazione all'indietro
+      onWillPop: _onWillPop,
       child: GestureDetector(
         onTap: () {
           FocusScope.of(context).unfocus();
@@ -73,8 +93,7 @@ class _AddNotePageState extends State<AddNotePage> {
                         ),
                         onChanged: (_) {
                           setState(() {
-                            _isDirty =
-                                true; // Segna che ci sono modifiche non salvate
+                            _isDirty = true;
                           });
                         },
                         decoration: InputDecoration(
@@ -95,6 +114,7 @@ class _AddNotePageState extends State<AddNotePage> {
                     decoration: BoxDecoration(
                       border: Border.all(color: Colors.grey),
                       borderRadius: BorderRadius.circular(10.0),
+                      color: _hasTransactions ? Colors.grey.shade200 : null,
                     ),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -103,11 +123,11 @@ class _AddNotePageState extends State<AddNotePage> {
                         style: TextStyle(
                           fontFamily: 'RobotoThin',
                           fontSize: 25,
+                          color: _hasTransactions ? Colors.grey : Colors.black,
                         ),
                         onChanged: (_) {
                           setState(() {
-                            _isDirty =
-                                true; // Segna che ci sono modifiche non salvate
+                            _isDirty = true;
                           });
                         },
                         keyboardType: TextInputType.number,
@@ -116,9 +136,13 @@ class _AddNotePageState extends State<AddNotePage> {
                           hintStyle: TextStyle(
                             fontFamily: 'RobotoThin',
                             fontSize: 25,
+                            color:
+                                _hasTransactions ? Colors.grey : Colors.black,
                           ),
                           border: InputBorder.none,
                         ),
+                        enabled:
+                            !_hasTransactions, // Disabilita se ci sono transazioni
                       ),
                     ),
                   ),
@@ -150,7 +174,6 @@ class _AddNotePageState extends State<AddNotePage> {
 
   Future<bool> _onWillPop() async {
     if (_isDirty) {
-      // Mostra un dialogo di conferma per chiedere all'utente se desidera salvare
       return await showDialog(
             context: context,
             builder: (context) => AlertDialog(
@@ -160,16 +183,14 @@ class _AddNotePageState extends State<AddNotePage> {
               actions: <Widget>[
                 TextButton(
                   onPressed: () {
-                    Navigator.of(context)
-                        .pop(false); // L'utente non vuole salvare
+                    Navigator.of(context).pop(false);
                   },
                   child: Text('No'),
                 ),
                 TextButton(
                   onPressed: () {
-                    _saveNote(); // Salva la nota
-                    Navigator.of(context)
-                        .pop(true); // L'utente vuole salvare e uscire
+                    _saveNote();
+                    Navigator.of(context).pop(true);
                   },
                   child: Text('Sì'),
                 ),
@@ -178,16 +199,22 @@ class _AddNotePageState extends State<AddNotePage> {
           ) ??
           false;
     }
-    return true; // Nessuna modifica da salvare, permetti l'uscita
+    return true;
   }
 
   void _saveNote() {
     if (widget.titleController.text.isNotEmpty &&
         widget.bodyController.text.isNotEmpty) {
-      widget.onSave(double.parse(widget.titleController.text),
-          widget.bodyController.text);
+      double title;
+      if (!_hasTransactions) {
+        title = double.parse(widget.titleController.text);
+      } else {
+        title = widget.initialTitle!;
+      }
+
+      widget.onSave(title, widget.bodyController.text);
       setState(() {
-        _isDirty = false; // Le modifiche sono state salvate
+        _isDirty = false;
       });
     }
   }
