@@ -4,7 +4,6 @@ A new Flutter project.
 
 ## cose da fare 
 1. ⁠saveZone per status bar 
-2. ⁠⁠errore tastiera su tutorial, sposta invece di andare in overlap 
 3. ⁠⁠rivedere grafica grafico a linea 
 4. ⁠⁠animazione transizione slide su grafico a linea come su grafico a torta (come page view)
 5. ⁠⁠sliverbar 

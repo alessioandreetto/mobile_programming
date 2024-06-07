@@ -31,6 +31,7 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: false, // Aggiungi questa linea
       body: Column(
         children: [
           Expanded(
