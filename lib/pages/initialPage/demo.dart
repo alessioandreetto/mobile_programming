@@ -4,6 +4,9 @@ import 'package:flutter_application_1/pages/initialPage/welcome_page.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../page-selector.dart';
+import '../../model/database_model.dart';
+import '../../providers/wallet_provider.dart';
+import 'package:provider/provider.dart';
 
 class PageIndicatorDemo extends StatefulWidget {
   @override
@@ -13,6 +16,17 @@ class PageIndicatorDemo extends StatefulWidget {
 class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
   PageController _pageController = PageController();
   int _currentPageIndex = 0;
+  String walletName = '';
+  double walletBalance = 0.0;
+  int? walletId;
+
+  void _updateWalletData(String name, double balance, {int? id}) {
+    setState(() {
+      walletName = name;
+      walletBalance = balance;
+      walletId = id;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,7 +49,11 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
                 ),
                 Container(
                   child: Center(
-                    child: FirstWallet(),
+                    child: FirstWallet(
+                      onWalletDataChanged: (name, balance) {
+                        _updateWalletData(name, balance);
+                      },
+                    ),
                   ),
                 ),
                 Container(
@@ -124,12 +142,31 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
     await prefs.setBool('firstTimeUser', false);
   }
 
-  // Chiamato quando viene premuto il pulsante "Fine tutorial"
   void _onTutorialCompleted() {
     _saveTutorialCompletion();
+
+    if (walletName.isNotEmpty && walletBalance > 0) {
+      Wallet newWallet = Wallet(
+        id: walletId,
+        name: walletName,
+        balance: walletBalance,
+      );
+
+      if (walletId != null) {
+        // Update existing wallet
+        DatabaseHelper().updateWallet(newWallet).then((id) {
+          Provider.of<WalletProvider>(context, listen: false).loadWallets();
+        });
+      } else {
+        // Insert new wallet
+        DatabaseHelper().insertWallet(newWallet).then((id) {
+          Provider.of<WalletProvider>(context, listen: false).loadWallets();
+        });
+      }
+    }
+
     Navigator.of(context).pushReplacement(MaterialPageRoute(
-      builder: (context) =>
-          BottomBarDemo(), // Cambia "HomePage()" con il nome della tua home page
+      builder: (context) => BottomBarDemo(),
     ));
   }
 }

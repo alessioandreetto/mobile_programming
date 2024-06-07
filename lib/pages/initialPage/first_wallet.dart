@@ -1,9 +1,14 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../model/database_model.dart';
+import '../../providers/wallet_provider.dart';
+import 'package:provider/provider.dart';
 
 class FirstWallet extends StatefulWidget {
-  FirstWallet();
+  final Function(String, double) onWalletDataChanged;
+
+  FirstWallet({required this.onWalletDataChanged});
 
   @override
   _FirstWalletState createState() => _FirstWalletState();
@@ -15,6 +20,20 @@ class _FirstWalletState extends State<FirstWallet> {
   bool _isDirty = false;
 
   @override
+  void initState() {
+    super.initState();
+    titleController.addListener(_onDataChanged);
+    bodyController.addListener(_onDataChanged);
+  }
+
+  void _onDataChanged() {
+    widget.onWalletDataChanged(
+      bodyController.text,
+      double.tryParse(titleController.text) ?? 0.0,
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
     return WillPopScope(
       onWillPop: _onWillPop,
@@ -23,6 +42,11 @@ class _FirstWalletState extends State<FirstWallet> {
           FocusScope.of(context).unfocus();
         },
         child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            systemOverlayStyle: SystemUiOverlayStyle.dark,
+            elevation: 0,
+          ),
           body: SingleChildScrollView(
             child: Column(
               children: [
@@ -132,12 +156,35 @@ class _FirstWalletState extends State<FirstWallet> {
 
   Future<bool> _onWillPop() async {
     if (_isDirty) {
-      _saveNote();
+      // Mostra un dialogo di conferma per chiedere all'utente se desidera salvare
+      return await showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text('Salvare le modifiche?'),
+              content: Text(
+                  'Hai delle modifiche non salvate. Vuoi salvarle prima di uscire?'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context)
+                        .pop(false); // L'utente non vuole salvare
+                  },
+                  child: Text('No'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.of(context)
+                        .pop(true); // L'utente vuole salvare e uscire
+                  },
+                  child: Text('Sì'),
+                ),
+              ],
+            ),
+          ) ??
+          false;
     }
-    return true;
+    return true; // Nessuna modifica da salvare, permetti l'uscita
   }
-
-  void _saveNote() {}
 
   @override
   void dispose() {
