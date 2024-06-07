@@ -220,7 +220,10 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
             ToggleButtons(
               children: _buildToggleButtons(),
               isSelected: List.generate(
-                  actionTypes.length, (index) => _selectedActionIndex == index),
+                  _wallets.length >= 2
+                      ? actionTypes.length
+                      : actionTypes.length - 1,
+                  (index) => _selectedActionIndex == index),
               onPressed: (index) {
                 setState(() {
                   _selectedActionIndex = index;
@@ -263,12 +266,16 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
   }
 
   List<Widget> _buildToggleButtons() {
-    return actionTypes.map((type) {
+    List<Widget> buttons = actionTypes.map((type) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Text(type),
       );
     }).toList();
+    if (_wallets.length < 2) {
+      buttons.removeLast(); // Remove "Exchange" button if less than 2 wallets
+    }
+    return buttons;
   }
 
   Future<void> _performRegularTransaction() async {
