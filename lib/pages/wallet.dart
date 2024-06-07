@@ -204,6 +204,8 @@ class _WalletPageState extends State<WalletPage> {
                                 );
                                 Navigator.pop(context);
                               },
+                              walletId:
+                                  -1, // Passa un ID fittizio per un nuovo wallet
                             ),
                           ),
                         );
@@ -251,6 +253,7 @@ class _WalletPageState extends State<WalletPage> {
   Widget buildItem(BuildContext context, int index, double title, String body,
       String valuta) {
     final isSelected = selectedIndices.contains(index);
+    final walletId = data[index].id;
 
     return GestureDetector(
       //per eliminazione multipla di wallet, manca la funzione del db
@@ -295,6 +298,7 @@ class _WalletPageState extends State<WalletPage> {
                   Navigator.pop(
                       context); // Chiudi AddNotePage dopo la cancellazione
                 },
+                walletId: walletId!, // Passa l'ID del wallet corrente
               ),
             ),
           );

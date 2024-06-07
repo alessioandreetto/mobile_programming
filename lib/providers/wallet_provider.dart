@@ -81,6 +81,13 @@ class WalletProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  // Metodo per verificare se ci sono transazioni per un determinato wallet
+  Future<bool> hasTransactionsForWallet(int walletId) async {
+    List<Transaction> transactions =
+        await DatabaseHelper().getTransactionsForWallet(walletId);
+    return transactions.isNotEmpty;
+  }
+
   void updateSelectedWalletIndex(int index) {
     _selectedWalletIndex = index;
     notifyListeners();
