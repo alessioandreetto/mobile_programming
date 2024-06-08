@@ -6,6 +6,7 @@ import 'dart:math' as Math;
 import 'package:intl/intl.dart';
 import '../pages/new_operation.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 void main() {
   runApp(MyApp());
@@ -167,6 +168,24 @@ class _WalletSliverScreenState extends State<WalletSliverScreen> {
       total += amount;
     });
     return total;
+  }
+
+    void _deleteTransaction(
+      Transaction transaction, WalletProvider walletProvider) async {
+// Recupera il valore della transazione eliminata
+    double deletedTransactionValue = transaction.value ?? 0.0;
+// Elimina la transazione dal database
+    await DatabaseHelper().deleteTransaction(transaction.id!);
+
+// Aggiorna il bilancio del wallet corrispondente
+    Wallet selectedWallet = walletProvider.wallets[_selectedWalletIndex];
+    selectedWallet.balance = selectedWallet.balance! - deletedTransactionValue;
+
+// Aggiorna il bilancio del wallet nel database
+    await DatabaseHelper().updateWallet(selectedWallet);
+
+// Aggiorna i wallet nel WalletProvider
+    walletProvider.refreshWallets();
   }
 
   Map<String, double> _calculateCategoryAmounts(List<Transaction> transactions) {
@@ -352,40 +371,66 @@ class _WalletSliverScreenState extends State<WalletSliverScreen> {
               ),
             ),
           ),
-          SliverList(
-            delegate: SliverChildBuilderDelegate(
-              (BuildContext context, int index) {
-                final Transaction transaction = transactions[index];
-                final date = DateTime.parse(transaction.date!);
-                final formattedDate = DateFormat('dd/MM/yyyy').format(date);
-                return GestureDetector(
-                  onTap: () {
-                    _navigateToTransactionDetail(context, transaction);
-                  },
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: Container(
-                      height: 70.0,
-                      child: ListTile(
-                        title: Text(transaction.name ?? ''),
-                        subtitle: Text(
-                          "Data: $formattedDate, Valore: ${transaction.value} ${walletProvider.valuta}",
-                        ),
-                      ),
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Color(0xffb3b3b3),
-                        ),
-                        color: Colors.transparent,
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                    ),
-                  ),
-                );
+    SliverList(
+  delegate: SliverChildBuilderDelegate(
+    (BuildContext context, int index) {
+      final Transaction transaction = transactions[index];
+      final date = DateTime.parse(transaction.date!);
+      final formattedDate = DateFormat('dd/MM/yyyy').format(date);
+      return Slidable(
+        key: ValueKey(index),
+        startActionPane: ActionPane(
+          extentRatio: 0.25,
+          motion: ScrollMotion(),
+          children: [
+            SlidableAction(
+              borderRadius: BorderRadius.circular(10),
+              padding: EdgeInsets.all(10),
+              onPressed: (context) {
+
+                // Aggiungi qui la logica per eliminare l'elemento dalla lista
+                setState(() {
+                  transactions.removeAt(index);
+                });
               },
-              childCount: transactions.length,
+              backgroundColor: Colors.red,
+              foregroundColor: Colors.white,
+              icon: Icons.delete,
+              label: 'Elimina',
+            ),
+          ],
+        ),
+        child: GestureDetector(
+          onTap: () {
+            _navigateToTransactionDetail(context, transaction);
+          },
+          child: Padding(
+            padding: const EdgeInsets.all(8.0),
+            child: Container(
+              height: 70.0,
+              child: ListTile(
+                title: Text(transaction.name ?? ''),
+                subtitle: Text(
+                  "Data: $formattedDate, Valore: ${transaction.value} ${walletProvider.valuta}",
+                ),
+              ),
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Color(0xffb3b3b3),
+                ),
+                color: Colors.transparent,
+                borderRadius: BorderRadius.circular(10.0),
+              ),
             ),
           ),
+        ),
+      );
+    },
+    childCount: transactions.length,
+  ),
+),
+
+
         ],
       ),
     );
