@@ -48,7 +48,7 @@ class SliverTest extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Container(
-                        color: Colors.red,
+                        color: Colors.pink[100],
                       ),
                     ),
                     Expanded(
@@ -69,7 +69,7 @@ class SliverTest extends StatelessWidget {
               child: Container(
                 color: Colors.green,
                 alignment: Alignment.center,
-                child: Text('Portafoglio'),
+                child: Text('Lista portafogli'),
               ),
             ),
           ),
