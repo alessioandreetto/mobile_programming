@@ -21,6 +21,7 @@ class WalletProvider with ChangeNotifier {
     return _wallets;
   }
 
+
   // Metodo per eliminare una transazione e aggiornare il saldo
   void deleteTransaction(int transactionId) async {
     await DatabaseHelper().deleteTransaction(transactionId);

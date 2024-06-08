@@ -211,7 +211,6 @@ class _WalletSliverScreenState extends State<WalletSliverScreen> {
     return categoryAmounts;
   }
 
-
   void _handleSwipe(int index) {
     if (_selectedWalletIndex != index) {
       _selectedWalletIndex = index;
@@ -220,7 +219,7 @@ class _WalletSliverScreenState extends State<WalletSliverScreen> {
     }
   }
 
-    void _handleButtonPress(int index) {
+  void _handleButtonPress(int index) {
     _pageController.animateToPage(
       index,
       duration: Duration(milliseconds: 500),
@@ -248,56 +247,57 @@ class _WalletSliverScreenState extends State<WalletSliverScreen> {
             floating: true,
             expandedHeight: 300.0,
             flexibleSpace: FlexibleSpaceBar(
-              background: PageView.builder(
-                  controller: _pageController,
-                  itemCount: walletProvider.wallets.length,
-                  onPageChanged: _handleSwipe,
-                  itemBuilder: (context, index) {
-                    return Padding(
-                padding: const EdgeInsets.only(top: 80.0),
-                child: Center(
-                  // Centrato il grafico a torta
-                  child: FutureBuilder<List<Transaction>>(
-                    future: _loadTransactions(_selectedWalletIndex),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasError) {
-                        return Center(child: Text('Errore: ${snapshot.error}'));
-                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                        return Container(
-                          width: 150,
-                          height: 150,
-                        );
-                      } else {
-                        List<Transaction> transactions = snapshot.data!;
-                        Map<String, double> categoryAmounts =
-                            _calculateCategoryAmounts(transactions);
-                        return GestureDetector(
-                          onTapUp: (details) {
-                            _handlePieChartTap(details, categoryAmounts);
-                          },
-                          child: Container(
-                            width:
-                                300, // Increased size to match the center position
-                            height:
-                                300, // Increased size to match the center position
-                            child: PieChart(
-                              PieChartData(
-                                sections:
-                                    _createPieChartSections(categoryAmounts),
-                                sectionsSpace: 2,
-                                centerSpaceRadius: 0,
+                background: PageView.builder(
+              controller: _pageController,
+              itemCount: walletProvider.wallets.length,
+              onPageChanged: _handleSwipe,
+              itemBuilder: (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.only(top: 80.0),
+                  child: Center(
+                    // Centrato il grafico a torta
+                    child: FutureBuilder<List<Transaction>>(
+                      future: _loadTransactions(_selectedWalletIndex),
+                      builder: (context, snapshot) {
+                        if (snapshot.hasError) {
+                          return Center(
+                              child: Text('Errore: ${snapshot.error}'));
+                        } else if (!snapshot.hasData ||
+                            snapshot.data!.isEmpty) {
+                          return Container(
+                            width: 150,
+                            height: 150,
+                          );
+                        } else {
+                          List<Transaction> transactions = snapshot.data!;
+                          Map<String, double> categoryAmounts =
+                              _calculateCategoryAmounts(transactions);
+                          return GestureDetector(
+                            onTapUp: (details) {
+                              _handlePieChartTap(details, categoryAmounts);
+                            },
+                            child: Container(
+                              width:
+                                  300, // Increased size to match the center position
+                              height:
+                                  300, // Increased size to match the center position
+                              child: PieChart(
+                                PieChartData(
+                                  sections:
+                                      _createPieChartSections(categoryAmounts),
+                                  sectionsSpace: 2,
+                                  centerSpaceRadius: 0,
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      }
-                    },
+                          );
+                        }
+                      },
+                    ),
                   ),
-                ),
-              );
+                );
               },
-            )
-            ),
+            )),
           ),
           SliverPersistentHeader(
             pinned: true,
