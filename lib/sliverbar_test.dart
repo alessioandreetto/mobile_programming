@@ -56,7 +56,8 @@ class _WalletSliverScreenState extends State<WalletSliverScreen> {
   Future<List<Transaction>> _loadTransactions(int walletIndex) async {
     try {
       List<Transaction> loadedTransactions = await DatabaseHelper()
-          .getTransactionsForWallet(walletIndex + 1); // Aggiungi 1 perché gli indici iniziano da 0
+          .getTransactionsForWallet(
+              walletIndex + 1); // Aggiungi 1 perché gli indici iniziano da 0
 
       if (_showExpenses) {
         loadedTransactions = loadedTransactions
@@ -81,30 +82,32 @@ class _WalletSliverScreenState extends State<WalletSliverScreen> {
     }
   }
 
-  void _navigateToTransactionDetail(BuildContext context, Transaction transaction) {
+  void _navigateToTransactionDetail(
+      BuildContext context, Transaction transaction) {
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => NewTransactionPage(transaction: transaction)),
+      MaterialPageRoute(
+          builder: (context) => NewTransactionPage(transaction: transaction)),
     );
   }
 
-  List<PieChartSectionData> _createPieChartSections(Map<String, double> categoryAmounts) {
-  Map<int, Color> categoryColors = {
-    0: Colors.red, // Auto
-    1: Colors.blue, // Banca
-    2: Colors.green, // Casa
-    3: Colors.orange, // Intrattenimento
-    4: Colors.purple, // Shopping
-    5: Colors.yellow, // Viaggio
-    6: Colors.brown, // Varie
-  };
-
+  List<PieChartSectionData> _createPieChartSections(
+      Map<String, double> categoryAmounts) {
+    Map<int, Color> categoryColors = {
+      0: Colors.red, // Auto
+      1: Colors.blue, // Banca
+      2: Colors.green, // Casa
+      3: Colors.orange, // Intrattenimento
+      4: Colors.purple, // Shopping
+      5: Colors.yellow, // Viaggio
+      6: Colors.brown, // Varie
+    };
 
     List<PieChartSectionData> sections = [];
     int index = 0;
 
     categoryAmounts.forEach((category, amount) {
-      bool isSelected = _selectedCategory == category ;
+      bool isSelected = _selectedCategory == category;
       sections.add(PieChartSectionData(
         color: categoryColors[int.parse(category)],
         value: amount,
@@ -118,7 +121,8 @@ class _WalletSliverScreenState extends State<WalletSliverScreen> {
     return sections;
   }
 
-  void _handlePieChartTap(TapUpDetails details, Map<String, double> categoryAmounts) {
+  void _handlePieChartTap(
+      TapUpDetails details, Map<String, double> categoryAmounts) {
     final touchPos = details.localPosition;
     final touchAngle = _getAngle(touchPos);
     final categoryIndex = _getTouchedCategoryIndex(touchAngle, categoryAmounts);
@@ -131,7 +135,7 @@ class _WalletSliverScreenState extends State<WalletSliverScreen> {
         valoreCategoria = 0;
       } else {
         _selectedCategory = tappedCategory;
-        nomeCategoria = categories[int.parse(tappedCategory) ].name;
+        nomeCategoria = categories[int.parse(tappedCategory)].name;
         valoreCategoria = categoryAmounts[tappedCategory]!;
       }
     });
@@ -146,7 +150,8 @@ class _WalletSliverScreenState extends State<WalletSliverScreen> {
     return angle;
   }
 
-  int _getTouchedCategoryIndex(double angle, Map<String, double> categoryAmounts) {
+  int _getTouchedCategoryIndex(
+      double angle, Map<String, double> categoryAmounts) {
     final totalAmount = getTotalAmount(categoryAmounts);
     double currentAngle = 0.0;
 
@@ -170,7 +175,7 @@ class _WalletSliverScreenState extends State<WalletSliverScreen> {
     return total;
   }
 
-    void _deleteTransaction(
+  void _deleteTransaction(
       Transaction transaction, WalletProvider walletProvider) async {
 // Recupera il valore della transazione eliminata
     double deletedTransactionValue = transaction.value ?? 0.0;
@@ -188,13 +193,15 @@ class _WalletSliverScreenState extends State<WalletSliverScreen> {
     walletProvider.refreshWallets();
   }
 
-  Map<String, double> _calculateCategoryAmounts(List<Transaction> transactions) {
+  Map<String, double> _calculateCategoryAmounts(
+      List<Transaction> transactions) {
     Map<String, double> categoryAmounts = {};
     transactions.forEach((transaction) {
       final categoryId = transaction.categoryId.toString();
       final value = transaction.value ?? 0.0;
       if (categoryAmounts.containsKey(categoryId)) {
-        categoryAmounts[categoryId] = (categoryAmounts[categoryId] ?? 0) + value;
+        categoryAmounts[categoryId] =
+            (categoryAmounts[categoryId] ?? 0) + value;
       } else {
         categoryAmounts[categoryId] = value;
       }
@@ -225,7 +232,8 @@ class _WalletSliverScreenState extends State<WalletSliverScreen> {
             flexibleSpace: FlexibleSpaceBar(
               background: Padding(
                 padding: const EdgeInsets.only(top: 80.0),
-                child: Center( // Centrato il grafico a torta
+                child: Center(
+                  // Centrato il grafico a torta
                   child: FutureBuilder<List<Transaction>>(
                     future: _loadTransactions(_selectedWalletIndex),
                     builder: (context, snapshot) {
@@ -238,17 +246,21 @@ class _WalletSliverScreenState extends State<WalletSliverScreen> {
                         );
                       } else {
                         List<Transaction> transactions = snapshot.data!;
-                        Map<String, double> categoryAmounts = _calculateCategoryAmounts(transactions);
+                        Map<String, double> categoryAmounts =
+                            _calculateCategoryAmounts(transactions);
                         return GestureDetector(
                           onTapUp: (details) {
                             _handlePieChartTap(details, categoryAmounts);
                           },
                           child: Container(
-                            width: 300, // Increased size to match the center position
-                            height: 300, // Increased size to match the center position
+                            width:
+                                300, // Increased size to match the center position
+                            height:
+                                300, // Increased size to match the center position
                             child: PieChart(
                               PieChartData(
-                                sections: _createPieChartSections(categoryAmounts),
+                                sections:
+                                    _createPieChartSections(categoryAmounts),
                                 sectionsSpace: 2,
                                 centerSpaceRadius: 0,
                               ),
@@ -278,16 +290,19 @@ class _WalletSliverScreenState extends State<WalletSliverScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                              "Nome Wallet: ${walletProvider.wallets[_selectedWalletIndex].name}", style: TextStyle(fontSize: 20)),
+                              "Nome Wallet: ${walletProvider.wallets[_selectedWalletIndex].name}",
+                              style: TextStyle(fontSize: 20)),
                           Text(
-                              'Bilancio: ${walletProvider.wallets[_selectedWalletIndex].balance} ${walletProvider.valuta}', style: TextStyle(fontSize: 20)),
+                              'Bilancio: ${walletProvider.wallets[_selectedWalletIndex].balance} ${walletProvider.valuta}',
+                              style: TextStyle(fontSize: 20)),
                           if (nomeCategoria.isNotEmpty) ...[
-                         
                             Text(
-                                '$nomeCategoria : $valoreCategoria ${walletProvider.valuta}', style: TextStyle(fontSize: 20)),
-                        
-                          ], if (nomeCategoria.isEmpty)...[
-                          Text(' ', style: TextStyle(fontSize: 20))],
+                                '$nomeCategoria : $valoreCategoria ${walletProvider.valuta}',
+                                style: TextStyle(fontSize: 20)),
+                          ],
+                          if (nomeCategoria.isEmpty) ...[
+                            Text(' ', style: TextStyle(fontSize: 20))
+                          ],
                         ],
                       ),
                     ),
@@ -298,7 +313,8 @@ class _WalletSliverScreenState extends State<WalletSliverScreen> {
                         itemCount: walletProvider.wallets.length,
                         itemBuilder: (context, index) {
                           return Padding(
-                            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 8.0, horizontal: 8.0),
                             child: ElevatedButton(
                               onPressed: () {
                                 setState(() {
@@ -308,21 +324,24 @@ class _WalletSliverScreenState extends State<WalletSliverScreen> {
                               },
                               style: ButtonStyle(
                                 elevation: MaterialStateProperty.all(0),
-                                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                shape: MaterialStateProperty.all<
+                                    RoundedRectangleBorder>(
                                   RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(20.0),
                                     side: BorderSide(color: Colors.black),
                                   ),
                                 ),
-                                foregroundColor: MaterialStateProperty.resolveWith<Color>(
-                                      (Set<MaterialState> states) {
+                                foregroundColor:
+                                    MaterialStateProperty.resolveWith<Color>(
+                                  (Set<MaterialState> states) {
                                     return _selectedWalletIndex == index
                                         ? Colors.white
                                         : Colors.black;
                                   },
                                 ),
-                                backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                                      (Set<MaterialState> states) {
+                                backgroundColor:
+                                    MaterialStateProperty.resolveWith<Color>(
+                                  (Set<MaterialState> states) {
                                     return _selectedWalletIndex == index
                                         ? Colors.black
                                         : Colors.white;
@@ -371,66 +390,63 @@ class _WalletSliverScreenState extends State<WalletSliverScreen> {
               ),
             ),
           ),
-    SliverList(
-  delegate: SliverChildBuilderDelegate(
-    (BuildContext context, int index) {
-      final Transaction transaction = transactions[index];
-      final date = DateTime.parse(transaction.date!);
-      final formattedDate = DateFormat('dd/MM/yyyy').format(date);
-      return Slidable(
-        key: ValueKey(index),
-        startActionPane: ActionPane(
-          extentRatio: 0.25,
-          motion: ScrollMotion(),
-          children: [
-            SlidableAction(
-              borderRadius: BorderRadius.circular(10),
-              padding: EdgeInsets.all(10),
-              onPressed: (context) {
-
-                // Aggiungi qui la logica per eliminare l'elemento dalla lista
-                setState(() {
-                  transactions.removeAt(index);
-                });
+          SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (BuildContext context, int index) {
+                final Transaction transaction = transactions[index];
+                final date = DateTime.parse(transaction.date!);
+                final formattedDate = DateFormat('dd/MM/yyyy').format(date);
+                return Slidable(
+                  key: ValueKey(index),
+                  startActionPane: ActionPane(
+                    extentRatio: 0.25,
+                    motion: ScrollMotion(),
+                    children: [
+                      SlidableAction(
+                        borderRadius: BorderRadius.circular(10),
+                        padding: EdgeInsets.all(10),
+                        onPressed: (context) {
+                          _deleteTransaction(transaction, walletProvider);
+                          setState(() {
+                            transactions.removeAt(index);
+                          });
+                        },
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                        icon: Icons.delete,
+                        label: 'Elimina',
+                      ),
+                    ],
+                  ),
+                  child: GestureDetector(
+                    onTap: () {
+                      _navigateToTransactionDetail(context, transaction);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        height: 70.0,
+                        child: ListTile(
+                          title: Text(transaction.name ?? ''),
+                          subtitle: Text(
+                            "Data: $formattedDate, Valore: ${transaction.value} ${walletProvider.valuta}",
+                          ),
+                        ),
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Color(0xffb3b3b3),
+                          ),
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
               },
-              backgroundColor: Colors.red,
-              foregroundColor: Colors.white,
-              icon: Icons.delete,
-              label: 'Elimina',
-            ),
-          ],
-        ),
-        child: GestureDetector(
-          onTap: () {
-            _navigateToTransactionDetail(context, transaction);
-          },
-          child: Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Container(
-              height: 70.0,
-              child: ListTile(
-                title: Text(transaction.name ?? ''),
-                subtitle: Text(
-                  "Data: $formattedDate, Valore: ${transaction.value} ${walletProvider.valuta}",
-                ),
-              ),
-              decoration: BoxDecoration(
-                border: Border.all(
-                  color: Color(0xffb3b3b3),
-                ),
-                color: Colors.transparent,
-                borderRadius: BorderRadius.circular(10.0),
-              ),
+              childCount: transactions.length,
             ),
           ),
-        ),
-      );
-    },
-    childCount: transactions.length,
-  ),
-),
-
-
         ],
       ),
     );
@@ -455,7 +471,8 @@ class _SliverPersistentHeaderDelegate extends SliverPersistentHeaderDelegate {
   double get maxExtent => maxHeight;
 
   @override
-  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
+  Widget build(
+      BuildContext context, double shrinkOffset, bool overlapsContent) {
     return SizedBox.expand(child: child);
   }
 
