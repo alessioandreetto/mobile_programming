@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import '../providers/wallet_provider.dart';
-import 'package:provider/provider.dart'; // Assicurati di importare correttamente il pacchetto provider
-import '../model/database_model.dart'; // Assicurati di importare correttamente la tua classe di gestione del database
+import 'package:provider/provider.dart';
+import '../model/database_model.dart';
 import 'dart:math' as Math;
+import 'package:intl/intl.dart';
+import '../pages/new_operation.dart';
+import 'package:fl_chart/fl_chart.dart';
 
 void main() {
   runApp(MyApp());
@@ -13,139 +16,258 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: ChangeNotifierProvider(
-        create: (_) => WalletProvider(), // Assicurati di fornire correttamente il WalletProvider
-        child: SliverTest(),
+        create: (_) => WalletProvider(),
+        child: WalletSliverScreen(),
       ),
     );
   }
 }
 
-class SliverTest extends StatefulWidget {
+class WalletSliverScreen extends StatefulWidget {
   @override
-  _SliverTestState createState() => _SliverTestState();
+  _WalletSliverScreenState createState() => _WalletSliverScreenState();
 }
 
-class _SliverTestState extends State<SliverTest> {
+class _WalletSliverScreenState extends State<WalletSliverScreen> {
   late List<Transaction> transactions = [];
-  late int _selectedWalletIndex = 0; // Assicurati di dichiarare correttamente _selectedWalletIndex
+  late int _selectedWalletIndex = 0;
   bool _showExpenses = true;
+  double valoreCategoria = 0;
+  String nomeCategoria = '';
+  String? _selectedCategory;
+
+  List<Category> categories = [
+    Category(id: 1, name: 'Auto'),
+    Category(id: 2, name: 'Banca'),
+    Category(id: 3, name: 'Casa'),
+    Category(id: 4, name: 'Intrattenimento'),
+    Category(id: 5, name: 'Shopping'),
+    Category(id: 6, name: 'Viaggio'),
+    Category(id: 7, name: 'Varie'),
+  ];
 
   @override
   void initState() {
     super.initState();
-    _loadTransactions(_selectedWalletIndex); // Carica le transazioni del portafoglio iniziale
+    _loadTransactions(_selectedWalletIndex);
   }
 
-Future<void> _loadTransactions(int walletIndex) async {
-  try {
-    List<Transaction> loadedTransactions = await DatabaseHelper()
-        .getTransactionsForWallet(walletIndex + 1); // Aggiungi 1 perché gli indici iniziano da 0
-    
-    if (_showExpenses) {
-      // Filtra solo le transazioni di uscita
-      loadedTransactions = loadedTransactions
-          .where((transaction) => transaction.value! < 0)
-          .toList();
-    } else {
-      // Filtra solo le transazioni di entrata
-      loadedTransactions = loadedTransactions
-          .where((transaction) => transaction.value! >= 0)
-          .toList();
+  Future<List<Transaction>> _loadTransactions(int walletIndex) async {
+    try {
+      List<Transaction> loadedTransactions = await DatabaseHelper()
+          .getTransactionsForWallet(walletIndex + 1); // Aggiungi 1 perché gli indici iniziano da 0
+
+      if (_showExpenses) {
+        loadedTransactions = loadedTransactions
+            .where((transaction) => transaction.value! < 0)
+            .toList();
+      } else {
+        loadedTransactions = loadedTransactions
+            .where((transaction) => transaction.value! >= 0)
+            .toList();
+      }
+
+      loadedTransactions.sort((a, b) => b.date!.compareTo(a.date!));
+
+      setState(() {
+        transactions = loadedTransactions;
+      });
+
+      return loadedTransactions;
+    } catch (e) {
+      print('Errore durante il caricamento delle transazioni: $e');
+      return [];
     }
+  }
+
+  void _navigateToTransactionDetail(BuildContext context, Transaction transaction) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => NewTransactionPage(transaction: transaction)),
+    );
+  }
+
+  List<PieChartSectionData> _createPieChartSections(Map<String, double> categoryAmounts) {
+    List<Color> fixedColors = [
+      Colors.red,
+      Colors.blue,
+      Colors.green,
+      Colors.orange,
+      Colors.purple,
+      Colors.yellow,
+      Colors.brown,
+    ];
+
+    List<PieChartSectionData> sections = [];
+    int index = 0;
+
+    categoryAmounts.forEach((category, amount) {
+      bool isSelected = _selectedCategory == category;
+      sections.add(PieChartSectionData(
+        color: fixedColors[int.parse(category)],
+        value: amount,
+        title: '',
+        radius: isSelected ? 100 : 90,
+      ));
+
+      index++;
+    });
+
+    return sections;
+  }
+
+  void _handlePieChartTap(TapUpDetails details, Map<String, double> categoryAmounts) {
+    final touchPos = details.localPosition;
+    final touchAngle = _getAngle(touchPos);
+    final categoryIndex = _getTouchedCategoryIndex(touchAngle, categoryAmounts);
 
     setState(() {
-      transactions = loadedTransactions;
+      String tappedCategory = categoryAmounts.keys.elementAt(categoryIndex);
+      if (_selectedCategory == tappedCategory) {
+        _selectedCategory = null;
+      } else {
+        _selectedCategory = tappedCategory;
+        nomeCategoria = categories[int.parse(tappedCategory)].name;
+        valoreCategoria = categoryAmounts[tappedCategory]!;
+      }
     });
-  } catch (e) {
-    print('Errore durante il caricamento delle transazioni: $e');
   }
-}
 
+  double _getAngle(Offset position) {
+    final centerX = 75.0;
+    final centerY = 75.0;
+    final dx = position.dx - centerX;
+    final dy = position.dy - centerY;
+    final angle = (Math.atan2(dy, dx) * 180 / Math.pi + 360) % 360;
+    return angle;
+  }
+
+  int _getTouchedCategoryIndex(double angle, Map<String, double> categoryAmounts) {
+    final totalAmount = getTotalAmount(categoryAmounts);
+    double currentAngle = 0.0;
+
+    int index = 0;
+    for (var amount in categoryAmounts.values) {
+      final sweepAngle = (amount / totalAmount) * 360;
+      if (angle >= currentAngle && angle <= currentAngle + sweepAngle) {
+        return index;
+      }
+      currentAngle += sweepAngle;
+      index++;
+    }
+    return -1;
+  }
+
+  double getTotalAmount(Map<String, double> categoryAmounts) {
+    double total = 0.0;
+    categoryAmounts.forEach((_, amount) {
+      total += amount;
+    });
+    return total;
+  }
+
+  Map<String, double> _calculateCategoryAmounts(List<Transaction> transactions) {
+    Map<String, double> categoryAmounts = {};
+    transactions.forEach((transaction) {
+      final categoryId = transaction.categoryId.toString();
+      final value = transaction.value ?? 0.0;
+      if (categoryAmounts.containsKey(categoryId)) {
+        categoryAmounts[categoryId] = (categoryAmounts[categoryId] ?? 0) + value;
+      } else {
+        categoryAmounts[categoryId] = value;
+      }
+    });
+
+    return categoryAmounts;
+  }
 
   @override
   Widget build(BuildContext context) {
-    var walletProvider = Provider.of<WalletProvider>(context); // Assicurati di ottenere correttamente il provider
+    var walletProvider = Provider.of<WalletProvider>(context);
 
     return Scaffold(
       body: CustomScrollView(
         slivers: <Widget>[
           SliverAppBar(
+            surfaceTintColor: Colors.transparent,
             pinned: true,
             snap: true,
-            title: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Portafoglio',
-                  style: TextStyle(fontSize: 16.0),
-                ),
-                Text(
-                  'di',
-                  style: TextStyle(fontSize: 12.0),
-                ),
-                Text(
-                  'Utente',
-                  style: TextStyle(fontSize: 12.0),
-                ),
-              ],
+            title: Consumer<WalletProvider>(
+              builder: (context, walletProvider, _) {
+                String userName = walletProvider.name;
+                return Text('Benvenuto $userName!');
+              },
             ),
             floating: true,
-            expandedHeight: 200.0,
+            expandedHeight: 300.0,
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Container(
-                        color: Colors.pink[100],
+                child: 
+                  Expanded(
+                    child: Container(
+                      color: Colors.blue,
+                      child: FutureBuilder<List<Transaction>>(
+                        future: _loadTransactions(_selectedWalletIndex),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasError) {
+                            return Center(child: Text('Errore: ${snapshot.error}'));
+                          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                            return Container(
+                              width: 150,
+                              height: 150,
+                            );
+                          } else {
+                            List<Transaction> transactions = snapshot.data!;
+                            Map<String, double> categoryAmounts = _calculateCategoryAmounts(transactions);
+                            return GestureDetector(
+                              onTapUp: (details) {
+                                _handlePieChartTap(details, categoryAmounts);
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.only(right: 35.0),
+                                child: Container(
+                                  width: 150,
+                                  height: 150,
+                                  child: PieChart(
+                                    PieChartData(
+                                      sections: _createPieChartSections(categoryAmounts),
+                                      sectionsSpace: 2,
+                                      centerSpaceRadius: 0,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
+                        },
                       ),
                     ),
-                    Expanded(
-                      child: Container(
-                        color: Colors.blue,
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
               ),
             ),
           ),
           SliverPersistentHeader(
             pinned: true,
             delegate: _SliverPersistentHeaderDelegate(
-              
-              minHeight: 100.0,
-              maxHeight: 100.0,
+              minHeight: 170.0,
+              maxHeight: 170.0,
               child: Container(
                 color: Colors.white,
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text("Transazioni per ${walletProvider.wallets[_selectedWalletIndex].name}:"),
-                    DropdownButton<bool>(
-                      value: _showExpenses,
-                      onChanged: (value) {
-                        setState(() {
-                          _showExpenses = value!;
-                          _loadTransactions(_selectedWalletIndex);
-                        });
-                      },
-                      items: [
-                        DropdownMenuItem<bool>(
-                          value: true,
-                          child: Text('Mostra Uscite'),
-                        ),
-                        DropdownMenuItem<bool>(
-                          value: false,
-                          child: Text('Mostra Entrate'),
-                        ),
-                      ],
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                              "Nome Wallet: ${walletProvider.wallets[_selectedWalletIndex].name}", style: TextStyle(fontSize: 20)),
+                          Text(
+                              'Bilancio: ${walletProvider.wallets[_selectedWalletIndex].balance} ${walletProvider.valuta}', style: TextStyle(fontSize: 20)),
+                        ],
+                      ),
                     ),
-                  ],
-                ),
                     Container(
                       height: 50,
                       child: ListView.builder(
@@ -153,33 +275,31 @@ Future<void> _loadTransactions(int walletIndex) async {
                         itemCount: walletProvider.wallets.length,
                         itemBuilder: (context, index) {
                           return Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 8.0, horizontal: 8.0),
+                            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 8.0),
                             child: ElevatedButton(
                               onPressed: () {
                                 setState(() {
                                   _selectedWalletIndex = index;
                                 });
-                                _loadTransactions(index); // Carica le transazioni del nuovo portafoglio selezionato
+                                _loadTransactions(index);
                               },
                               style: ButtonStyle(
+                               
                                 elevation: MaterialStateProperty.all(0),
-                                shape:
-                                    MaterialStateProperty.all<RoundedRectangleBorder>(
-                                        RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(20.0),
-                                  side: BorderSide(color: Colors.black),
-                                )),
-                                foregroundColor:
-                                    MaterialStateProperty.resolveWith<Color>(
+                                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(20.0),
+                                    side: BorderSide(color: Colors.black),
+                                  ),
+                                ),
+                                foregroundColor: MaterialStateProperty.resolveWith<Color>(
                                   (Set<MaterialState> states) {
                                     return _selectedWalletIndex == index
                                         ? Colors.white
                                         : Colors.black;
                                   },
                                 ),
-                                backgroundColor:
-                                    MaterialStateProperty.resolveWith<Color>(
+                                backgroundColor: MaterialStateProperty.resolveWith<Color>(
                                   (Set<MaterialState> states) {
                                     return _selectedWalletIndex == index
                                         ? Colors.black
@@ -193,6 +313,37 @@ Future<void> _loadTransactions(int walletIndex) async {
                         },
                       ),
                     ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            "Transazioni per ${walletProvider.wallets[_selectedWalletIndex].name}:",
+                            style: TextStyle(fontSize: 16),
+                          ),
+                          DropdownButton<bool>(
+                            value: _showExpenses,
+                            onChanged: (value) {
+                              setState(() {
+                                _showExpenses = value!;
+                                _loadTransactions(_selectedWalletIndex);
+                              });
+                            },
+                            items: [
+                              DropdownMenuItem<bool>(
+                                value: true,
+                                child: Text('Mostra Uscite'),
+                              ),
+                              DropdownMenuItem<bool>(
+                                value: false,
+                                child: Text('Mostra Entrate'),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
@@ -202,25 +353,36 @@ Future<void> _loadTransactions(int walletIndex) async {
             delegate: SliverChildBuilderDelegate(
               (BuildContext context, int index) {
                 final Transaction transaction = transactions[index];
-                return Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Container(
-                    height: 100.0,
-                    child: Center(child: Text(transaction.name!)),
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                        color: Color(0xffb3b3b3),
+                final date = DateTime.parse(transaction.date!);
+                final formattedDate = DateFormat('dd/MM/yyyy').format(date);
+                return GestureDetector(
+                  onTap: () {
+                    _navigateToTransactionDetail(context, transaction);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Container(
+                      height: 70.0,
+                      child: ListTile(
+                        title: Text(transaction.name ?? ''),
+                        subtitle: Text(
+                          "Data: $formattedDate, Valore: ${transaction.value} ${walletProvider.valuta}",
+                        ),
                       ),
-                      color: Colors.transparent,
-                      borderRadius: BorderRadius.circular(10.0),
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Color(0xffb3b3b3),
+                        ),
+                        color: Colors.transparent,
+                        borderRadius: BorderRadius.circular(10.0),
+                      ),
                     ),
                   ),
                 );
               },
-              childCount: transactions.length, // Numero di transazioni
+              childCount: transactions.length,
             ),
           ),
-          
         ],
       ),
     );
@@ -245,11 +407,7 @@ class _SliverPersistentHeaderDelegate extends SliverPersistentHeaderDelegate {
   double get maxExtent => maxHeight;
 
   @override
-  Widget build(
-    BuildContext context,
-    double shrinkOffset,
-    bool overlapsContent,
-  ) {
+  Widget build(BuildContext context, double shrinkOffset, bool overlapsContent) {
     return SizedBox.expand(child: child);
   }
 
@@ -260,4 +418,3 @@ class _SliverPersistentHeaderDelegate extends SliverPersistentHeaderDelegate {
         child != oldDelegate.child;
   }
 }
-
