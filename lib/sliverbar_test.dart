@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import '../providers/wallet_provider.dart';
+import 'package:provider/provider.dart'; // Assicurati di importare correttamente il pacchetto provider
+import '../model/database_model.dart'; // Assicurati di importare correttamente la tua classe di gestione del database
 
 void main() {
   runApp(MyApp());
@@ -8,14 +11,45 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: SliverTest(),
+      home: ChangeNotifierProvider(
+        create: (_) => WalletProvider(), // Assicurati di fornire correttamente il WalletProvider
+        child: SliverTest(),
+      ),
     );
   }
 }
 
-class SliverTest extends StatelessWidget {
+class SliverTest extends StatefulWidget {
+  @override
+  _SliverTestState createState() => _SliverTestState();
+}
+
+class _SliverTestState extends State<SliverTest> {
+  late List<Transaction> transactions = [];
+  late int _selectedWalletIndex = 0; // Assicurati di dichiarare correttamente _selectedWalletIndex
+
+  @override
+  void initState() {
+    super.initState();
+    _loadTransactions(_selectedWalletIndex); // Carica le transazioni del portafoglio iniziale
+  }
+
+  Future<void> _loadTransactions(int walletIndex) async {
+    try {
+      List<Transaction> loadedTransactions =
+          await DatabaseHelper().getTransactionsForWallet(walletIndex + 1); // Aggiungi 1 perché gli indici iniziano da 0
+      setState(() {
+        transactions = loadedTransactions;
+      });
+    } catch (e) {
+      print('Errore durante il caricamento delle transazioni: $e');
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    var walletProvider = Provider.of<WalletProvider>(context); // Assicurati di ottenere correttamente il provider
+
     return Scaffold(
       body: CustomScrollView(
         slivers: <Widget>[
@@ -67,20 +101,63 @@ class SliverTest extends StatelessWidget {
               minHeight: 50.0,
               maxHeight: 50.0,
               child: Container(
-                color: Colors.green,
-                alignment: Alignment.center,
-                child: Text('Lista portafogli'),
+                height: 50,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: walletProvider.wallets.length,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8.0, horizontal: 8.0),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          setState(() {
+                            _selectedWalletIndex = index;
+                          });
+                          _loadTransactions(index); // Carica le transazioni del nuovo portafoglio selezionato
+                        },
+                        style: ButtonStyle(
+                          elevation: MaterialStateProperty.all(0),
+                          shape:
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
+                                  RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(20.0),
+                            side: BorderSide(color: Colors.black),
+                          )),
+                          foregroundColor:
+                              MaterialStateProperty.resolveWith<Color>(
+                            (Set<MaterialState> states) {
+                              return _selectedWalletIndex == index
+                                  ? Colors.white
+                                  : Colors.black;
+                            },
+                          ),
+                          backgroundColor:
+                              MaterialStateProperty.resolveWith<Color>(
+                            (Set<MaterialState> states) {
+                              return _selectedWalletIndex == index
+                                  ? Colors.black
+                                  : Colors.white;
+                            },
+                          ),
+                        ),
+                        child: Text(walletProvider.wallets[index].name!),
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
           ),
           SliverList(
             delegate: SliverChildBuilderDelegate(
               (BuildContext context, int index) {
+                final Transaction transaction = transactions[index];
                 return Padding(
                   padding: const EdgeInsets.all(8.0),
                   child: Container(
                     height: 100.0,
-                    child: Center(child: Text('Elemento $index')),
+                    child: Center(child: Text(transaction.name!)),
                     decoration: BoxDecoration(
                       border: Border.all(
                         color: Color(0xffb3b3b3),
@@ -91,7 +168,7 @@ class SliverTest extends StatelessWidget {
                   ),
                 );
               },
-              childCount: 20, // Numero di elementi nella lista
+              childCount: transactions.length, // Numero di transazioni
             ),
           ),
         ],
@@ -119,7 +196,10 @@ class _SliverPersistentHeaderDelegate extends SliverPersistentHeaderDelegate {
 
   @override
   Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
+    BuildContext context,
+    double shrinkOffset,
+    bool overlapsContent,
+  ) {
     return SizedBox.expand(child: child);
   }
 
