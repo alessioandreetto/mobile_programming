@@ -18,6 +18,7 @@ class MyApp extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return MaterialApp(
             home: Scaffold(
+              backgroundColor: Colors.white,
               body: Center(
                 child: CircularProgressIndicator(), // Indicatore di caricamento
               ),

@@ -104,7 +104,7 @@ class _WalletSliverScreenState extends State<WalletSliverScreen> {
     categoryAmounts.forEach((category, amount) {
       bool isSelected = _selectedCategory == category;
       sections.add(PieChartSectionData(
-        color: fixedColors[int.parse(category)],
+        color: fixedColors[int.parse(category) % fixedColors.length],
         value: amount,
         title: '',
         radius: isSelected ? 100 : 90,
@@ -127,15 +127,15 @@ class _WalletSliverScreenState extends State<WalletSliverScreen> {
         _selectedCategory = null;
       } else {
         _selectedCategory = tappedCategory;
-        nomeCategoria = categories[int.parse(tappedCategory)].name;
+        nomeCategoria = categories[int.parse(tappedCategory) - 1].name;
         valoreCategoria = categoryAmounts[tappedCategory]!;
       }
     });
   }
 
   double _getAngle(Offset position) {
-    final centerX = 75.0;
-    final centerY = 75.0;
+    final centerX = 150.0; // Updated to match the size of the PieChart
+    final centerY = 150.0; // Updated to match the size of the PieChart
     final dx = position.dx - centerX;
     final dy = position.dy - centerY;
     final angle = (Math.atan2(dy, dx) * 180 / Math.pi + 360) % 360;
@@ -201,51 +201,42 @@ class _WalletSliverScreenState extends State<WalletSliverScreen> {
             floating: true,
             expandedHeight: 300.0,
             flexibleSpace: FlexibleSpaceBar(
-              background: Container(
-                child:  Container(
-                      height: 300,
-                      width: 300,
-                      color: Colors.blue,
-                      child: Padding(
-                        padding: const EdgeInsets.only(top: 130.0),
-                        child: FutureBuilder<List<Transaction>>(
-                          future: _loadTransactions(_selectedWalletIndex),
-                          builder: (context, snapshot) {
-                            if (snapshot.hasError) {
-                              return Center(child: Text('Errore: ${snapshot.error}'));
-                            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                              return Container(
-                                width: 150,
-                                height: 150,
-                              );
-                            } else {
-                              List<Transaction> transactions = snapshot.data!;
-                              Map<String, double> categoryAmounts = _calculateCategoryAmounts(transactions);
-                              return GestureDetector(
-                                onTapUp: (details) {
-                                  _handlePieChartTap(details, categoryAmounts);
-                                },
-                                child: Padding(
-                                  padding: const EdgeInsets.only(right: 35.0),
-                                  child: Container(
-                                    width: 150,
-                                    height: 150,
-                                    child: PieChart(
-                                      PieChartData(
-                                        sections: _createPieChartSections(categoryAmounts),
-                                        sectionsSpace: 2,
-                                        centerSpaceRadius: 0,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              );
-                            }
+              background: Padding(
+                padding: const EdgeInsets.only(top: 80.0),
+                child: Center( // Centrato il grafico a torta
+                  child: FutureBuilder<List<Transaction>>(
+                    future: _loadTransactions(_selectedWalletIndex),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasError) {
+                        return Center(child: Text('Errore: ${snapshot.error}'));
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return Container(
+                          width: 150,
+                          height: 150,
+                        );
+                      } else {
+                        List<Transaction> transactions = snapshot.data!;
+                        Map<String, double> categoryAmounts = _calculateCategoryAmounts(transactions);
+                        return GestureDetector(
+                          onTapUp: (details) {
+                            _handlePieChartTap(details, categoryAmounts);
                           },
-                        ),
-                      ),
-                    ),
-                  
+                          child: Container(
+                            width: 300, // Increased size to match the center position
+                            height: 300, // Increased size to match the center position
+                            child: PieChart(
+                              PieChartData(
+                                sections: _createPieChartSections(categoryAmounts),
+                                sectionsSpace: 2,
+                                centerSpaceRadius: 0,
+                              ),
+                            ),
+                          ),
+                        );
+                      }
+                    },
+                  ),
+                ),
               ),
             ),
           ),
@@ -287,7 +278,6 @@ class _WalletSliverScreenState extends State<WalletSliverScreen> {
                                 _loadTransactions(index);
                               },
                               style: ButtonStyle(
-                               
                                 elevation: MaterialStateProperty.all(0),
                                 shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                                   RoundedRectangleBorder(
