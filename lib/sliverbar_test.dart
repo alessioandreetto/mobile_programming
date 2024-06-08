@@ -202,47 +202,50 @@ class _WalletSliverScreenState extends State<WalletSliverScreen> {
             expandedHeight: 300.0,
             flexibleSpace: FlexibleSpaceBar(
               background: Container(
-                child: 
-                  Expanded(
-                    child: Container(
+                child:  Container(
+                      height: 300,
+                      width: 300,
                       color: Colors.blue,
-                      child: FutureBuilder<List<Transaction>>(
-                        future: _loadTransactions(_selectedWalletIndex),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasError) {
-                            return Center(child: Text('Errore: ${snapshot.error}'));
-                          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                            return Container(
-                              width: 150,
-                              height: 150,
-                            );
-                          } else {
-                            List<Transaction> transactions = snapshot.data!;
-                            Map<String, double> categoryAmounts = _calculateCategoryAmounts(transactions);
-                            return GestureDetector(
-                              onTapUp: (details) {
-                                _handlePieChartTap(details, categoryAmounts);
-                              },
-                              child: Padding(
-                                padding: const EdgeInsets.only(right: 35.0),
-                                child: Container(
-                                  width: 150,
-                                  height: 150,
-                                  child: PieChart(
-                                    PieChartData(
-                                      sections: _createPieChartSections(categoryAmounts),
-                                      sectionsSpace: 2,
-                                      centerSpaceRadius: 0,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 130.0),
+                        child: FutureBuilder<List<Transaction>>(
+                          future: _loadTransactions(_selectedWalletIndex),
+                          builder: (context, snapshot) {
+                            if (snapshot.hasError) {
+                              return Center(child: Text('Errore: ${snapshot.error}'));
+                            } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                              return Container(
+                                width: 150,
+                                height: 150,
+                              );
+                            } else {
+                              List<Transaction> transactions = snapshot.data!;
+                              Map<String, double> categoryAmounts = _calculateCategoryAmounts(transactions);
+                              return GestureDetector(
+                                onTapUp: (details) {
+                                  _handlePieChartTap(details, categoryAmounts);
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.only(right: 35.0),
+                                  child: Container(
+                                    width: 150,
+                                    height: 150,
+                                    child: PieChart(
+                                      PieChartData(
+                                        sections: _createPieChartSections(categoryAmounts),
+                                        sectionsSpace: 2,
+                                        centerSpaceRadius: 0,
+                                      ),
                                     ),
                                   ),
                                 ),
-                              ),
-                            );
-                          }
-                        },
+                              );
+                            }
+                          },
+                        ),
                       ),
                     ),
-                  ),
+                  
               ),
             ),
           ),
