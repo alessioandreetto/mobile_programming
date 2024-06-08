@@ -10,5 +10,3 @@ A new Flutter project.
 6. ⁠⁠sistemazione grafica
 7. sistemare snackbar
 9. ⁠breve relazione che descriva la realizzazione del progetto
-
-

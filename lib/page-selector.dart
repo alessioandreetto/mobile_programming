@@ -65,7 +65,8 @@ class _BottomBarDemoState extends State<BottomBarDemo> {
                     );
                   }
                 : () {
-                    _showSnackbar(context);
+                    _showSnackbar(context,
+                        'Impossibile aggiungere nuova transazione!\nCreare prima un nuovo wallet!');
                   },
             child: Icon(
               Icons.add,
@@ -109,12 +110,36 @@ class _BottomBarDemoState extends State<BottomBarDemo> {
     );
   }
 
-  void _showSnackbar(BuildContext context) {
-    final snackBar = SnackBar(
-      content: Text(
-          'Impossibile aggiungere nuova transazione!\nCreare prima un nuovo wallet!'),
-      duration: Duration(seconds: 2), // Imposta la durata della snackbar
+  void _showSnackbar(BuildContext context, String message) {
+    final overlay = Overlay.of(context);
+    final overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        top: 50.0, // Posiziona il messaggio a 50 pixel dall'alto
+        left: MediaQuery.of(context).size.width * 0.1,
+        width: MediaQuery.of(context).size.width * 0.8,
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.blueAccent,
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 20.0, vertical: 10.0),
+            child: Text(
+              message,
+              style: TextStyle(color: Colors.white),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ),
     );
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+
+    overlay.insert(overlayEntry);
+
+    // Rimuove il messaggio dopo 2 secondi
+    Future.delayed(Duration(seconds: 2), () {
+      overlayEntry.remove();
+    });
   }
 }
