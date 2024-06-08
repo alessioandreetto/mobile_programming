@@ -7,6 +7,7 @@ import '../../providers/wallet_provider.dart';
 import 'SettingsPage/change_name.dart'; // Assicurati che il percorso sia corretto
 import 'initialPage/welcome_page.dart';
 import 'initialPage/demo.dart';
+import '../sliverbar_test.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -104,6 +105,25 @@ class _SettingsPageState extends State<SettingsPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => PageIndicatorDemo()),
+                );
+              },
+            ),
+          ),
+           Container(
+            margin: EdgeInsets.only(bottom: 10, left: 10, right: 10),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Color(0xffb3b3b3),
+              ),
+              borderRadius: BorderRadius.circular(10),
+              color: Colors.white,
+            ),
+            child: ListTile(
+              title: Text('test sliver '),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => SliverTest()),
                 );
               },
             ),
