@@ -36,6 +36,7 @@ class _WalletSliverScreenState extends State<WalletSliverScreen> {
   double valoreCategoria = 0;
   String nomeCategoria = '';
   String? _selectedCategory;
+  PageController _pageController = PageController();
 
   List<Category> categories = [
     Category(id: 1, name: 'Auto'),
@@ -210,6 +211,23 @@ class _WalletSliverScreenState extends State<WalletSliverScreen> {
     return categoryAmounts;
   }
 
+
+  void _handleSwipe(int index) {
+    if (_selectedWalletIndex != index) {
+      _selectedWalletIndex = index;
+      _selectedCategory = null;
+      setState(() {});
+    }
+  }
+
+    void _handleButtonPress(int index) {
+    _pageController.animateToPage(
+      index,
+      duration: Duration(milliseconds: 500),
+      curve: Curves.easeInOut,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     var walletProvider = Provider.of<WalletProvider>(context);
@@ -230,7 +248,12 @@ class _WalletSliverScreenState extends State<WalletSliverScreen> {
             floating: true,
             expandedHeight: 300.0,
             flexibleSpace: FlexibleSpaceBar(
-              background: Padding(
+              background: PageView.builder(
+                  controller: _pageController,
+                  itemCount: walletProvider.wallets.length,
+                  onPageChanged: _handleSwipe,
+                  itemBuilder: (context, index) {
+                    return Padding(
                 padding: const EdgeInsets.only(top: 80.0),
                 child: Center(
                   // Centrato il grafico a torta
@@ -271,7 +294,9 @@ class _WalletSliverScreenState extends State<WalletSliverScreen> {
                     },
                   ),
                 ),
-              ),
+              );
+              },
+            )
             ),
           ),
           SliverPersistentHeader(
@@ -317,6 +342,7 @@ class _WalletSliverScreenState extends State<WalletSliverScreen> {
                                 vertical: 8.0, horizontal: 8.0),
                             child: ElevatedButton(
                               onPressed: () {
+                                _handleButtonPress(index);
                                 setState(() {
                                   _selectedWalletIndex = index;
                                 });
