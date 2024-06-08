@@ -88,23 +88,24 @@ class _WalletSliverScreenState extends State<WalletSliverScreen> {
   }
 
   List<PieChartSectionData> _createPieChartSections(Map<String, double> categoryAmounts) {
-    List<Color> fixedColors = [
-      Colors.red,
-      Colors.blue,
-      Colors.green,
-      Colors.orange,
-      Colors.purple,
-      Colors.yellow,
-      Colors.brown,
-    ];
+  Map<int, Color> categoryColors = {
+    0: Colors.red, // Auto
+    1: Colors.blue, // Banca
+    2: Colors.green, // Casa
+    3: Colors.orange, // Intrattenimento
+    4: Colors.purple, // Shopping
+    5: Colors.yellow, // Viaggio
+    6: Colors.brown, // Varie
+  };
+
 
     List<PieChartSectionData> sections = [];
     int index = 0;
 
     categoryAmounts.forEach((category, amount) {
-      bool isSelected = _selectedCategory == category;
+      bool isSelected = _selectedCategory == category ;
       sections.add(PieChartSectionData(
-        color: fixedColors[int.parse(category) % fixedColors.length],
+        color: categoryColors[int.parse(category)],
         value: amount,
         title: '',
         radius: isSelected ? 100 : 90,
@@ -125,9 +126,11 @@ class _WalletSliverScreenState extends State<WalletSliverScreen> {
       String tappedCategory = categoryAmounts.keys.elementAt(categoryIndex);
       if (_selectedCategory == tappedCategory) {
         _selectedCategory = null;
+        nomeCategoria = '';
+        valoreCategoria = 0;
       } else {
         _selectedCategory = tappedCategory;
-        nomeCategoria = categories[int.parse(tappedCategory) - 1].name;
+        nomeCategoria = categories[int.parse(tappedCategory) ].name;
         valoreCategoria = categoryAmounts[tappedCategory]!;
       }
     });
@@ -243,8 +246,8 @@ class _WalletSliverScreenState extends State<WalletSliverScreen> {
           SliverPersistentHeader(
             pinned: true,
             delegate: _SliverPersistentHeaderDelegate(
-              minHeight: 170.0,
-              maxHeight: 170.0,
+              minHeight: 200.0, // Increased to accommodate additional texts
+              maxHeight: 200.0, // Increased to accommodate additional texts
               child: Container(
                 color: Colors.white,
                 child: Column(
@@ -259,6 +262,13 @@ class _WalletSliverScreenState extends State<WalletSliverScreen> {
                               "Nome Wallet: ${walletProvider.wallets[_selectedWalletIndex].name}", style: TextStyle(fontSize: 20)),
                           Text(
                               'Bilancio: ${walletProvider.wallets[_selectedWalletIndex].balance} ${walletProvider.valuta}', style: TextStyle(fontSize: 20)),
+                          if (nomeCategoria.isNotEmpty) ...[
+                         
+                            Text(
+                                '$nomeCategoria : $valoreCategoria ${walletProvider.valuta}', style: TextStyle(fontSize: 20)),
+                        
+                          ], if (nomeCategoria.isEmpty)...[
+                          Text(' ', style: TextStyle(fontSize: 20))],
                         ],
                       ),
                     ),
@@ -286,14 +296,14 @@ class _WalletSliverScreenState extends State<WalletSliverScreen> {
                                   ),
                                 ),
                                 foregroundColor: MaterialStateProperty.resolveWith<Color>(
-                                  (Set<MaterialState> states) {
+                                      (Set<MaterialState> states) {
                                     return _selectedWalletIndex == index
                                         ? Colors.white
                                         : Colors.black;
                                   },
                                 ),
                                 backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                                  (Set<MaterialState> states) {
+                                      (Set<MaterialState> states) {
                                     return _selectedWalletIndex == index
                                         ? Colors.black
                                         : Colors.white;
