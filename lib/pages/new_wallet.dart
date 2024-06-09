@@ -86,22 +86,21 @@ class _AddNotePageState extends State<AddNotePage> {
       bool? confirm = await showDialog<bool>(
         context: context,
         builder: (context) => AlertDialog(
-          title: Text('Salvare le modifiche?'),
+          title: Text('Conferma uscita'),
           content: Text(
-              'Hai delle modifiche non salvate. Vuoi salvarle prima di uscire?'),
+              'Hai delle modifiche non salvate. Sei sicuro di voler tornare indietro senza salvare?'),
           actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+              child: Text('Sì'),
+            ),
             TextButton(
               onPressed: () {
                 Navigator.of(context).pop(false);
               },
               child: Text('No'),
-            ),
-            TextButton(
-              onPressed: () {
-                _saveNote();
-                Navigator.of(context).pop(true);
-              },
-              child: Text('Sì'),
             ),
           ],
         ),
