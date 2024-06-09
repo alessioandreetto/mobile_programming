@@ -7,6 +7,7 @@ import '../../page-selector.dart';
 import '../../model/database_model.dart';
 import '../../providers/wallet_provider.dart';
 import 'package:provider/provider.dart';
+import 'tutorial.dart'; // Import your HomeList page
 
 class PageIndicatorDemo extends StatefulWidget {
   @override
@@ -31,7 +32,7 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      resizeToAvoidBottomInset: false, // Aggiungi questa linea
+      resizeToAvoidBottomInset: false,
       body: Column(
         children: [
           Expanded(
@@ -58,9 +59,9 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
                   ),
                 ),
                 Container(
-                  color: Colors.orange,
                   child: Center(
-                    child: Text('Page 3'),
+                    child:
+                        InteractiveTutorial(), // Qui sostituiamo la pagina arancione con il tutorial
                   ),
                 ),
                 Container(
@@ -110,12 +111,11 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
                     },
                   )
                 else
-                  SizedBox(
-                      width: 48), // Lascia lo spazio se siamo alla prima pagina
+                  SizedBox(width: 48),
                 SmoothPageIndicator(
                   controller: _pageController,
-                  count: 4, // Numero totale di pagine
-                  effect: WormEffect(), // Effetto desiderato
+                  count: 4,
+                  effect: WormEffect(),
                 ),
                 if (_currentPageIndex != 3)
                   IconButton(
@@ -128,8 +128,7 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
                     },
                   )
                 else
-                  SizedBox(
-                      width: 48), // Lascia lo spazio se siamo all'ultima pagina
+                  SizedBox(width: 48),
               ],
             ),
           ),
