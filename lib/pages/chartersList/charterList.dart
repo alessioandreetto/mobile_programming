@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_application_1/pages/charts.dart';
+import 'package:flutter_application_1/pages/new_operation.dart';
 import 'dart:math' as math;
 import '../../model/database_model.dart';
 import '../../providers/wallet_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:fl_chart/fl_chart.dart';
-import '../new_operation.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
+
 class ChartsList extends StatefulWidget {
   @override
   _ChartsListState createState() => _ChartsListState();
@@ -16,7 +16,6 @@ class _ChartsListState extends State<ChartsList> {
   late int _selectedWalletIndex;
   late String _selectedButton;
   late PageController _pageController;
-
 
 
   Map<int, Color> categoryColors = {
@@ -38,8 +37,6 @@ class _ChartsListState extends State<ChartsList> {
     5: Icons.airplanemode_active, // Categoria Viaggio
     6: Icons.category, // Categoria Varie
   };
-
-
   @override
   void initState() {
     super.initState();
@@ -55,7 +52,7 @@ class _ChartsListState extends State<ChartsList> {
         title: Text('Charts page'),
         elevation: 0,
         backgroundColor: Colors.transparent,
-        surfaceTintColor: Colors.transparent,
+        shadowColor: Colors.transparent,
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -135,7 +132,7 @@ class _ChartsListState extends State<ChartsList> {
                   children: [
                     Padding(
                       padding: const EdgeInsets.only(
-                          left: 8.0), // Aggiungi il padding a sinistra
+                          left: 8.0), 
                       child: Text("Transazioni per ${selectedWallet.name}:"),
                     ),
                     SizedBox(height: 10),
@@ -220,69 +217,66 @@ class _ChartsListState extends State<ChartsList> {
                                 final date = DateTime.parse(transaction.date!);
                                 final formattedDate = _formatDateTime(date);
                                 return Slidable(
-                  key: ValueKey(index),
-                  startActionPane: ActionPane(
-                    extentRatio: 0.25,
-                    motion: ScrollMotion(),
-                    children: [
-                      SlidableAction(
-                        borderRadius: BorderRadius.circular(10),
-                        padding: EdgeInsets.all(20),
-                        onPressed: (context) {
-                          _deleteTransaction(transaction, walletProvider);
-                          setState(() {
-                            transactions.removeAt(index);
-                          });
-                        },
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white,
-                        icon: Icons.delete,
-                        label: 'Elimina',
-                      ),
-                    ],
-                  ),
-                  child: GestureDetector(
-                    onTap: () {
-                      _navigateToTransactionDetail(context, transaction);
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Container(
-                        height: 70.0,
-                        child: ListTile(
-                          leading: Container(
-                            width: 50,
-                            height: 50,
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(
-                                  10), // Metà dell'altezza/larghezza per ottenere i bordi tondi
-                              color: categoryColors[transaction.categoryId] ??
-                                  Colors
-                                      .grey, // Colore della categoria o grigio come fallback
-                            ),
-                            child: Icon(
-                              categoryIcons[transaction.categoryId] ??
-                                  Icons
-                                      .category, // Icona della categoria o categoria come fallback
-                              color: Colors.white, // Colore dell'icona
-                            ),
-                          ),
-                          title: Text(transaction.name ?? ''),
-                          subtitle: Text(
-                            "Data: $formattedDate, Valore: ${transaction.value} ${walletProvider.valuta}",
-                          ),
-                        ),
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: Color(0xffb3b3b3),
-                          ),
-                          color: Colors.transparent,
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                      ),
-                    ),
-                  ),
-                );
+                                  key: ValueKey(index),
+                                  startActionPane: ActionPane(
+                                    extentRatio: 0.25,
+                                    motion: ScrollMotion(),
+                                    children: [
+                                      SlidableAction(
+                                        borderRadius: BorderRadius.circular(10),
+                                        padding: EdgeInsets.all(20),
+                                        onPressed: (context) {
+                                          _deleteTransaction(transaction, walletProvider);
+                                          setState(() {
+                                            transactions.removeAt(index);
+                                          });
+                                        },
+                                        backgroundColor: Colors.red,
+                                        foregroundColor: Colors.white,
+                                        icon: Icons.delete,
+                                        label: 'Elimina',
+                                      ),
+                                    ],
+                                  ),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      _navigateToTransactionDetail(context, transaction);
+                                    },
+                                    child: Padding(
+                                      padding: const EdgeInsets.all(8.0),
+                                      child: Container(
+                                        height: 70.0,
+                                        child: ListTile(
+                                          leading: Container(
+                                            width: 50,
+                                            height: 50,
+                                            decoration: BoxDecoration(
+                                              borderRadius: BorderRadius.circular(10),
+                                              color: categoryColors[transaction.categoryId] ??
+                                                  Colors.grey,
+                                            ),
+                                            child: Icon(
+                                              categoryIcons[transaction.categoryId] ??
+                                                  Icons.category,
+                                              color: Colors.white,
+                                            ),
+                                          ),
+                                          title: Text(transaction.name ?? ''),
+                                          subtitle: Text(
+                                            "Data: $formattedDate, Valore: ${transaction.value} ${walletProvider.valuta}",
+                                          ),
+                                        ),
+                                        decoration: BoxDecoration(
+                                          border: Border.all(
+                                            color: Color(0xffb3b3b3),
+                                          ),
+                                          color: Colors.transparent,
+                                          borderRadius: BorderRadius.circular(10.0),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                );
                               },
                             );
                           }
@@ -314,132 +308,31 @@ class _ChartsListState extends State<ChartsList> {
           future: _fetchTransactions(selectedWallet.id!, period),
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: CircularProgressIndicator());
+              return Container();
             } else if (snapshot.hasError) {
               return Center(child: Text('Error: ${snapshot.error}'));
             } else {
               List<Transaction> transactions = snapshot.data!['transactions'];
-              List<FlSpot> chartData =
+              List<ChartSampleData> chartData =
                   _calculateChartData(transactions, selectedWallet);
 
               return Padding(
-                padding:
-                    const EdgeInsets.all(16.0), // Add padding around the chart
-                child: LineChart(
-                  LineChartData(
-                    gridData: FlGridData(
-                      show: true,
-                      getDrawingHorizontalLine: (value) {
-                        return FlLine(
-                          color: Color(0xffe7e8ec),
-                          strokeWidth: 1,
-                        );
-                      },
-                      getDrawingVerticalLine: (value) {
-                        return FlLine(
-                          color: Color(0xffe7e8ec),
-                          strokeWidth: 1,
-                        );
-                      },
+                padding: const EdgeInsets.all(16.0),
+                child: SfCartesianChart(
+                  primaryXAxis: NumericAxis( 
+                    labelStyle: TextStyle(
+                      color: Colors.black,
                     ),
-                    titlesData: FlTitlesData(
-                      show: true,
-                      bottomTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          getTitlesWidget: (value, meta) {
-                            // Mostra i titoli solo nei punti corrispondenti alle transazioni
-                            if (chartData.any((spot) => spot.x == value)) {
-                              return Padding(
-                                padding: const EdgeInsets.only(top: 8.0),
-                                child: Text(
-                                  value.toInt().toString(),
-                                  style: TextStyle(
-                                    color: Color(0xff939393),
-                                    fontSize: 10,
-                                  ),
-                                ),
-                              );
-                            } else {
-                              return Container(); // Non mostrare nulla se non è un punto della transazione
-                            }
-                          },
-                        ),
-                      ),
-                      leftTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: true,
-                          reservedSize: 40, // Aumenta la larghezza riservata
-                          getTitlesWidget: (value, meta) {
-                            return Padding(
-                              padding: const EdgeInsets.only(right: 8.0),
-                              child: Text(
-                                value.toInt().toString(),
-                                style: TextStyle(
-                                  color: Color(0xff939393),
-                                  fontSize: 10,
-                                  height: 1.2, // Imposta l'altezza della linea
-                                ),
-                                textAlign: TextAlign.center, // Centra il testo
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      rightTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: false,
-                        ),
-                      ),
-                      topTitles: AxisTitles(
-                        sideTitles: SideTitles(
-                          showTitles: false,
-                        ),
-                      ),
-                    ),
-                    borderData: FlBorderData(
-                      show: true,
-                      border:
-                          Border.all(color: const Color(0xffe7e8ec), width: 1),
-                    ),
-                    minX: 0,
-                    maxX: transactions.length.toDouble(),
-                    minY: chartData
-                        .map((spot) => spot.y)
-                        .reduce(math.min)
-                        .floorToDouble(),
-                    maxY: chartData
-                        .map((spot) => spot.y)
-                        .reduce(math.max)
-                        .ceilToDouble(),
-                    lineBarsData: [
-                      LineChartBarData(
-                        spots: chartData,
-                        isCurved: true,
-                        gradient: LinearGradient(
-                          colors: [
-                            Color(0xff4af699),
-                            Color(0xff23b6e6),
-                          ],
-                          begin: Alignment.centerLeft,
-                          end: Alignment.centerRight,
-                        ),
-                        barWidth: 4,
-                        isStrokeCapRound: true,
-                        belowBarData: BarAreaData(
-                          show: true,
-                          gradient: LinearGradient(
-                            colors: [
-                              Color(0xff4af699).withOpacity(0.4),
-                              Color(0xff23b6e6).withOpacity(0.4),
-                            ],
-                            begin: Alignment.centerLeft,
-                            end: Alignment.centerRight,
-                          ),
-                        ),
-                      ),
-                    ],
                   ),
+                  primaryYAxis: NumericAxis( ),
+                  series: <LineSeries<ChartSampleData, num>>[
+                    LineSeries<ChartSampleData, num>(
+                      dataSource: chartData,
+                      xValueMapper: (ChartSampleData sales, _) => sales.x,
+                      yValueMapper: (ChartSampleData sales, _) => sales.y,
+                      dataLabelSettings: DataLabelSettings(isVisible: true),
+                    ),
+                  ],
                 ),
               );
             }
@@ -449,26 +342,25 @@ class _ChartsListState extends State<ChartsList> {
     );
   }
 
-  // Method to calculate chart data
-  List<FlSpot> _calculateChartData(
+  List<ChartSampleData> _calculateChartData(
       List<Transaction> transactions, Wallet wallet) {
-    List<FlSpot> chartData = [];
+    List<ChartSampleData> chartData = [];
 
     double balance = wallet.balance ?? 0;
     double cumulativeSum = 0;
 
-    chartData.add(FlSpot(transactions.length.toDouble(), balance));
+    chartData.add(ChartSampleData(
+        transactions.length.toDouble(), balance));
 
     for (int i = transactions.length - 1; i >= 0; i--) {
       cumulativeSum += transactions[i].value!;
       double currentBalance = balance - cumulativeSum;
-      chartData.insert(0, FlSpot(i.toDouble(), currentBalance));
+      chartData.insert(0, ChartSampleData(i.toDouble(), currentBalance));
     }
 
     return chartData;
   }
 
-  // Method to format DateTime to desired format
   String _formatDateTime(DateTime dateTime) {
     final formattedDate =
         "${dateTime.year}-${_twoDigits(dateTime.month)}-${_twoDigits(dateTime.day)}";
@@ -477,7 +369,6 @@ class _ChartsListState extends State<ChartsList> {
     return "$formattedDate";
   }
 
-  // Method to fetch transactions
   Future<Map<String, dynamic>> _fetchTransactions(
       int walletId, String selectedButton) async {
     Map<String, dynamic> result = {};
@@ -492,7 +383,6 @@ class _ChartsListState extends State<ChartsList> {
     return result;
   }
 
-  // Method to fetch negative transactions
   Future<List<Transaction>> _fetchNegativeTransactions(
       int walletId, String selectedButton) async {
     DateTime startDate = DateTime.now();
@@ -522,14 +412,12 @@ class _ChartsListState extends State<ChartsList> {
     return transactions;
   }
 
-  // Method to handle button press
   void _handleButtonPress(int index) {
     setState(() {
       _selectedWalletIndex = index;
     });
   }
 
-  // Method to navigate to transaction detail page
   void _navigateToTransactionDetail(
       BuildContext context, Transaction transaction) {
     Navigator.push(
@@ -540,17 +428,13 @@ class _ChartsListState extends State<ChartsList> {
     );
   }
 
-    void _deleteTransaction(
+  void _deleteTransaction(
       Transaction transaction, WalletProvider walletProvider) async {
-// Recupera il valore della transazione eliminata
     double deletedTransactionValue = transaction.value ?? 0.0;
-// Elimina la transazione dal database
     await DatabaseHelper().deleteTransaction(transaction.id!);
-
     walletProvider.refreshWallets();
   }
 
-  // Helper method to format two digits
   String _twoDigits(int n) {
     if (n >= 10) return "$n";
     return "0$n";
@@ -561,4 +445,11 @@ class _ChartsListState extends State<ChartsList> {
     _pageController.dispose();
     super.dispose();
   }
+}
+
+class ChartSampleData {
+  final double x;
+  final double y;
+
+  ChartSampleData(this.x, this.y);
 }
