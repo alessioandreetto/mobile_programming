@@ -60,6 +60,10 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
       _selectedCategoryId = widget.transaction!.categoryId!;
       _selectedDate = DateTime.parse(widget.transaction!.date!);
 
+      // Formatta la data come YYYY-MM-DD
+      widget.dateController.text =
+          "${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}";
+
       if (widget.transaction!.value! < 0) {
         _selectedActionIndex = 1; // Uscita
         widget.valueController.text =
