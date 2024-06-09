@@ -456,6 +456,8 @@ class _HomeListState extends State<HomeList> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
+                      
+                
                           if (walletProvider.wallets.isNotEmpty)
                             Text(
                               "Transazioni per ${walletProvider.wallets.firstWhere((wallet) => wallet.id == _selectedWalletId, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).name}:",
@@ -488,12 +490,16 @@ class _HomeListState extends State<HomeList> {
               ),
             ),
           ),
+               
+          
           SliverList(
+            
             delegate: SliverChildBuilderDelegate(
               (BuildContext context, int index) {
                 final Transaction transaction = transactions[index];
                 final date = DateTime.parse(transaction.date!);
                 final formattedDate = DateFormat('dd/MM/yyyy').format(date);
+                
                 return Slidable(
                   key: ValueKey(index),
                   startActionPane: ActionPane(
@@ -564,6 +570,7 @@ class _HomeListState extends State<HomeList> {
           ),
         ],
       ),
+  
     );
   }
 }

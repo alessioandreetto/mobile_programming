@@ -83,6 +83,11 @@ class WalletProvider with ChangeNotifier {
     notifyListeners();
   }
 
+
+int getWalletCount() {
+  return _wallets.length;
+}
+
   // Metodo per ricaricare i wallet
   Future<void> refreshWallets() async {
     _wallets = await loadWallets();

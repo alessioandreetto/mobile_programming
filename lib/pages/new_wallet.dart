@@ -30,6 +30,7 @@ class AddNotePage extends StatefulWidget {
 class _AddNotePageState extends State<AddNotePage> {
   bool _isDirty = false;
   bool _hasTransactions = false;
+  bool _hideDeleteButton = false;
 
   @override
   void initState() {
@@ -39,10 +40,12 @@ class _AddNotePageState extends State<AddNotePage> {
 
   Future<void> _checkTransactions() async {
     final walletProvider = Provider.of<WalletProvider>(context, listen: false);
+    int walletCount = await walletProvider.getWalletCount();
     bool hasTransactions =
         await walletProvider.hasTransactionsForWallet(widget.walletId);
     setState(() {
       _hasTransactions = hasTransactions;
+      _hideDeleteButton = walletCount <= 1;
     });
   }
 
@@ -100,7 +103,7 @@ class _AddNotePageState extends State<AddNotePage> {
               onPressed: _onBackPressed,
             ),
             actions: [
-              if (widget.onDelete != null)
+              if (!_hideDeleteButton && widget.onDelete != null)
                 IconButton(
                   icon: Icon(Icons.delete),
                   onPressed: _confirmDelete,
@@ -255,7 +258,8 @@ class _AddNotePageState extends State<AddNotePage> {
 
   @override
   void dispose() {
-    widget.titleController.dispose();
+    widget.titleController.dispose
+();
     widget.bodyController.dispose();
     super.dispose();
   }
