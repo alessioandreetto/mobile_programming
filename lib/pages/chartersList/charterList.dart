@@ -17,6 +17,29 @@ class _ChartsListState extends State<ChartsList> {
   late String _selectedButton;
   late PageController _pageController;
 
+
+
+  Map<int, Color> categoryColors = {
+    0: Colors.red, // Categoria Auto
+    1: Colors.blue, // Categoria Banca
+    2: Colors.green, // Categoria Casa
+    3: Colors.orange, // Categoria Intrattenimento
+    4: Colors.purple, // Categoria Shopping
+    5: Colors.yellow, // Categoria Viaggio
+    6: Colors.brown, // Categoria Varie
+  };
+
+  Map<int, IconData> categoryIcons = {
+    0: Icons.directions_car, // Categoria Auto
+    1: Icons.account_balance, // Categoria Banca
+    2: Icons.home, // Categoria Casa
+    3: Icons.movie, // Categoria Intrattenimento
+    4: Icons.shopping_cart, // Categoria Shopping
+    5: Icons.airplanemode_active, // Categoria Viaggio
+    6: Icons.category, // Categoria Varie
+  };
+
+
   @override
   void initState() {
     super.initState();
@@ -212,6 +235,23 @@ class _ChartsListState extends State<ChartsList> {
                                       color: Colors.white,
                                     ),
                                     child: ListTile(
+                                        leading: Container(
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(
+                                  10), // Metà dell'altezza/larghezza per ottenere i bordi tondi
+                              color: categoryColors[transaction.categoryId] ??
+                                  Colors
+                                      .grey, // Colore della categoria o grigio come fallback
+                            ),
+                            child: Icon(
+                              categoryIcons[transaction.categoryId] ??
+                                  Icons
+                                      .category, // Icona della categoria o categoria come fallback
+                              color: Colors.white, // Colore dell'icona
+                            ),
+                          ),
                                       title: Text(transaction.name ?? ''),
                                       subtitle: Text(
                                           "Data: $formattedDate, Valore: ${transaction.value} $valuta"),
