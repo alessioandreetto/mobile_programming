@@ -336,7 +336,7 @@ class _ChartsListState extends State<ChartsList> {
                           // Ottieni il valore della transazione
                           double transactionValue = data.transactionValue;
                           // Formatta il testo dell'etichetta per includere sia il bilancio parziale che il valore della transazione
-                          return '${partialBalance.toStringAsFixed(2)}\n ${transactionValue.toStringAsFixed(2)}';
+                          return '${partialBalance.toStringAsFixed(2)} ${walletProvider.valuta}\n ${transactionValue.toStringAsFixed(2)} ${walletProvider.valuta}';
                         },
                         dataLabelSettings: DataLabelSettings(isVisible: true),
                       ),
