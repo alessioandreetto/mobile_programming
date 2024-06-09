@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import '../providers/wallet_provider.dart'; // Assicurati che il percorso sia corretto
+import '../providers/wallet_provider.dart';
 
 class AddNotePage extends StatefulWidget {
   final TextEditingController titleController;
@@ -11,15 +11,14 @@ class AddNotePage extends StatefulWidget {
   final VoidCallback? onDelete;
   final double? initialTitle;
   final String? initialBody;
-  final int
-      walletId; // Aggiungi walletId per identificare il portafoglio corrente
+  final int walletId;
 
   AddNotePage({
     required this.onSave,
     this.onDelete,
     this.initialTitle,
     this.initialBody,
-    required this.walletId, // Richiesto walletId nel costruttore
+    required this.walletId,
   })  : titleController = TextEditingController(
             text: initialTitle != null ? initialTitle.toString() : null),
         bodyController = TextEditingController(text: initialBody);
@@ -47,19 +46,59 @@ class _AddNotePageState extends State<AddNotePage> {
     });
   }
 
+  Future<void> _onBackPressed() async {
+    if (_isDirty) {
+      bool? confirm = await showDialog<bool>(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Salvare le modifiche?'),
+          content: Text(
+              'Hai delle modifiche non salvate. Vuoi salvarle prima di uscire?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+              child: Text('No'),
+            ),
+            TextButton(
+              onPressed: () {
+                _saveNote();
+                Navigator.of(context).pop(true);
+              },
+              child: Text('Sì'),
+            ),
+          ],
+        ),
+      );
+      if (confirm == true) {
+        Navigator.of(context).pop();
+      }
+    } else {
+      Navigator.of(context).pop();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: _onWillPop,
-      child: GestureDetector(
-        onTap: () {
-          FocusScope.of(context).unfocus();
+    return GestureDetector(
+      onTap: () {
+        FocusScope.of(context).unfocus();
+      },
+      child: WillPopScope(
+        onWillPop: () async {
+          await _onBackPressed();
+          return false;
         },
         child: Scaffold(
           appBar: AppBar(
             backgroundColor: Colors.transparent,
             systemOverlayStyle: SystemUiOverlayStyle.dark,
             elevation: 0,
+            leading: IconButton(
+              icon: Icon(Icons.arrow_back),
+              onPressed: _onBackPressed,
+            ),
             actions: [
               if (widget.onDelete != null)
                 IconButton(
@@ -166,36 +205,6 @@ class _AddNotePageState extends State<AddNotePage> {
         ),
       ),
     );
-  }
-
-  Future<bool> _onWillPop() async {
-    if (_isDirty) {
-      return await showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: Text('Salvare le modifiche?'),
-              content: Text(
-                  'Hai delle modifiche non salvate. Vuoi salvarle prima di uscire?'),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).pop(false);
-                  },
-                  child: Text('No'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    _saveNote();
-                    Navigator.of(context).pop(true);
-                  },
-                  child: Text('Sì'),
-                ),
-              ],
-            ),
-          ) ??
-          false;
-    }
-    return true;
   }
 
   void _saveNote() {
