@@ -31,7 +31,8 @@ class HomeList extends StatefulWidget {
 
 class _HomeListState extends State<HomeList> {
   late List<Transaction> transactions = [];
-  late int _selectedWalletIndex = 0;
+  late int _selectedWalletId;
+  late String _selectedValuta;
   bool _showExpenses = true;
   double valoreCategoria = 0;
   String nomeCategoria = '';
@@ -51,15 +52,18 @@ class _HomeListState extends State<HomeList> {
   @override
   void initState() {
     super.initState();
-    _loadTransactions(_selectedWalletIndex);
-        Provider.of<WalletProvider>(context, listen: false).loadAccountName();
+    _selectedWalletId = 0;
+    _selectedValuta = 'USD'; // Set a default value for _selectedValuta
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadTransactions(_selectedWalletId);
+      Provider.of<WalletProvider>(context, listen: false).loadAccountName();
+    });
   }
 
-  Future<List<Transaction>> _loadTransactions(int walletIndex) async {
+  Future<List<Transaction>> _loadTransactions(int walletId) async {
     try {
-      List<Transaction> loadedTransactions = await DatabaseHelper()
-          .getTransactionsForWallet(
-              walletIndex + 1); // Aggiungi 1 perché gli indici iniziano da 0
+      List<Transaction> loadedTransactions =
+          await DatabaseHelper().getTransactionsForWallet(walletId);
 
       if (_showExpenses) {
         loadedTransactions = loadedTransactions
@@ -185,7 +189,8 @@ class _HomeListState extends State<HomeList> {
     await DatabaseHelper().deleteTransaction(transaction.id!);
 
 // Aggiorna il bilancio del wallet corrispondente
-    Wallet selectedWallet = walletProvider.wallets[_selectedWalletIndex];
+    Wallet selectedWallet = walletProvider.wallets
+        .firstWhere((wallet) => wallet.id == _selectedWalletId);
     selectedWallet.balance = selectedWallet.balance! - deletedTransactionValue;
 
 // Aggiorna il bilancio del wallet nel database
@@ -213,8 +218,11 @@ class _HomeListState extends State<HomeList> {
   }
 
   void _handleSwipe(int index) {
-    if (_selectedWalletIndex != index) {
-      _selectedWalletIndex = index;
+    final walletId = Provider.of<WalletProvider>(context, listen: false)
+        .wallets[index]
+        .id!;
+    if (_selectedWalletId != walletId) {
+      _selectedWalletId = walletId;
       _selectedCategory = null;
       setState(() {});
     }
@@ -240,7 +248,6 @@ class _HomeListState extends State<HomeList> {
             pinned: true,
             snap: true,
             title: Text('Benvenuto ${walletProvider.name} !'),
-             
             floating: true,
             expandedHeight: 300.0,
             flexibleSpace: FlexibleSpaceBar(
@@ -254,7 +261,7 @@ class _HomeListState extends State<HomeList> {
                   child: Center(
                     // Centrato il grafico a torta
                     child: FutureBuilder<List<Transaction>>(
-                      future: _loadTransactions(_selectedWalletIndex),
+                      future: _loadTransactions(_selectedWalletId),
                       builder: (context, snapshot) {
                         if (snapshot.hasError) {
                           return Center(
@@ -264,14 +271,16 @@ class _HomeListState extends State<HomeList> {
                           return Container(
                             width: 150,
                             height: 150,
+                            child: Center(child: Text('Nessuna transazione')),
                           );
                         } else {
-                          List<Transaction> transactions = snapshot.data!;
-                          Map<String, double> categoryAmounts =
+                          final transactions = snapshot.data!;
+                          final categoryAmounts =
                               _calculateCategoryAmounts(transactions);
+
                           return GestureDetector(
                             onTapUp: (details) {
-                              _handlePieChartTap(details, categoryAmounts);
+                             _handlePieChartTap(details, categoryAmounts);
                             },
                             child: Container(
                               width:
@@ -311,12 +320,14 @@ class _HomeListState extends State<HomeList> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                              "Nome Wallet: ${walletProvider.wallets[_selectedWalletIndex].name}",
-                              style: TextStyle(fontSize: 20)),
-                          Text(
-                              'Bilancio: ${walletProvider.wallets[_selectedWalletIndex].balance} ${walletProvider.valuta}',
-                              style: TextStyle(fontSize: 20)),
+                          if (walletProvider.wallets.isNotEmpty)
+                            Text(
+                                "Nome Wallet: ${walletProvider.wallets.firstWhere((wallet) => wallet.id == _selectedWalletId, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).name}",
+                                style: TextStyle(fontSize: 20)),
+                          if (walletProvider.wallets.isNotEmpty)
+                            Text(
+                                'Bilancio: ${walletProvider.wallets.firstWhere((wallet) => wallet.id == _selectedWalletId, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).balance} ${walletProvider.valuta}',
+                                style: TextStyle(fontSize: 20)),
                           if (nomeCategoria.isNotEmpty) ...[
                             Text(
                                 '$nomeCategoria : $valoreCategoria ${walletProvider.valuta}',
@@ -341,9 +352,11 @@ class _HomeListState extends State<HomeList> {
                               onPressed: () {
                                 _handleButtonPress(index);
                                 setState(() {
-                                  _selectedWalletIndex = index;
+                                  _selectedWalletId =
+                                      walletProvider.wallets[index].id!;
                                 });
-                                _loadTransactions(index);
+                                _loadTransactions(walletProvider
+                                    .wallets[index].id!);
                               },
                               style: ButtonStyle(
                                 elevation: MaterialStateProperty.all(0),
@@ -357,7 +370,8 @@ class _HomeListState extends State<HomeList> {
                                 foregroundColor:
                                     MaterialStateProperty.resolveWith<Color>(
                                   (Set<MaterialState> states) {
-                                    return _selectedWalletIndex == index
+                                    return _selectedWalletId ==
+                                            walletProvider.wallets[index].id!
                                         ? Colors.white
                                         : Colors.black;
                                   },
@@ -365,7 +379,8 @@ class _HomeListState extends State<HomeList> {
                                 backgroundColor:
                                     MaterialStateProperty.resolveWith<Color>(
                                   (Set<MaterialState> states) {
-                                    return _selectedWalletIndex == index
+                                    return _selectedWalletId ==
+                                            walletProvider.wallets[index].id!
                                         ? Colors.black
                                         : Colors.white;
                                   },
@@ -382,16 +397,17 @@ class _HomeListState extends State<HomeList> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
-                          Text(
-                            "Transazioni per ${walletProvider.wallets[_selectedWalletIndex].name}:",
-                            style: TextStyle(fontSize: 16),
-                          ),
+                          if (walletProvider.wallets.isNotEmpty)
+                            Text(
+                              "Transazioni per ${walletProvider.wallets.firstWhere((wallet) => wallet.id == _selectedWalletId, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).name}:",
+                              style: TextStyle(fontSize: 16),
+                            ),
                           DropdownButton<bool>(
                             value: _showExpenses,
                             onChanged: (value) {
                               setState(() {
                                 _showExpenses = value!;
-                                _loadTransactions(_selectedWalletIndex);
+                                _loadTransactions(_selectedWalletId);
                               });
                             },
                             items: [
