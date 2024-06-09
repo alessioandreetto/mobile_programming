@@ -158,130 +158,173 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
     Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        title: widget.transaction == null
-            ? Text('Nuova Transazione')
-            : Text('Modifica Transazione'),
-        elevation: 0,
-        actions: [
-          Visibility(
-            visible: _deleteButtonVisible,
-            child: IconButton(
-              icon: Icon(Icons.delete),
-              onPressed: () {
-                _deleteTransaction(context);
-              },
-            ),
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            TextField(
-              controller: widget.nameController,
-              decoration: InputDecoration(labelText: 'Nome'),
-            ),
-            TextField(
-              controller: widget.valueController,
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(labelText: 'Valore'),
-              inputFormatters: [
-                FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+  Future<bool> _onWillPop() async {
+    if (_hasUnsavedChanges()) {
+      return await showDialog<bool>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text('Conferma'),
+              content: Text(
+                  'Sei sicuro di voler tornare indietro e non salvare le modifiche?'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: Text('No'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: Text('Si'),
+                ),
               ],
             ),
-            TextField(
-              controller: widget.dateController,
-              readOnly: true,
-              decoration: InputDecoration(
-                labelText: 'Data',
-                suffixIcon: IconButton(
-                  icon: Icon(Icons.calendar_today),
-                  onPressed: () => _selectDate(context),
-                ),
-              ),
-            ),
-            DropdownButtonFormField<String>(
-              value: _selectedWallet,
-              onChanged: (newValue) {
-                setState(() {
-                  _selectedWallet = newValue!;
-                });
-              },
-              items: _wallets.map((wallet) {
-                return DropdownMenuItem(
-                  value: wallet.name!,
-                  child: Text(wallet.name!),
-                );
-              }).toList(),
-              decoration: InputDecoration(
-                labelText: 'Portafoglio',
-              ),
-            ),
-            SizedBox(height: 16.0),
-            DropdownButtonFormField<Category>(
-              value: categories.firstWhere(
-                  (category) => category.id == _selectedCategoryId,
-                  orElse: () => categories[0]),
-              onChanged: (newValue) {
-                setState(() {
-                  _selectedCategoryId = newValue!.id;
-                });
-              },
-              items: categories.map((category) {
-                return DropdownMenuItem(
-                  value: category,
-                  child: Text(category.name),
-                );
-              }).toList(),
-              decoration: InputDecoration(
-                labelText: 'Categoria',
-              ),
-            ),
-            SizedBox(height: 16.0),
-            ToggleButtons(
-              children: _buildToggleButtons(),
-              isSelected: List.generate(
-                  _wallets.length >= 2
-                      ? actionTypes.length
-                      : actionTypes.length - 1,
-                  (index) => _selectedActionIndex == index),
-              onPressed: (index) {
-                setState(() {
-                  _selectedActionIndex = index;
-                });
-              },
-            ),
-            SizedBox(height: 16.0),
-            ElevatedButton(
-              onPressed: () async {
-                if (_validateFields()) {
-                  await _performRegularTransaction();
+          ) ??
+          false;
+    }
+    return true;
+  }
 
-                  Provider.of<WalletProvider>(context, listen: false)
-                      .loadWallets();
+  bool _hasUnsavedChanges() {
+    // Add logic to check if there are unsaved changes
+    return widget.nameController.text.isNotEmpty ||
+        widget.valueController.text.isNotEmpty ||
+        widget.dateController.text.isNotEmpty;
+  }
 
-                  _showSnackbar(
-                      context,
-                      widget.transaction == null
-                          ? 'Transazione aggiunta con successo!'
-                          : 'Transazione modificata con successo!');
-                  _navigateToHome(context);
-                } else {
-                  _showSnackbar(context, 'Inserisci tutti i campi');
-                }
-              },
-              child: Text(widget.transaction == null
-                  ? 'Aggiungi Transazione'
-                  : 'Modifica Transazione'),
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: _onWillPop,
+      child: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.transparent,
+          title: widget.transaction == null
+              ? Text('Nuova Transazione')
+              : Text('Modifica Transazione'),
+          elevation: 0,
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back),
+            onPressed: () async {
+              if (await _onWillPop()) {
+                Navigator.of(context).pop();
+              }
+            },
+          ),
+          actions: [
+            Visibility(
+              visible: _deleteButtonVisible,
+              child: IconButton(
+                icon: Icon(Icons.delete),
+                onPressed: () {
+                  _confirmDeleteTransaction(context);
+                },
+              ),
             ),
           ],
+        ),
+        body: SingleChildScrollView(
+          padding: EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              TextField(
+                controller: widget.nameController,
+                decoration: InputDecoration(labelText: 'Nome'),
+              ),
+              TextField(
+                controller: widget.valueController,
+                keyboardType: TextInputType.number,
+                decoration: InputDecoration(labelText: 'Valore'),
+                inputFormatters: [
+                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
+                ],
+              ),
+              TextField(
+                controller: widget.dateController,
+                readOnly: true,
+                decoration: InputDecoration(
+                  labelText: 'Data',
+                  suffixIcon: IconButton(
+                    icon: Icon(Icons.calendar_today),
+                    onPressed: () => _selectDate(context),
+                  ),
+                ),
+              ),
+              DropdownButtonFormField<String>(
+                value: _selectedWallet,
+                onChanged: (newValue) {
+                  setState(() {
+                    _selectedWallet = newValue!;
+                  });
+                },
+                items: _wallets.map((wallet) {
+                  return DropdownMenuItem(
+                    value: wallet.name!,
+                    child: Text(wallet.name!),
+                  );
+                }).toList(),
+                decoration: InputDecoration(
+                  labelText: 'Portafoglio',
+                ),
+              ),
+              SizedBox(height: 16.0),
+              DropdownButtonFormField<Category>(
+                value: categories.firstWhere(
+                    (category) => category.id == _selectedCategoryId,
+                    orElse: () => categories[0]),
+                onChanged: (newValue) {
+                  setState(() {
+                    _selectedCategoryId = newValue!.id;
+                  });
+                },
+                items: categories.map((category) {
+                  return DropdownMenuItem(
+                    value: category,
+                    child: Text(category.name),
+                  );
+                }).toList(),
+                decoration: InputDecoration(
+                  labelText: 'Categoria',
+                ),
+              ),
+              SizedBox(height: 16.0),
+              ToggleButtons(
+                children: _buildToggleButtons(),
+                isSelected: List.generate(
+                    _wallets.length >= 2
+                        ? actionTypes.length
+                        : actionTypes.length - 1,
+                    (index) => _selectedActionIndex == index),
+                onPressed: (index) {
+                  setState(() {
+                    _selectedActionIndex = index;
+                  });
+                },
+              ),
+              SizedBox(height: 16.0),
+              ElevatedButton(
+                onPressed: () async {
+                  if (_validateFields()) {
+                    await _performRegularTransaction();
+
+                    Provider.of<WalletProvider>(context, listen: false)
+                        .loadWallets();
+
+                    _showSnackbar(
+                        context,
+                        widget.transaction == null
+                            ? 'Transazione aggiunta con successo!'
+                            : 'Transazione modificata con successo!');
+                    _navigateToHome(context);
+                  } else {
+                    _showSnackbar(context, 'Inserisci tutti i campi');
+                  }
+                },
+                child: Text(widget.transaction == null
+                    ? 'Aggiungi Transazione'
+                    : 'Modifica Transazione'),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -360,6 +403,30 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
         balance: newBalance,
       );
       await dbHelper.updateWallet(updatedWallet);
+    }
+  }
+
+  Future<void> _confirmDeleteTransaction(BuildContext context) async {
+    bool? confirmDelete = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: Text('Conferma Eliminazione'),
+        content: Text('Sei sicuro di voler eliminare questa transazione?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text('No'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text('Si'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirmDelete == true) {
+      await _deleteTransaction(context);
     }
   }
 
