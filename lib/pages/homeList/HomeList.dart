@@ -24,6 +24,7 @@ class MyApp extends StatelessWidget {
   }
 }
 
+
 class HomeList extends StatefulWidget {
   @override
   _HomeListState createState() => _HomeListState();
@@ -52,13 +53,60 @@ class _HomeListState extends State<HomeList> {
   @override
   void initState() {
     super.initState();
-    _selectedWalletId = 0;
-    _selectedValuta = 'USD'; // Set a default value for _selectedValuta
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _loadTransactions(_selectedWalletId);
-      Provider.of<WalletProvider>(context, listen: false).loadAccountName();
-    });
+    // Inizializza lo stato selezionando il primo wallet se presente
+    _initSelectedWallet();
+    // Ascolta i cambiamenti nel provider dei wallet
+    Provider.of<WalletProvider>(context, listen: false)
+        .addListener(_onWalletsChanged);
   }
+
+  @override
+  void dispose() {
+    // Rimuovi il listener quando il widget viene eliminato
+    Provider.of<WalletProvider>(context, listen: false)
+        .removeListener(_onWalletsChanged);
+    super.dispose();
+  }
+
+  void _initSelectedWallet() {
+    var walletProvider = Provider.of<WalletProvider>(context, listen: false);
+    if (walletProvider.wallets.isNotEmpty) {
+      setState(() {
+        _selectedWalletId = walletProvider.wallets.first.id!;
+        _selectedValuta = '€'; // Imposta il valore predefinito per _selectedValuta
+      });
+      _loadTransactions(_selectedWalletId);
+    } else {
+      // Se non ci sono wallet disponibili, setta _selectedWalletId a 0
+      setState(() {
+        _selectedWalletId = 0;
+      });
+    }
+    walletProvider.loadAccountName();
+  }
+
+  void _onWalletsChanged() {
+    var walletProvider = Provider.of<WalletProvider>(context, listen: false);
+    // Controlla se il wallet attualmente selezionato è stato eliminato
+    if (!walletProvider.wallets.any((wallet) => wallet.id == _selectedWalletId)) {
+      // Se il wallet attualmente selezionato è stato eliminato, seleziona automaticamente il wallet con l'indice più basso
+      setState(() {
+        _selectedWalletId = walletProvider.wallets.isNotEmpty ? walletProvider.wallets.first.id! : 0;
+      });
+      _loadTransactions(_selectedWalletId);
+    }
+  }
+
+void _handleSwipe(int index) {
+  final walletId = Provider.of<WalletProvider>(context, listen: false)
+      .wallets[index]
+      .id!;
+  setState(() {
+    _selectedWalletId = walletId;
+    _selectedCategory = null;
+  });
+  _loadTransactions(walletId);
+}
 
   Future<List<Transaction>> _loadTransactions(int walletId) async {
     try {
@@ -217,17 +265,7 @@ class _HomeListState extends State<HomeList> {
     return categoryAmounts;
   }
 
-  void _handleSwipe(int index) {
-    final walletId = Provider.of<WalletProvider>(context, listen: false)
-        .wallets[index]
-        .id!;
-    if (_selectedWalletId != walletId) {
-      _selectedWalletId = walletId;
-      _selectedCategory = null;
-      setState(() {});
-    }
-  }
-
+ 
   void _handleButtonPress(int index) {
     _pageController.animateToPage(
       index,
