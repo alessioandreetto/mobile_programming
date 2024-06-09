@@ -98,10 +98,20 @@ class DatabaseHelper {
   }
 
   // Eliminazione di un portafoglio
-  Future<int> deleteWallet(int id) async {
+/*   Future<int> deleteWallet(int id) async {
     Database db = await this.database;
     return await db.delete(walletTable, where: '$colId = ?', whereArgs: [id]);
   }
+ */
+
+  Future<int> deleteWallet(int id) async {
+  Database db = await this.database;
+  // Elimina prima tutte le transazioni associate al wallet
+  await db.delete(transactionsTable, where: '$colWalletid = ?', whereArgs: [id]);
+  // Poi elimina il wallet stesso
+  return await db.delete(walletTable, where: '$colId = ?', whereArgs: [id]);
+}
+
 
   // Operazioni per la tabella transazioni
 
