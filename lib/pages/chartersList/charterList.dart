@@ -17,7 +17,6 @@ class _ChartsListState extends State<ChartsList> {
   late String _selectedButton;
   late PageController _pageController;
 
-
   Map<int, Color> categoryColors = {
     0: Colors.red, // Categoria Auto
     1: Colors.blue, // Categoria Banca
@@ -131,8 +130,7 @@ class _ChartsListState extends State<ChartsList> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Padding(
-                      padding: const EdgeInsets.only(
-                          left: 8.0), 
+                      padding: const EdgeInsets.only(left: 8.0),
                       child: Text("Transazioni per ${selectedWallet.name}:"),
                     ),
                     SizedBox(height: 10),
@@ -226,7 +224,8 @@ class _ChartsListState extends State<ChartsList> {
                                         borderRadius: BorderRadius.circular(10),
                                         padding: EdgeInsets.all(20),
                                         onPressed: (context) {
-                                          _deleteTransaction(transaction, walletProvider);
+                                          _deleteTransaction(
+                                              transaction, walletProvider);
                                           setState(() {
                                             transactions.removeAt(index);
                                           });
@@ -240,7 +239,8 @@ class _ChartsListState extends State<ChartsList> {
                                   ),
                                   child: GestureDetector(
                                     onTap: () {
-                                      _navigateToTransactionDetail(context, transaction);
+                                      _navigateToTransactionDetail(
+                                          context, transaction);
                                     },
                                     child: Padding(
                                       padding: const EdgeInsets.all(8.0),
@@ -251,12 +251,15 @@ class _ChartsListState extends State<ChartsList> {
                                             width: 50,
                                             height: 50,
                                             decoration: BoxDecoration(
-                                              borderRadius: BorderRadius.circular(10),
-                                              color: categoryColors[transaction.categoryId] ??
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              color: categoryColors[
+                                                      transaction.categoryId] ??
                                                   Colors.grey,
                                             ),
                                             child: Icon(
-                                              categoryIcons[transaction.categoryId] ??
+                                              categoryIcons[
+                                                      transaction.categoryId] ??
                                                   Icons.category,
                                               color: Colors.white,
                                             ),
@@ -271,7 +274,8 @@ class _ChartsListState extends State<ChartsList> {
                                             color: Color(0xffb3b3b3),
                                           ),
                                           color: Colors.transparent,
-                                          borderRadius: BorderRadius.circular(10.0),
+                                          borderRadius:
+                                              BorderRadius.circular(10.0),
                                         ),
                                       ),
                                     ),
@@ -317,24 +321,27 @@ class _ChartsListState extends State<ChartsList> {
                   _calculateChartData(transactions, selectedWallet);
 
               return Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: SfCartesianChart(
-                  primaryXAxis: NumericAxis( 
-                    labelStyle: TextStyle(
-                      color: Colors.black,
-                    ),
-                  ),
-                  primaryYAxis: NumericAxis( ),
-                  series: <LineSeries<ChartSampleData, num>>[
-                    LineSeries<ChartSampleData, num>(
-                      dataSource: chartData,
-                      xValueMapper: (ChartSampleData sales, _) => sales.x,
-                      yValueMapper: (ChartSampleData sales, _) => sales.y,
-                      dataLabelSettings: DataLabelSettings(isVisible: true),
-                    ),
-                  ],
-                ),
-              );
+                  padding: const EdgeInsets.all(16.0),
+                  child: SfCartesianChart(
+                    primaryXAxis: NumericAxis(interval: 1),
+                    primaryYAxis: NumericAxis(),
+                    series: <LineSeries<ChartSampleData, num>>[
+                      LineSeries<ChartSampleData, num>(
+                        dataSource: chartData,
+                        xValueMapper: (ChartSampleData sales, _) => sales.x,
+                        yValueMapper: (ChartSampleData sales, _) => sales.y,
+                        dataLabelMapper: (ChartSampleData data, _) {
+                          // Calcola il bilancio parziale
+                          double partialBalance = data.y;
+                          // Ottieni il valore della transazione
+                          double transactionValue = data.transactionValue;
+                          // Formatta il testo dell'etichetta per includere sia il bilancio parziale che il valore della transazione
+                          return '${partialBalance.toStringAsFixed(2)}\n ${transactionValue.toStringAsFixed(2)}';
+                        },
+                        dataLabelSettings: DataLabelSettings(isVisible: true),
+                      ),
+                    ],
+                  ));
             }
           },
         );
@@ -349,13 +356,11 @@ class _ChartsListState extends State<ChartsList> {
     double balance = wallet.balance ?? 0;
     double cumulativeSum = 0;
 
-    chartData.add(ChartSampleData(
-        transactions.length.toDouble(), balance));
-
     for (int i = transactions.length - 1; i >= 0; i--) {
       cumulativeSum += transactions[i].value!;
       double currentBalance = balance - cumulativeSum;
-      chartData.insert(0, ChartSampleData(i.toDouble(), currentBalance));
+      double transactionValue = transactions[i].value!; // Valore della transazione per il punto dati del grafico
+      chartData.insert(0, ChartSampleData(i.toDouble(), currentBalance, transactionValue));
     }
 
     return chartData;
@@ -450,6 +455,7 @@ class _ChartsListState extends State<ChartsList> {
 class ChartSampleData {
   final double x;
   final double y;
+  final double transactionValue; // Aggiunto valore della transazione per il punto dati del grafico
 
-  ChartSampleData(this.x, this.y);
+  ChartSampleData(this.x, this.y, this.transactionValue);
 }
