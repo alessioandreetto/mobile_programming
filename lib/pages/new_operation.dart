@@ -60,7 +60,6 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
       _selectedCategoryId = widget.transaction!.categoryId!;
       _selectedDate = DateTime.parse(widget.transaction!.date!);
 
-      // Formatta la data come YYYY-MM-DD
       widget.dateController.text =
           "${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}";
 
@@ -70,7 +69,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
             (widget.transaction!.value! * -1).toString();
       }
 
-      WidgetsBinding.instance!.addPostFrameCallback((_) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
         setState(() {
           Wallet originalWallet = _wallets.firstWhere(
               (wallet) => wallet.id == widget.transaction!.transactionId);
@@ -78,7 +77,6 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
         });
       });
     } else {
-      // Set the default selected date to today for a new transaction
       _selectedDate = DateTime.now();
       widget.dateController.text =
           "${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}";
@@ -125,7 +123,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
     final overlay = Overlay.of(context);
     final overlayEntry = OverlayEntry(
       builder: (context) => Positioned(
-        top: 50.0, // Posiziona il messaggio a 50 pixel dall'alto
+        top: 50.0,
         left: MediaQuery.of(context).size.width * 0.1,
         width: MediaQuery.of(context).size.width * 0.8,
         child: Material(
@@ -148,7 +146,6 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
 
     overlay.insert(overlayEntry);
 
-    // Rimuove il messaggio dopo 2 secondi
     Future.delayed(Duration(seconds: 2), () {
       overlayEntry.remove();
     });
@@ -159,13 +156,15 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
   }
 
   Future<bool> _onWillPop() async {
-    if (_hasUnsavedChanges()) {
+    bool hasUnsavedChanges = _hasUnsavedChanges();
+
+    if (hasUnsavedChanges) {
       return await showDialog<bool>(
             context: context,
             builder: (context) => AlertDialog(
               title: Text('Conferma'),
               content: Text(
-                  'Sei sicuro di voler tornare indietro e non salvare le modifiche?'),
+                  'Sei sicuro di voler tornare indietro e non effettuare quindi le modifiche?'),
               actions: [
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(false),
@@ -179,15 +178,25 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
             ),
           ) ??
           false;
+    } else {
+      return true;
     }
-    return true;
   }
 
   bool _hasUnsavedChanges() {
-    // Add logic to check if there are unsaved changes
     return widget.nameController.text.isNotEmpty ||
         widget.valueController.text.isNotEmpty ||
-        widget.dateController.text.isNotEmpty;
+        widget.dateController.text.isNotEmpty ||
+        _selectedCategoryId != (widget.transaction?.categoryId ?? 0) ||
+        _selectedWallet !=
+            (_wallets.isNotEmpty && widget.transaction != null
+                ? _wallets
+                    .firstWhere((wallet) =>
+                        wallet.id == widget.transaction!.transactionId)
+                    .name!
+                : '') ||
+        _selectedDate?.toIso8601String() !=
+            (widget.transaction?.date ?? DateTime.now().toIso8601String());
   }
 
   @override
@@ -222,108 +231,111 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
           ],
         ),
         body: SingleChildScrollView(
-          padding: EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              TextField(
-                controller: widget.nameController,
-                decoration: InputDecoration(labelText: 'Nome'),
-              ),
-              TextField(
-                controller: widget.valueController,
-                keyboardType: TextInputType.number,
-                decoration: InputDecoration(labelText: 'Valore'),
-                inputFormatters: [
-                  FilteringTextInputFormatter.allow(RegExp(r'^\d+\.?\d{0,2}')),
-                ],
-              ),
-              TextField(
-                controller: widget.dateController,
-                readOnly: true,
-                decoration: InputDecoration(
-                  labelText: 'Data',
-                  suffixIcon: IconButton(
-                    icon: Icon(Icons.calendar_today),
-                    onPressed: () => _selectDate(context),
+          child: Padding(
+            padding: EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                TextField(
+                  controller: widget.nameController,
+                  decoration: InputDecoration(labelText: 'Nome'),
+                ),
+                TextField(
+                  controller: widget.valueController,
+                  decoration: InputDecoration(labelText: 'Valore'),
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [
+                    FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+                  ],
+                ),
+                TextField(
+                  controller: widget.dateController,
+                  readOnly: true,
+                  decoration: InputDecoration(
+                    labelText: 'Data',
+                    suffixIcon: Icon(Icons.calendar_today),
+                  ),
+                  onTap: () {
+                    _selectDate(context);
+                  },
+                ),
+                DropdownButtonFormField<Wallet>(
+                  value: _wallets.isNotEmpty
+                      ? _wallets.firstWhere(
+                          (wallet) => wallet.name == _selectedWallet)
+                      : null,
+                  onChanged: (newValue) {
+                    setState(() {
+                      _selectedWallet = newValue!.name!;
+                    });
+                  },
+                  items: _wallets.map((wallet) {
+                    return DropdownMenuItem(
+                      value: wallet,
+                      child: Text(wallet.name!),
+                    );
+                  }).toList(),
+                  decoration: InputDecoration(
+                    labelText: 'Portafoglio',
                   ),
                 ),
-              ),
-              DropdownButtonFormField<String>(
-                value: _selectedWallet,
-                onChanged: (newValue) {
-                  setState(() {
-                    _selectedWallet = newValue!;
-                  });
-                },
-                items: _wallets.map((wallet) {
-                  return DropdownMenuItem(
-                    value: wallet.name!,
-                    child: Text(wallet.name!),
-                  );
-                }).toList(),
-                decoration: InputDecoration(
-                  labelText: 'Portafoglio',
+                SizedBox(height: 16.0),
+                DropdownButtonFormField<Category>(
+                  value: categories.firstWhere(
+                      (category) => category.id == _selectedCategoryId),
+                  onChanged: (newValue) {
+                    setState(() {
+                      _selectedCategoryId = newValue!.id;
+                    });
+                  },
+                  items: categories.map((category) {
+                    return DropdownMenuItem(
+                      value: category,
+                      child: Text(category.name),
+                    );
+                  }).toList(),
+                  decoration: InputDecoration(
+                    labelText: 'Categoria',
+                  ),
                 ),
-              ),
-              SizedBox(height: 16.0),
-              DropdownButtonFormField<Category>(
-                value: categories.firstWhere(
-                    (category) => category.id == _selectedCategoryId,
-                    orElse: () => categories[0]),
-                onChanged: (newValue) {
-                  setState(() {
-                    _selectedCategoryId = newValue!.id;
-                  });
-                },
-                items: categories.map((category) {
-                  return DropdownMenuItem(
-                    value: category,
-                    child: Text(category.name),
-                  );
-                }).toList(),
-                decoration: InputDecoration(
-                  labelText: 'Categoria',
+                SizedBox(height: 16.0),
+                ToggleButtons(
+                  children: _buildToggleButtons(),
+                  isSelected: List.generate(
+                      _wallets.length >= 2
+                          ? actionTypes.length
+                          : actionTypes.length - 1,
+                      (index) => _selectedActionIndex == index),
+                  onPressed: (index) {
+                    setState(() {
+                      _selectedActionIndex = index;
+                    });
+                  },
                 ),
-              ),
-              SizedBox(height: 16.0),
-              ToggleButtons(
-                children: _buildToggleButtons(),
-                isSelected: List.generate(
-                    _wallets.length >= 2
-                        ? actionTypes.length
-                        : actionTypes.length - 1,
-                    (index) => _selectedActionIndex == index),
-                onPressed: (index) {
-                  setState(() {
-                    _selectedActionIndex = index;
-                  });
-                },
-              ),
-              SizedBox(height: 16.0),
-              ElevatedButton(
-                onPressed: () async {
-                  if (_validateFields()) {
-                    await _performRegularTransaction();
+                SizedBox(height: 16.0),
+                ElevatedButton(
+                  onPressed: () async {
+                    if (_validateFields()) {
+                      await _performRegularTransaction();
 
-                    Provider.of<WalletProvider>(context, listen: false)
-                        .loadWallets();
+                      Provider.of<WalletProvider>(context, listen: false)
+                          .loadWallets();
 
-                    _showSnackbar(
-                        context,
-                        widget.transaction == null
-                            ? 'Transazione aggiunta con successo!'
-                            : 'Transazione modificata con successo!');
-                    _navigateToHome(context);
-                  } else {
-                    _showSnackbar(context, 'Inserisci tutti i campi');
-                  }
-                },
-                child: Text(widget.transaction == null
-                    ? 'Aggiungi Transazione'
-                    : 'Modifica Transazione'),
-              ),
-            ],
+                      _showSnackbar(
+                          context,
+                          widget.transaction == null
+                              ? 'Transazione aggiunta con successo!'
+                              : 'Transazione modificata con successo!');
+                      _navigateToHome(context);
+                    } else {
+                      _showSnackbar(context, 'Inserisci tutti i campi');
+                    }
+                  },
+                  child: Text(widget.transaction == null
+                      ? 'Aggiungi Transazione'
+                      : 'Modifica Transazione'),
+                ),
+              ],
+            ),
           ),
         ),
       ),
@@ -344,7 +356,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
       );
     }).toList();
     if (_wallets.length < 2) {
-      buttons.removeLast(); // Remove "Exchange" button if less than 2 wallets
+      buttons.removeLast();
     }
     return buttons;
   }
@@ -359,23 +371,17 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
         _wallets.firstWhere((wallet) => wallet.name == _selectedWallet);
 
     if (widget.transaction != null) {
-      // Ottieni il portafoglio originale della transazione
       Wallet originalWallet = _wallets.firstWhere(
           (wallet) => wallet.id == widget.transaction!.transactionId);
 
-      // Rimuovi la transazione dal portafoglio originale
       originalWallet.balance =
           originalWallet.balance! - widget.transaction!.value!;
       await dbHelper.updateWallet(originalWallet);
 
-      // Aggiungi la transazione al nuovo portafoglio selezionato
       selectedWallet.balance = selectedWallet.balance! + transactionValue;
       await dbHelper.updateWallet(selectedWallet);
 
-      // Aggiorna l'ID del portafoglio per la transazione
       widget.transaction!.transactionId = selectedWallet.id;
-
-      // Aggiorna la transazione nel database
       widget.transaction!.name = widget.nameController.text;
       widget.transaction!.categoryId = _selectedCategoryId;
       widget.transaction!.date =
@@ -383,7 +389,6 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
       widget.transaction!.value = transactionValue;
       await dbHelper.updateTransaction(widget.transaction!);
     } else {
-      // Logica per aggiungere una nuova transazione
       Transaction newTransaction = Transaction(
         name: widget.nameController.text,
         categoryId: _selectedCategoryId,
@@ -395,7 +400,6 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
 
       await dbHelper.insertTransaction(newTransaction);
 
-      // Aggiorna il bilancio del nuovo portafoglio
       double newBalance = selectedWallet.balance! + transactionValue;
       Wallet updatedWallet = Wallet(
         id: selectedWallet.id,
