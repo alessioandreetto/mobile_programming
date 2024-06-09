@@ -129,11 +129,6 @@ class _ChartsListState extends State<ChartsList> {
                 return Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Padding(
-                      padding: const EdgeInsets.only(left: 8.0),
-                      child: Text("Transazioni per ${selectedWallet.name}:"),
-                    ),
-                    SizedBox(height: 10),
                     Consumer<WalletProvider>(
                       builder: (context, walletProvider, _) {
                         return Container(
@@ -182,6 +177,10 @@ class _ChartsListState extends State<ChartsList> {
                           ),
                         );
                       },
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 8.0),
+                      child: Text("Transazioni per ${selectedWallet.name}:"),
                     ),
                     Expanded(
                       child: FutureBuilder<List<Transaction>>(
