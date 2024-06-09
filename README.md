@@ -14,6 +14,7 @@ A new Flutter project.
 ## Wallet
 
 ## Settings
+1. rimuovere i due test
 
 ## Demo
 1. Da completare il tutorial

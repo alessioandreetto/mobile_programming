@@ -25,7 +25,8 @@ class _ChangeNamePageState extends State<ChangeNamePage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String name = prefs.getString('account_name') ?? '';
     setState(() {
-      _nameController.text = name; // Imposta il valore iniziale del campo di testo
+      _nameController.text =
+          name; // Imposta il valore iniziale del campo di testo
     });
   }
 
@@ -35,77 +36,107 @@ class _ChangeNamePageState extends State<ChangeNamePage> {
       onTap: () {
         FocusScope.of(context).unfocus();
       },
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.transparent,
-          elevation: 0,
-        ),
-        body: SingleChildScrollView(
-          child: Column(
-            children: [
-              Divider(height: 1, color: Color(0xffb3b3b3)),
-              Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: TextField(
-                      controller: _nameController,
-                      style: TextStyle(
-                        fontFamily: 'RobotoThin',
-                        fontSize: 25,
-                      ),
-                      onChanged: (_) {
-                        setState(() {
-                          _isDirty = true;
-                        });
-                      },
-                      decoration: InputDecoration(
-                        hintText: 'Account Name',
-                        hintStyle: TextStyle(
+      child: WillPopScope(
+        onWillPop: _onWillPop,
+        child: Scaffold(
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+          ),
+          body: SingleChildScrollView(
+            child: Column(
+              children: [
+                Divider(height: 1, color: Color(0xffb3b3b3)),
+                Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      border: Border.all(color: Colors.grey),
+                      borderRadius: BorderRadius.circular(10.0),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                      child: TextField(
+                        controller: _nameController,
+                        style: TextStyle(
                           fontFamily: 'RobotoThin',
                           fontSize: 25,
                         ),
-                        border: InputBorder.none,
+                        onChanged: (_) {
+                          setState(() {
+                            _isDirty = true;
+                          });
+                        },
+                        decoration: InputDecoration(
+                          hintText: 'Account Name',
+                          hintStyle: TextStyle(
+                            fontFamily: 'RobotoThin',
+                            fontSize: 25,
+                          ),
+                          border: InputBorder.none,
+                        ),
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
-          ),
-        ),
-        bottomNavigationBar: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                side: BorderSide(color: Color(0xffb3b3b3), width: 1),
-                borderRadius: BorderRadius.circular(10),
-              ),
+              ],
             ),
-            onPressed: () => _saveName(context),
-            child: Text("Salva"),
+          ),
+          bottomNavigationBar: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  side: BorderSide(color: Color(0xffb3b3b3), width: 1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+              onPressed: () => _saveName(context),
+              child: Text("Salva"),
+            ),
           ),
         ),
       ),
     );
   }
 
+  Future<bool> _onWillPop() async {
+    if (_isDirty && _nameController.text.isNotEmpty) {
+      return await showDialog(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text('Conferma'),
+              content: Text(
+                  'Sei sicuro di voler tornare indietro senza salvare le modifiche?'),
+              actions: <Widget>[
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: Text('Sì'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: Text('No'),
+                ),
+              ],
+            ),
+          ) ??
+          false;
+    }
+    return true;
+  }
+
   void _saveName(BuildContext context) {
     if (_isDirty && _nameController.text.isNotEmpty) {
       String newName = _nameController.text;
-      Provider.of<WalletProvider>(context, listen: false).updateAccountName(newName);
+      Provider.of<WalletProvider>(context, listen: false)
+          .updateAccountName(newName);
       _saveNameToSharedPreferences(newName);
       setState(() {
         _isDirty = false;
       });
       Navigator.of(context).pop();
+      _showSnackbar(context, 'Nome account modificato con successo');
     }
   }
 
@@ -113,5 +144,37 @@ class _ChangeNamePageState extends State<ChangeNamePage> {
   Future<void> _saveNameToSharedPreferences(String newName) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('account_name', newName);
+  }
+
+  void _showSnackbar(BuildContext context, String message) {
+    final overlay = Overlay.of(context);
+    final overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        top: 50.0,
+        left: MediaQuery.of(context).size.width * 0.1,
+        width: MediaQuery.of(context).size.width * 0.8,
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.blueAccent,
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+            child: Text(
+              message,
+              style: TextStyle(color: Colors.white),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    overlay.insert(overlayEntry);
+
+    Future.delayed(Duration(seconds: 2), () {
+      overlayEntry.remove();
+    });
   }
 }
