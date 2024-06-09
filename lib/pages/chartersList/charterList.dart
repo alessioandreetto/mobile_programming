@@ -6,7 +6,7 @@ import '../../providers/wallet_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:fl_chart/fl_chart.dart';
 import '../new_operation.dart';
-
+import 'package:flutter_slidable/flutter_slidable.dart';
 class ChartsList extends StatefulWidget {
   @override
   _ChartsListState createState() => _ChartsListState();
@@ -219,23 +219,38 @@ class _ChartsListState extends State<ChartsList> {
                                     transactions.reversed.toList()[index];
                                 final date = DateTime.parse(transaction.date!);
                                 final formattedDate = _formatDateTime(date);
-                                return GestureDetector(
-                                  onTap: () {
-                                    _navigateToTransactionDetail(
-                                        context, transaction);
-                                  },
-                                  child: Container(
-                                    margin: EdgeInsets.only(
-                                        bottom: 10, left: 10, right: 10),
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: Color(0xffb3b3b3),
-                                      ),
-                                      borderRadius: BorderRadius.circular(10),
-                                      color: Colors.white,
-                                    ),
-                                    child: ListTile(
-                                        leading: Container(
+                                return Slidable(
+                  key: ValueKey(index),
+                  startActionPane: ActionPane(
+                    extentRatio: 0.25,
+                    motion: ScrollMotion(),
+                    children: [
+                      SlidableAction(
+                        borderRadius: BorderRadius.circular(10),
+                        padding: EdgeInsets.all(20),
+                        onPressed: (context) {
+                          _deleteTransaction(transaction, walletProvider);
+                          setState(() {
+                            transactions.removeAt(index);
+                          });
+                        },
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                        icon: Icons.delete,
+                        label: 'Elimina',
+                      ),
+                    ],
+                  ),
+                  child: GestureDetector(
+                    onTap: () {
+                      _navigateToTransactionDetail(context, transaction);
+                    },
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        height: 70.0,
+                        child: ListTile(
+                          leading: Container(
                             width: 50,
                             height: 50,
                             decoration: BoxDecoration(
@@ -252,12 +267,22 @@ class _ChartsListState extends State<ChartsList> {
                               color: Colors.white, // Colore dell'icona
                             ),
                           ),
-                                      title: Text(transaction.name ?? ''),
-                                      subtitle: Text(
-                                          "Data: $formattedDate, Valore: ${transaction.value} $valuta"),
-                                    ),
-                                  ),
-                                );
+                          title: Text(transaction.name ?? ''),
+                          subtitle: Text(
+                            "Data: $formattedDate, Valore: ${transaction.value} ${walletProvider.valuta}",
+                          ),
+                        ),
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Color(0xffb3b3b3),
+                          ),
+                          color: Colors.transparent,
+                          borderRadius: BorderRadius.circular(10.0),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
                               },
                             );
                           }
@@ -513,6 +538,16 @@ class _ChartsListState extends State<ChartsList> {
         builder: (context) => NewTransactionPage(transaction: transaction),
       ),
     );
+  }
+
+    void _deleteTransaction(
+      Transaction transaction, WalletProvider walletProvider) async {
+// Recupera il valore della transazione eliminata
+    double deletedTransactionValue = transaction.value ?? 0.0;
+// Elimina la transazione dal database
+    await DatabaseHelper().deleteTransaction(transaction.id!);
+
+    walletProvider.refreshWallets();
   }
 
   // Helper method to format two digits
