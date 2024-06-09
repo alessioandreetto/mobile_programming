@@ -24,7 +24,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-
 class HomeList extends StatefulWidget {
   @override
   _HomeListState createState() => _HomeListState();
@@ -50,6 +49,26 @@ class _HomeListState extends State<HomeList> {
     Category(id: 7, name: 'Varie'),
   ];
 
+  Map<int, Color> categoryColors = {
+    0: Colors.red, // Categoria Auto
+    1: Colors.blue, // Categoria Banca
+    2: Colors.green, // Categoria Casa
+    3: Colors.orange, // Categoria Intrattenimento
+    4: Colors.purple, // Categoria Shopping
+    5: Colors.yellow, // Categoria Viaggio
+    6: Colors.brown, // Categoria Varie
+  };
+
+  Map<int, IconData> categoryIcons = {
+    0: Icons.directions_car, // Categoria Auto
+    1: Icons.account_balance, // Categoria Banca
+    2: Icons.home, // Categoria Casa
+    3: Icons.movie, // Categoria Intrattenimento
+    4: Icons.shopping_cart, // Categoria Shopping
+    5: Icons.airplanemode_active, // Categoria Viaggio
+    6: Icons.category, // Categoria Varie
+  };
+
   @override
   void initState() {
     super.initState();
@@ -73,7 +92,8 @@ class _HomeListState extends State<HomeList> {
     if (walletProvider.wallets.isNotEmpty) {
       setState(() {
         _selectedWalletId = walletProvider.wallets.first.id!;
-        _selectedValuta = '€'; // Imposta il valore predefinito per _selectedValuta
+        _selectedValuta =
+            '€'; // Imposta il valore predefinito per _selectedValuta
       });
       _loadTransactions(_selectedWalletId);
     } else {
@@ -88,25 +108,27 @@ class _HomeListState extends State<HomeList> {
   void _onWalletsChanged() {
     var walletProvider = Provider.of<WalletProvider>(context, listen: false);
     // Controlla se il wallet attualmente selezionato è stato eliminato
-    if (!walletProvider.wallets.any((wallet) => wallet.id == _selectedWalletId)) {
+    if (!walletProvider.wallets
+        .any((wallet) => wallet.id == _selectedWalletId)) {
       // Se il wallet attualmente selezionato è stato eliminato, seleziona automaticamente il wallet con l'indice più basso
       setState(() {
-        _selectedWalletId = walletProvider.wallets.isNotEmpty ? walletProvider.wallets.first.id! : 0;
+        _selectedWalletId = walletProvider.wallets.isNotEmpty
+            ? walletProvider.wallets.first.id!
+            : 0;
       });
       _loadTransactions(_selectedWalletId);
     }
   }
 
-void _handleSwipe(int index) {
-  final walletId = Provider.of<WalletProvider>(context, listen: false)
-      .wallets[index]
-      .id!;
-  setState(() {
-    _selectedWalletId = walletId;
-    _selectedCategory = null;
-  });
-  _loadTransactions(walletId);
-}
+  void _handleSwipe(int index) {
+    final walletId =
+        Provider.of<WalletProvider>(context, listen: false).wallets[index].id!;
+    setState(() {
+      _selectedWalletId = walletId;
+      _selectedCategory = null;
+    });
+    _loadTransactions(walletId);
+  }
 
   Future<List<Transaction>> _loadTransactions(int walletId) async {
     try {
@@ -265,7 +287,6 @@ void _handleSwipe(int index) {
     return categoryAmounts;
   }
 
- 
   void _handleButtonPress(int index) {
     _pageController.animateToPage(
       index,
@@ -318,7 +339,7 @@ void _handleSwipe(int index) {
 
                           return GestureDetector(
                             onTapUp: (details) {
-                             _handlePieChartTap(details, categoryAmounts);
+                              _handlePieChartTap(details, categoryAmounts);
                             },
                             child: Container(
                               width:
@@ -393,8 +414,8 @@ void _handleSwipe(int index) {
                                   _selectedWalletId =
                                       walletProvider.wallets[index].id!;
                                 });
-                                _loadTransactions(walletProvider
-                                    .wallets[index].id!);
+                                _loadTransactions(
+                                    walletProvider.wallets[index].id!);
                               },
                               style: ButtonStyle(
                                 elevation: MaterialStateProperty.all(0),
@@ -481,7 +502,7 @@ void _handleSwipe(int index) {
                     children: [
                       SlidableAction(
                         borderRadius: BorderRadius.circular(10),
-                        padding: EdgeInsets.all(10),
+                        padding: EdgeInsets.all(20),
                         onPressed: (context) {
                           _deleteTransaction(transaction, walletProvider);
                           setState(() {
@@ -504,6 +525,23 @@ void _handleSwipe(int index) {
                       child: Container(
                         height: 70.0,
                         child: ListTile(
+                          leading: Container(
+                            width: 50,
+                            height: 50,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(
+                                  10), // Metà dell'altezza/larghezza per ottenere i bordi tondi
+                              color: categoryColors[transaction.categoryId] ??
+                                  Colors
+                                      .grey, // Colore della categoria o grigio come fallback
+                            ),
+                            child: Icon(
+                              categoryIcons[transaction.categoryId] ??
+                                  Icons
+                                      .category, // Icona della categoria o categoria come fallback
+                              color: Colors.white, // Colore dell'icona
+                            ),
+                          ),
                           title: Text(transaction.name ?? ''),
                           subtitle: Text(
                             "Data: $formattedDate, Valore: ${transaction.value} ${walletProvider.valuta}",
