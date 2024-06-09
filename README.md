@@ -2,11 +2,23 @@
 
 A new Flutter project.
 
-## cose da fare 
+## Home Page
+1. ⁠⁠sliverappbar + sistemazione home
+
+## Charts Page
+1. ⁠⁠rivedere grafica del grafico a linea
+
+## New Transaction
+1. Quando viene creata una nuova transazione, il portafoglio deve essere quello del wallet selezionato
+
+## Wallet
+
+## Settings
+
+## Demo
+1. Da completare il tutorial
+
+## Other
 1. ⁠saveZone per status bar
-2. ⁠⁠rivedere grafica del grafico a linea 
-3. ⁠⁠sliverappbar + sistemazione home
-4. completare il tutorial
-5. tutorial strech 
-6. ⁠⁠sistemazione grafica
-7. ⁠breve relazione che descriva la realizzazione del progetto
+2. Sistemazione grafica
+3. ⁠breve relazione che descriva la realizzazione del progetto

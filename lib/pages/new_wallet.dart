@@ -49,6 +49,38 @@ class _AddNotePageState extends State<AddNotePage> {
     });
   }
 
+  void _showSnackbar(BuildContext context, String message) {
+    final overlay = Overlay.of(context);
+    final overlayEntry = OverlayEntry(
+      builder: (context) => Positioned(
+        top: 50.0,
+        left: MediaQuery.of(context).size.width * 0.1,
+        width: MediaQuery.of(context).size.width * 0.8,
+        child: Material(
+          color: Colors.transparent,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.blueAccent,
+              borderRadius: BorderRadius.circular(10.0),
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+            child: Text(
+              message,
+              style: TextStyle(color: Colors.white),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ),
+      ),
+    );
+
+    overlay.insert(overlayEntry);
+
+    Future.delayed(Duration(seconds: 2), () {
+      overlayEntry.remove();
+    });
+  }
+
   Future<void> _onBackPressed() async {
     if (_isDirty) {
       bool? confirm = await showDialog<bool>(
@@ -224,6 +256,13 @@ class _AddNotePageState extends State<AddNotePage> {
       setState(() {
         _isDirty = false;
       });
+      _showSnackbar(
+          context,
+          widget.initialTitle == null && widget.initialBody == null
+              ? 'Wallet creato con successo'
+              : 'Wallet modificato con successo');
+    } else {
+      _showSnackbar(context, 'Inserire tutti i campi');
     }
   }
 
@@ -231,7 +270,7 @@ class _AddNotePageState extends State<AddNotePage> {
     bool? confirmed = await showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Eliminare il wallet?'),
+        title: Text('Conferma Eliminazione'),
         content: Text(
             'Sei sicuro di voler eliminare questo wallet? Questa azione non può essere annullata.'),
         actions: <Widget>[
@@ -253,13 +292,14 @@ class _AddNotePageState extends State<AddNotePage> {
 
     if (confirmed == true && widget.onDelete != null) {
       widget.onDelete!();
+      _showSnackbar(context, 'Wallet eliminato con successo');
+      Navigator.of(context).popUntil;
     }
   }
 
   @override
   void dispose() {
-    widget.titleController.dispose
-();
+    widget.titleController.dispose();
     widget.bodyController.dispose();
     super.dispose();
   }
