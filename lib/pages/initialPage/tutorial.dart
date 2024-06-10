@@ -1,25 +1,46 @@
 import 'package:flutter/material.dart';
-import 'dart:math' as math;
+import 'dart:ui';
 import '../homeList/HomeList.dart';
 
 class InteractiveTutorial extends StatefulWidget {
+  final Function onComplete;
+
+  InteractiveTutorial({required this.onComplete});
+
   @override
   _InteractiveTutorialState createState() => _InteractiveTutorialState();
 }
 
 class _InteractiveTutorialState extends State<InteractiveTutorial> {
   int _currentStep = 0;
+  bool _isBlurVisible = true;
+  bool _isInfoVisible = true;
 
   void _nextStep() {
     setState(() {
-      _currentStep++;
+      _isInfoVisible = false;
+    });
+    Future.delayed(Duration(milliseconds: 500), () {
+      // Updated duration
+      setState(() {
+        _currentStep++;
+        _isInfoVisible = true;
+        _isBlurVisible = true;
+      });
+    });
+    setState(() {
+      _isBlurVisible = false;
     });
   }
 
   void _skipTutorial() {
-    Navigator.of(context).pushReplacement(
-      MaterialPageRoute(builder: (context) => HomeList()),
-    );
+    widget.onComplete();
+  }
+
+  void _addTransaction() {
+    setState(() {
+      _currentStep++;
+    });
   }
 
   @override
@@ -28,9 +49,28 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
       body: Stack(
         children: [
           HomeList(), // HomePage content
-          if (_currentStep == 0) _buildStep1(),
-          if (_currentStep == 1) _buildStep2(),
+          if (_isBlurVisible && (_currentStep >= 0 && _currentStep <= 5))
+            _buildBlurBackground(),
+          if (_isInfoVisible && _currentStep == 0) _buildStep1(),
+          if (_isInfoVisible && _currentStep == 1) _buildStep2(),
+          if (_isInfoVisible && _currentStep == 2) _buildStep3(),
+          if (_isInfoVisible && _currentStep == 3) _buildStep4(),
+          if (_currentStep == 4) _buildAddTransactionButton(),
+          if (_isInfoVisible && _currentStep == 5) _buildStep5(),
         ],
+      ),
+    );
+  }
+
+  Widget _buildBlurBackground() {
+    return AnimatedOpacity(
+      opacity: _isBlurVisible ? 1.0 : 0.0,
+      duration: Duration(milliseconds: 500), // Updated duration
+      child: BackdropFilter(
+        filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
+        child: Container(
+          color: Colors.black.withOpacity(0.5),
+        ),
       ),
     );
   }
@@ -41,7 +81,8 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
       top: 100,
       child: Container(
         width: MediaQuery.of(context).size.width - 40,
-        color: Colors.black54,
+        color:
+            Colors.black.withOpacity(0.1), // Make background nearly transparent
         padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -52,7 +93,7 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
             ),
             SizedBox(height: 10),
             Text(
-              '1. Questa è la pagina principale dove puoi vedere un grafico a torta delle tue transazioni.',
+              '1. Questa è la Home! Qui puoi vedere in grafico a torta delle tue transazioni.',
               style: TextStyle(color: Colors.white, fontSize: 18),
             ),
             SizedBox(height: 10),
@@ -72,10 +113,11 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
   Widget _buildStep2() {
     return Positioned(
       left: 20,
-      top: 100,
+      top: 330, // Adjust this value to position step 2 further down
       child: Container(
         width: MediaQuery.of(context).size.width - 40,
-        color: Colors.black54,
+        color:
+            Colors.black.withOpacity(0.1), // Make background nearly transparent
         padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -86,7 +128,7 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
             ),
             SizedBox(height: 10),
             Text(
-              '2. Puoi selezionare un portafoglio per visualizzare le sue transazioni.',
+              '2. In questa sezione puoi selezionare un portafoglio per visualizzare le sue transazioni.',
               style: TextStyle(color: Colors.white, fontSize: 18),
             ),
             SizedBox(height: 10),
@@ -94,6 +136,124 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
               onPressed: _nextStep,
               child: Text(
                 'Continua',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStep3() {
+    return Positioned(
+      left: 20,
+      top: 560, // Adjust this value to position step 3 further down
+      child: Container(
+        width: MediaQuery.of(context).size.width - 40,
+        color:
+            Colors.black.withOpacity(0.1), // Make background nearly transparent
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Transazioni',
+              style: TextStyle(color: Colors.white, fontSize: 24),
+            ),
+            SizedBox(height: 10),
+            Text(
+              '3. Qui invece puoi vedere tutte le tue transazioni! Toccando la transazione stessa puoi modificarla o eliminarla!',
+              style: TextStyle(color: Colors.white, fontSize: 18),
+            ),
+            SizedBox(height: 10),
+            TextButton(
+              onPressed: _nextStep,
+              child: Text(
+                'Continua',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStep4() {
+    return Positioned(
+      left: 20,
+      top: 560, // Adjust this value to position step 4 further down
+      child: Container(
+        width: MediaQuery.of(context).size.width - 40,
+        color:
+            Colors.black.withOpacity(0.1), // Make background nearly transparent
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Nuova Transazione',
+              style: TextStyle(color: Colors.white, fontSize: 24),
+            ),
+            SizedBox(height: 10),
+            Text(
+              '4. Per andare a creare una nuova transazione, clicca su prossimo +',
+              style: TextStyle(color: Colors.white, fontSize: 18),
+            ),
+            SizedBox(height: 10),
+            TextButton(
+              onPressed: _nextStep,
+              child: Text(
+                'Continua',
+                style: TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildAddTransactionButton() {
+    return Align(
+      alignment: Alignment.bottomCenter,
+      child: Padding(
+        padding: const EdgeInsets.only(bottom: 20.0),
+        child: FloatingActionButton(
+          onPressed: _addTransaction,
+          child: Icon(Icons.add),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildStep5() {
+    return Positioned(
+      left: 20,
+      top: 520, // Adjust this value to position step 5 further down
+      child: Container(
+        width: MediaQuery.of(context).size.width - 40,
+        color:
+            Colors.black.withOpacity(0.1), // Make background nearly transparent
+        padding: EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Creazione Transazione',
+              style: TextStyle(color: Colors.white, fontSize: 24),
+            ),
+            SizedBox(height: 10),
+            Text(
+              '5. Dopo aver cliccato + l\'app ti porterà alla pagina di creazione della nuova transazione! Ti basterà inserire correttamente tutti i dati e premere il pulsante "Aggiungi transazione" e il gioco è fatto!',
+              style: TextStyle(color: Colors.white, fontSize: 18),
+            ),
+            SizedBox(height: 10),
+            TextButton(
+              onPressed: _skipTutorial,
+              child: Text(
+                'Prosegui',
                 style: TextStyle(color: Colors.white),
               ),
             ),

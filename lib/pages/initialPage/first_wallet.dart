@@ -5,6 +5,56 @@ import '../../model/database_model.dart';
 import '../../providers/wallet_provider.dart';
 import 'package:provider/provider.dart';
 
+class FirstWalletPage extends StatefulWidget {
+  @override
+  _FirstWalletPageState createState() => _FirstWalletPageState();
+}
+
+class _FirstWalletPageState extends State<FirstWalletPage> {
+  final PageController _pageController = PageController();
+  int _currentPage = 0;
+
+  void _onPageChanged(int index) {
+    setState(() {
+      _currentPage = index;
+    });
+
+    if (index == 1) {
+      // Assuming the next page index is 1
+      // Trigger the saving process here
+      _saveWalletData();
+    }
+  }
+
+  void _saveWalletData() {
+    // You can access the data from the FirstWallet widget here
+    // Implement your save logic here
+    print('Save wallet data');
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      body: PageView(
+        controller: _pageController,
+        onPageChanged: _onPageChanged,
+        children: [
+          FirstWallet(
+            onWalletDataChanged: (name, balance) {
+              // Handle the data change if needed
+            },
+          ),
+          // Add other pages here
+          Container(
+            color: Colors.blue,
+            child: Center(child: Text('Next Page')),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class FirstWallet extends StatefulWidget {
   final Function(String, double) onWalletDataChanged;
 

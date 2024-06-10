@@ -29,6 +29,28 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
     });
   }
 
+  void _saveWalletData() {
+    if (walletName.isNotEmpty && walletBalance > 0) {
+      Wallet newWallet = Wallet(
+        id: walletId,
+        name: walletName,
+        balance: walletBalance,
+      );
+
+      if (walletId != null) {
+        // Update existing wallet
+        DatabaseHelper().updateWallet(newWallet).then((id) {
+          Provider.of<WalletProvider>(context, listen: false).loadWallets();
+        });
+      } else {
+        // Insert new wallet
+        DatabaseHelper().insertWallet(newWallet).then((id) {
+          Provider.of<WalletProvider>(context, listen: false).loadWallets();
+        });
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -39,6 +61,9 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
             child: PageView(
               controller: _pageController,
               onPageChanged: (index) {
+                if (_currentPageIndex == 1) {
+                  _saveWalletData();
+                }
                 setState(() {
                   _currentPageIndex = index;
                 });
@@ -60,8 +85,14 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
                 ),
                 Container(
                   child: Center(
-                    child:
-                        InteractiveTutorial(), // Qui sostituiamo la pagina arancione con il tutorial
+                    child: InteractiveTutorial(
+                      onComplete: () {
+                        _pageController.nextPage(
+                          duration: Duration(milliseconds: 300),
+                          curve: Curves.ease,
+                        );
+                      },
+                    ),
                   ),
                 ),
                 Container(
@@ -144,26 +175,7 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
 
   void _onTutorialCompleted() {
     _saveTutorialCompletion();
-
-    if (walletName.isNotEmpty && walletBalance > 0) {
-      Wallet newWallet = Wallet(
-        id: walletId,
-        name: walletName,
-        balance: walletBalance,
-      );
-
-      if (walletId != null) {
-        // Update existing wallet
-        DatabaseHelper().updateWallet(newWallet).then((id) {
-          Provider.of<WalletProvider>(context, listen: false).loadWallets();
-        });
-      } else {
-        // Insert new wallet
-        DatabaseHelper().insertWallet(newWallet).then((id) {
-          Provider.of<WalletProvider>(context, listen: false).loadWallets();
-        });
-      }
-    }
+    _saveWalletData();
 
     Navigator.of(context).pushReplacement(MaterialPageRoute(
       builder: (context) => BottomBarDemo(),
