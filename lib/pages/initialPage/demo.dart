@@ -175,7 +175,6 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
 
   void _onTutorialCompleted() {
     _saveTutorialCompletion();
-    _saveWalletData();
 
     Navigator.of(context).pushReplacement(MaterialPageRoute(
       builder: (context) => BottomBarDemo(),
