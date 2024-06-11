@@ -7,6 +7,7 @@ A new Flutter project.
 
 ## Charts Page
 1. ⁠⁠rivedere grafica del grafico a linea
+2. rivedere le transazioni mostrate dal grafico
 
 ## New Transaction
 1. Quando viene creata una nuova transazione, il portafoglio deve essere quello del wallet selezionato
