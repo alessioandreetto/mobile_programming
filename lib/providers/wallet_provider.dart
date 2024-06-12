@@ -104,6 +104,7 @@ int getWalletCount() {
   // Metodo per aggiornare l'indice del wallet selezionato
   void updateSelectedWalletIndex(int index) {
     _selectedWalletIndex = index;
+    print (_selectedWalletIndex);
     notifyListeners();
   }
 }

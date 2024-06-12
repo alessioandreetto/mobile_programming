@@ -416,6 +416,7 @@ class _HomeListState extends State<HomeList> {
                                 });
                                 _loadTransactions(
                                     walletProvider.wallets[index].id!);
+                                    walletProvider.updateSelectedWalletIndex(index);
                               },
                               style: ButtonStyle(
                                 elevation: MaterialStateProperty.all(0),

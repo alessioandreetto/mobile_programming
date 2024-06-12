@@ -83,24 +83,24 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
     }
   }
 
-  Future<void> _loadWallets() async {
-    final wallets = await dbHelper.getWallets();
-    setState(() {
-      _wallets = wallets;
-      if (_wallets.isNotEmpty) {
-        final walletProvider =
-            Provider.of<WalletProvider>(context, listen: false);
-        final selectedWallet =
-            walletProvider.wallets[walletProvider.selectedWalletIndex];
-        _selectedWallet = widget.transaction != null
-            ? _wallets
-                .firstWhere(
-                    (wallet) => wallet.id == widget.transaction!.transactionId)
-                .name!
-            : selectedWallet.name!;
-      }
-    });
-  }
+Future<void> _loadWallets() async {
+  final wallets = await dbHelper.getWallets();
+  setState(() {
+    _wallets = wallets;
+    if (_wallets.isNotEmpty) {
+      final walletProvider =
+          Provider.of<WalletProvider>(context, listen: false);
+      final selectedWalletIndex = walletProvider.selectedWalletIndex;
+      _selectedWallet = widget.transaction != null
+          ? _wallets
+              .firstWhere(
+                  (wallet) => wallet.id == widget.transaction!.transactionId)
+              .name!
+          : walletProvider.wallets[selectedWalletIndex].name!;
+    }
+  });
+}
+
 
   Future<void> _selectDate(BuildContext context) async {
     DateTime selectedDate = _selectedDate ?? DateTime.now();
