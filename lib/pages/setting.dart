@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:flutter_application_1/main.dart';
 import 'package:flutter_application_1/model/database_model.dart';
 import 'package:provider/provider.dart';
@@ -17,17 +18,26 @@ class SettingsPage extends StatefulWidget {
 
 class _SettingsPageState extends State<SettingsPage> {
   late String _selectedValuta;
+  bool _isDarkMode = false;
 
   @override
   void initState() {
     super.initState();
     _loadValutaFromSharedPreferences();
+    _loadThemeMode();
   }
 
   Future<void> _loadValutaFromSharedPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     setState(() {
       _selectedValuta = prefs.getString('valuta') ?? '€';
+    });
+  }
+
+  Future<void> _loadThemeMode() async {
+    final savedThemeMode = await AdaptiveTheme.getThemeMode();
+    setState(() {
+      _isDarkMode = savedThemeMode == AdaptiveThemeMode.dark;
     });
   }
 
@@ -110,7 +120,7 @@ class _SettingsPageState extends State<SettingsPage> {
               },
             ),
           ),
-           Container(
+          Container(
             margin: EdgeInsets.only(bottom: 10, left: 10, right: 10),
             decoration: BoxDecoration(
               border: Border.all(
@@ -127,6 +137,32 @@ class _SettingsPageState extends State<SettingsPage> {
                   MaterialPageRoute(builder: (context) => WalletSliverScreen()),
                 );
               },
+            ),
+          ),
+          Container(
+            margin: EdgeInsets.only(bottom: 10, left: 10, right: 10),
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: Color(0xffb3b3b3),
+              ),
+              borderRadius: BorderRadius.circular(10),
+              color: Colors.white,
+            ),
+            child: ListTile(
+              title: Text('Modalità scura'),
+              trailing: Switch(
+                value: _isDarkMode,
+                onChanged: (value) {
+                  setState(() {
+                    _isDarkMode = value;
+                  });
+                  if (_isDarkMode) {
+                    AdaptiveTheme.of(context).setDark();
+                  } else {
+                    AdaptiveTheme.of(context).setLight();
+                  }
+                },
+              ),
             ),
           ),
         ],

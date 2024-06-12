@@ -7,15 +7,15 @@ A new Flutter project.
 
 ## Charts Page
 1. ⁠⁠rivedere grafica del grafico a linea
-2. rivedere le transazioni mostrate dal grafico
 
 ## New Transaction
-1. Quando viene creata una nuova transazione, il portafoglio deve essere quello del wallet selezionato
+
 
 ## Wallet
 
 ## Settings
 1. rimuovere i due test
+2. sistemare button e scritte button per dark mode
 
 ## Demo
 1. Da completare il tutorial
