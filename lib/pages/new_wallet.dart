@@ -205,8 +205,7 @@ class _AddNotePageState extends State<AddNotePage> {
                           hintStyle: TextStyle(
                             fontFamily: 'RobotoThin',
                             fontSize: 25,
-                            color:
-                                _hasTransactions ? Colors.grey : Colors.black,
+                            color: _hasTransactions ? Colors.grey : null,
                           ),
                           border: InputBorder.none,
                         ),
