@@ -117,18 +117,23 @@ class _HomeListState extends State<HomeList> {
             : 0;
       });
       _loadTransactions(_selectedWalletId);
+      
+      
     }
   }
 
-  void _handleSwipe(int index) {
-    final walletId =
-        Provider.of<WalletProvider>(context, listen: false).wallets[index].id!;
-    setState(() {
-      _selectedWalletId = walletId;
-      _selectedCategory = null;
-    });
-    _loadTransactions(walletId);
-  }
+ void _handleSwipe(int index) {
+  final walletId =
+      Provider.of<WalletProvider>(context, listen: false).wallets[index].id!;
+  setState(() {
+    _selectedWalletId = walletId;
+    _selectedCategory = null;
+  });
+  _loadTransactions(walletId);
+  Provider.of<WalletProvider>(context, listen: false)
+      .updateSelectedWalletIndex(index);
+}
+
 
   Future<List<Transaction>> _loadTransactions(int walletId) async {
     try {
@@ -165,6 +170,7 @@ class _HomeListState extends State<HomeList> {
       MaterialPageRoute(
           builder: (context) => NewTransactionPage(transaction: transaction)),
     );
+    
   }
 
   List<PieChartSectionData> _createPieChartSections(
@@ -287,13 +293,13 @@ class _HomeListState extends State<HomeList> {
     return categoryAmounts;
   }
 
-  void _handleButtonPress(int index) {
-    _pageController.animateToPage(
-      index,
-      duration: Duration(milliseconds: 500),
-      curve: Curves.easeInOut,
-    );
-  }
+void _handleButtonPress(int index) {
+  _pageController.animateToPage(
+    index,
+    duration: Duration(milliseconds: 500),
+    curve: Curves.easeInOut,
+  );
+}
 
   @override
   Widget build(BuildContext context) {
