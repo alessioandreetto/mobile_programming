@@ -10,15 +10,14 @@ A new Flutter project.
 
 ## New Transaction
 
-
 ## Wallet
 
 ## Settings
 1. rimuovere i due test
-2. sistemare button e scritte button per dark mode
 
 ## Demo
-1. Da completare il tutorial
+1. Da completare il tutorial iterativo
+2. da sistemare screenshot tutorial iterativo
 
 ## Other
 1. ⁠saveZone per status bar
