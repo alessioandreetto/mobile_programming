@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:adaptive_theme/adaptive_theme.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:adaptive_theme/adaptive_theme.dart';
 import 'providers/wallet_provider.dart';
 import 'page-selector.dart';
 import 'pages/initialPage/demo.dart';
-import 'pages/setting.dart'; // Assicurati che il percorso sia corretto
 
 void main() {
   runApp(MyApp());
@@ -22,7 +21,7 @@ class MyApp extends StatelessWidget {
             home: Scaffold(
               backgroundColor: Colors.white,
               body: Center(
-                child: CircularProgressIndicator(),
+                child: CircularProgressIndicator(), // Indicatore di caricamento
               ),
             ),
           );
@@ -31,31 +30,46 @@ class MyApp extends StatelessWidget {
           return MaterialApp(
             home: Scaffold(
               body: Center(
-                child: Text('Error: ${snapshot.error}'),
+                child: Text(
+                    'Error: ${snapshot.error}'), // Mostra un messaggio di errore se si verifica un errore durante il controllo
               ),
             ),
           );
         }
         final isFirstTimeUser = snapshot.data ?? true;
-        return AdaptiveTheme(
-          light: ThemeData(
-            brightness: Brightness.light,
-            primarySwatch: Colors.blue,
-          ),
-          dark: ThemeData(
-            brightness: Brightness.dark,
-            primarySwatch: Colors.blue,
-          ),
-          initial: AdaptiveThemeMode.system,
-          builder: (theme, darkTheme) => MultiProvider(
-            providers: [
-              ChangeNotifierProvider(
-                  create: (_) => WalletProvider()..loadWallets()),
-            ],
-            child: MaterialApp(
-              debugShowCheckedModeBanner: false,
+        return MultiProvider(
+          providers: [
+            ChangeNotifierProvider(
+                create: (_) => WalletProvider()..loadWallets()),
+          ],
+          child: AdaptiveTheme(
+            light: ThemeData(
+              brightness: Brightness.light,
+              primarySwatch: Colors.blue,
+              scaffoldBackgroundColor: Colors.white,
+              cardColor: Colors.white,
+              appBarTheme: AppBarTheme(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                surfaceTintColor: Colors.transparent,
+              ),
+            ),
+            dark: ThemeData(
+              brightness: Brightness.dark,
+              primarySwatch: Colors.blue,
+              scaffoldBackgroundColor: Colors.black,
+              cardColor: Colors.grey[900],
+              appBarTheme: AppBarTheme(
+                backgroundColor: Colors.transparent,
+                elevation: 0,
+                surfaceTintColor: Colors.transparent,
+              ),
+            ),
+            initial: AdaptiveThemeMode.light,
+            builder: (theme, darkTheme) => MaterialApp(
               theme: theme,
               darkTheme: darkTheme,
+              debugShowCheckedModeBanner: false,
               home: isFirstTimeUser ? PageIndicatorDemo() : BottomBarDemo(),
             ),
           ),

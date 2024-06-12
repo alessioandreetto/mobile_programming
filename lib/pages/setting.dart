@@ -59,7 +59,6 @@ class _SettingsPageState extends State<SettingsPage> {
                 color: Color(0xffb3b3b3),
               ),
               borderRadius: BorderRadius.circular(10),
-              color: Colors.white,
             ),
             child: ListTile(
               title: Text('Modifica nome account'),
@@ -78,7 +77,6 @@ class _SettingsPageState extends State<SettingsPage> {
                 color: Color(0xffb3b3b3),
               ),
               borderRadius: BorderRadius.circular(10),
-              color: Colors.white,
             ),
             child: ListTile(
               title: Text('Cambia valuta'),
@@ -108,7 +106,6 @@ class _SettingsPageState extends State<SettingsPage> {
                 color: Color(0xffb3b3b3),
               ),
               borderRadius: BorderRadius.circular(10),
-              color: Colors.white,
             ),
             child: ListTile(
               title: Text('test tutorial iniziale'),
@@ -127,7 +124,6 @@ class _SettingsPageState extends State<SettingsPage> {
                 color: Color(0xffb3b3b3),
               ),
               borderRadius: BorderRadius.circular(10),
-              color: Colors.white,
             ),
             child: ListTile(
               title: Text('test sliver '),
@@ -146,7 +142,6 @@ class _SettingsPageState extends State<SettingsPage> {
                 color: Color(0xffb3b3b3),
               ),
               borderRadius: BorderRadius.circular(10),
-              color: Colors.white,
             ),
             child: ListTile(
               title: Text('Modalità scura'),
