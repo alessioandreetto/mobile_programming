@@ -38,7 +38,6 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
   int _selectedActionIndex = 0;
   DateTime? _selectedDate;
   bool _deleteButtonVisible = false;
-  bool _isDirty = false;
 
   List<Category> categories = [
     Category(id: 0, name: 'Auto'),
@@ -116,7 +115,6 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
         _selectedDate = picked;
         widget.dateController.text =
             "${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}";
-        _isDirty = true;
       });
     }
   }
@@ -153,34 +151,52 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
     });
   }
 
+  void _navigateToHome(BuildContext context) {
+    Navigator.of(context).popUntil((route) => route.isFirst);
+  }
+
   Future<bool> _onWillPop() async {
-    if (_isDirty) {
-      bool? confirm = await showDialog<bool>(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Conferma uscita'),
-          content: Text(
-              'Hai delle modifiche non salvate. Sei sicuro di voler tornare indietro senza salvare?'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(true);
-              },
-              child: Text('Sì'),
+    bool hasUnsavedChanges = _hasUnsavedChanges();
+
+    if (hasUnsavedChanges) {
+      return await showDialog<bool>(
+            context: context,
+            builder: (context) => AlertDialog(
+              title: Text('Conferma'),
+              content: Text(
+                  'Sei sicuro di voler tornare indietro e non effettuare quindi le modifiche?'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: Text('No'),
+                ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(true),
+                  child: Text('Si'),
+                ),
+              ],
             ),
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop(false);
-              },
-              child: Text('No'),
-            ),
-          ],
-        ),
-      );
-      return confirm == true;
+          ) ??
+          false;
     } else {
       return true;
     }
+  }
+
+  bool _hasUnsavedChanges() {
+    return widget.nameController.text.isNotEmpty ||
+        widget.valueController.text.isNotEmpty ||
+        widget.dateController.text.isNotEmpty ||
+        _selectedCategoryId != (widget.transaction?.categoryId ?? 0) ||
+        _selectedWallet !=
+            (_wallets.isNotEmpty && widget.transaction != null
+                ? _wallets
+                    .firstWhere((wallet) =>
+                        wallet.id == widget.transaction!.transactionId)
+                    .name!
+                : '') ||
+        _selectedDate?.toIso8601String() !=
+            (widget.transaction?.date ?? DateTime.now().toIso8601String());
   }
 
   @override
@@ -222,11 +238,6 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                 TextField(
                   controller: widget.nameController,
                   decoration: InputDecoration(labelText: 'Nome'),
-                  onChanged: (_) {
-                    setState(() {
-                      _isDirty = true;
-                    });
-                  },
                 ),
                 TextField(
                   controller: widget.valueController,
@@ -235,11 +246,6 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                   inputFormatters: [
                     FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
                   ],
-                  onChanged: (_) {
-                    setState(() {
-                      _isDirty = true;
-                    });
-                  },
                 ),
                 TextField(
                   controller: widget.dateController,
@@ -252,28 +258,25 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                     _selectDate(context);
                   },
                 ),
-                DropdownButtonFormField<Wallet>(
-                  value: _wallets.isNotEmpty
-                      ? _wallets.firstWhere(
-                          (wallet) => wallet.name == _selectedWallet)
-                      : null,
-                  onChanged: (newValue) {
-                    setState(() {
-                      _selectedWallet = newValue!.name!;
-                      _isDirty = true;
-                    });
-                    int selectedWalletIndex = _wallets.indexOf(
-                        newValue!); // Ottieni l'indice del wallet selezionato
-                    Provider.of<WalletProvider>(context, listen: false)
-                        .updateSelectedWalletIndex(
-                            selectedWalletIndex); // Passa l'indice del wallet
-                  },
-                  items: _wallets.map((wallet) {
-                    return DropdownMenuItem(
-                      value: wallet,
-                      child: Text(wallet.name!),
-                    );
-                  }).toList(), // Converte la lista in una lista di DropdownMenuItem
+DropdownButtonFormField<Wallet>(
+  value: _wallets.isNotEmpty
+      ? _wallets.firstWhere(
+          (wallet) => wallet.name == _selectedWallet)
+      : null,
+  onChanged: (newValue) {
+    setState(() {
+      _selectedWallet = newValue!.name!;
+    });
+    int selectedWalletIndex = _wallets.indexOf(newValue!); // Ottieni l'indice del wallet selezionato
+    Provider.of<WalletProvider>(context, listen: false)
+        .updateSelectedWalletIndex(selectedWalletIndex); // Passa l'indice del wallet
+  },
+  items: _wallets.map((wallet) {
+    return DropdownMenuItem(
+      value: wallet,
+      child: Text(wallet.name!),
+    );
+  }).toList(), // Converte la lista in una lista di DropdownMenuItem
 
                   decoration: InputDecoration(
                     labelText: 'Portafoglio',
@@ -286,7 +289,6 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                   onChanged: (newValue) {
                     setState(() {
                       _selectedCategoryId = newValue!.id;
-                      _isDirty = true;
                     });
                   },
                   items: categories.map((category) {
@@ -301,27 +303,40 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                 ),
                 SizedBox(height: 16.0),
                 ToggleButtons(
-                  children: actionTypes
-                      .map((type) => Padding(
-                            padding: const EdgeInsets.all(8.0),
-                            child: Text(type),
-                          ))
-                      .toList(),
+                  children: _buildToggleButtons(),
                   isSelected: List.generate(
-                    actionTypes.length,
-                    (index) => _selectedActionIndex == index,
-                  ),
+                      _wallets.length >= 2
+                          ? actionTypes.length
+                          : actionTypes.length - 1,
+                      (index) => _selectedActionIndex == index),
                   onPressed: (index) {
                     setState(() {
                       _selectedActionIndex = index;
-                      _isDirty = true;
                     });
                   },
                 ),
-                SizedBox(height: 20.0),
+                SizedBox(height: 16.0),
                 ElevatedButton(
-                  onPressed: _saveTransaction,
-                  child: Text('Salva'),
+                  onPressed: () async {
+                    if (_validateFields()) {
+                      await _performRegularTransaction();
+
+                      Provider.of<WalletProvider>(context, listen: false)
+                          .loadWallets();
+
+                      _showSnackbar(
+                          context,
+                          widget.transaction == null
+                              ? 'Transazione aggiunta con successo!'
+                              : 'Transazione modificata con successo!');
+                      _navigateToHome(context);
+                    } else {
+                      _showSnackbar(context, 'Inserisci tutti i campi');
+                    }
+                  },
+                  child: Text(widget.transaction == null
+                      ? 'Aggiungi Transazione'
+                      : 'Modifica Transazione'),
                 ),
               ],
             ),
@@ -331,68 +346,112 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
     );
   }
 
-  Future<void> _saveTransaction() async {
-    final transactionName = widget.nameController.text;
-    final transactionValue =
-        double.tryParse(widget.valueController.text) ?? 0.0;
-    final transactionDate = widget.dateController.text;
+  bool _validateFields() {
+    return widget.nameController.text.isNotEmpty &&
+        widget.valueController.text.isNotEmpty &&
+        widget.dateController.text.isNotEmpty;
+  }
 
-    final wallet =
-        _wallets.firstWhere((wallet) => wallet.name == _selectedWallet);
-    final categoryId = _selectedCategoryId;
-    final actionType = _selectedActionIndex == 1 ? 'Uscita' : 'Entrata';
+  List<Widget> _buildToggleButtons() {
+    List<Widget> buttons = actionTypes.map((type) {
+      return Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16.0),
+        child: Text(type),
+      );
+    }).toList();
+    if (_wallets.length < 2) {
+      buttons.removeLast();
+    }
+    return buttons;
+  }
 
-    double finalTransactionValue = transactionValue;
+  Future<void> _performRegularTransaction() async {
+    double transactionValue = double.parse(widget.valueController.text);
     if (_selectedActionIndex == 1) {
-      finalTransactionValue *= -1; // Rendere il valore negativo per l'uscita
+      transactionValue = -transactionValue;
     }
 
-    final newTransaction = Transaction(
-      name: transactionName,
-      value: finalTransactionValue,
-      date: transactionDate,
-      categoryId: categoryId,
-      transactionId: wallet.id,
-    );
+    Wallet selectedWallet =
+        _wallets.firstWhere((wallet) => wallet.name == _selectedWallet);
 
-    if (widget.transaction == null) {
-      await dbHelper.insertTransaction(newTransaction);
+    if (widget.transaction != null) {
+      Wallet originalWallet = _wallets.firstWhere(
+          (wallet) => wallet.id == widget.transaction!.transactionId);
+
+      originalWallet.balance =
+          originalWallet.balance! - widget.transaction!.value!;
+      await dbHelper.updateWallet(originalWallet);
+
+      selectedWallet.balance = selectedWallet.balance! + transactionValue;
+      await dbHelper.updateWallet(selectedWallet);
+
+      widget.transaction!.transactionId = selectedWallet.id;
+      widget.transaction!.name = widget.nameController.text;
+      widget.transaction!.categoryId = _selectedCategoryId;
+      widget.transaction!.date =
+          _selectedDate?.toIso8601String() ?? DateTime.now().toIso8601String();
+      widget.transaction!.value = transactionValue;
+      await dbHelper.updateTransaction(widget.transaction!);
     } else {
-      newTransaction.id = widget.transaction!.id;
-      await dbHelper.updateTransaction(newTransaction);
-    }
+      Transaction newTransaction = Transaction(
+        name: widget.nameController.text,
+        categoryId: _selectedCategoryId,
+        date: _selectedDate?.toIso8601String() ??
+            DateTime.now().toIso8601String(),
+        value: transactionValue,
+        transactionId: selectedWallet.id,
+      );
 
-    _showSnackbar(context, 'Transazione salvata con successo');
-    _isDirty = false; // Resetta lo stato _isDirty
-    Navigator.pop(context, true);
+      await dbHelper.insertTransaction(newTransaction);
+
+      double newBalance = selectedWallet.balance! + transactionValue;
+      Wallet updatedWallet = Wallet(
+        id: selectedWallet.id,
+        name: selectedWallet.name,
+        balance: newBalance,
+      );
+      await dbHelper.updateWallet(updatedWallet);
+    }
   }
 
   Future<void> _confirmDeleteTransaction(BuildContext context) async {
-    bool? confirm = await showDialog<bool>(
+    bool? confirmDelete = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Conferma cancellazione'),
-        content: Text('Sei sicuro di voler cancellare questa transazione?'),
-        actions: <Widget>[
+        title: Text('Conferma Eliminazione'),
+        content: Text('Sei sicuro di voler eliminare questa transazione?'),
+        actions: [
           TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(true);
-            },
-            child: Text('Sì'),
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text('No'),
           ),
           TextButton(
-            onPressed: () {
-              Navigator.of(context).pop(false);
-            },
-            child: Text('No'),
+            onPressed: () => Navigator.of(context).pop(true),
+            child: Text('Si'),
           ),
         ],
       ),
     );
-    if (confirm == true) {
+
+    if (confirmDelete == true) {
+      await _deleteTransaction(context);
+    }
+  }
+
+  Future<void> _deleteTransaction(BuildContext context) async {
+    if (widget.transaction != null) {
+      Wallet wallet = _wallets.firstWhere(
+          (wallet) => wallet.id == widget.transaction!.transactionId);
+
+      wallet.balance = wallet.balance! - widget.transaction!.value!;
+
+      await dbHelper.updateWallet(wallet);
       await dbHelper.deleteTransaction(widget.transaction!.id!);
-      _showSnackbar(context, 'Transazione cancellata con successo');
-      Navigator.pop(context, true);
+
+      Provider.of<WalletProvider>(context, listen: false).loadWallets();
+
+      _showSnackbar(context, 'Transazione eliminata con successo!');
+      _navigateToHome(context);
     }
   }
 }
