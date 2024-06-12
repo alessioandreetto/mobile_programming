@@ -312,6 +312,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                   },
                 ),
                 SizedBox(height: 16.0),
+                
                 ElevatedButton(
                   onPressed: () async {
                     if (_validateFields()) {
@@ -338,6 +339,38 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
             ),
           ),
         ),
+         bottomNavigationBar: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                elevation: 0,
+                shape: RoundedRectangleBorder(
+                  side: BorderSide(color: Color(0xffb3b3b3), width: 1),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+              ),
+             onPressed: () async {
+                    if (_validateFields()) {
+                      await _performRegularTransaction();
+
+                      Provider.of<WalletProvider>(context, listen: false)
+                          .loadWallets();
+
+                      _showSnackbar(
+                          context,
+                          widget.transaction == null
+                              ? 'Transazione aggiunta con successo!'
+                              : 'Transazione modificata con successo!');
+                      _navigateToHome(context);
+                    } else {
+                      _showSnackbar(context, 'Inserisci tutti i campi');
+                    }
+                  },
+               child: Text(widget.transaction == null
+                      ? 'Aggiungi Transazione'
+                      : 'Modifica Transazione'),
+            ),
+          ),
       ),
     );
   }
