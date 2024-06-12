@@ -21,7 +21,6 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
       _isInfoVisible = false;
     });
     Future.delayed(Duration(milliseconds: 500), () {
-      // Updated duration
       setState(() {
         _currentStep++;
         _isInfoVisible = true;
@@ -48,7 +47,14 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
     return Scaffold(
       body: Stack(
         children: [
-          HomeList(), // HomePage content
+          Container(
+            decoration: BoxDecoration(
+              image: DecorationImage(
+                image: AssetImage('assets/images/sfondo_tutorial.jpg'),
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
           if (_isBlurVisible && (_currentStep >= 0 && _currentStep <= 5))
             _buildBlurBackground(),
           if (_isInfoVisible && _currentStep == 0) _buildStep1(),
@@ -65,7 +71,7 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
   Widget _buildBlurBackground() {
     return AnimatedOpacity(
       opacity: _isBlurVisible ? 1.0 : 0.0,
-      duration: Duration(milliseconds: 500), // Updated duration
+      duration: Duration(milliseconds: 500),
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 5.0, sigmaY: 5.0),
         child: Container(
@@ -81,8 +87,7 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
       top: 100,
       child: Container(
         width: MediaQuery.of(context).size.width - 40,
-        color:
-            Colors.black.withOpacity(0.1), // Make background nearly transparent
+        color: Colors.black.withOpacity(0.1),
         padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -113,11 +118,10 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
   Widget _buildStep2() {
     return Positioned(
       left: 20,
-      top: 330, // Adjust this value to position step 2 further down
+      top: 330,
       child: Container(
         width: MediaQuery.of(context).size.width - 40,
-        color:
-            Colors.black.withOpacity(0.1), // Make background nearly transparent
+        color: Colors.black.withOpacity(0.1),
         padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -148,11 +152,10 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
   Widget _buildStep3() {
     return Positioned(
       left: 20,
-      top: 560, // Adjust this value to position step 3 further down
+      top: 560,
       child: Container(
         width: MediaQuery.of(context).size.width - 40,
-        color:
-            Colors.black.withOpacity(0.1), // Make background nearly transparent
+        color: Colors.black.withOpacity(0.1),
         padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -183,11 +186,10 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
   Widget _buildStep4() {
     return Positioned(
       left: 20,
-      top: 560, // Adjust this value to position step 4 further down
+      top: 560,
       child: Container(
         width: MediaQuery.of(context).size.width - 40,
-        color:
-            Colors.black.withOpacity(0.1), // Make background nearly transparent
+        color: Colors.black.withOpacity(0.1),
         padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -231,11 +233,10 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
   Widget _buildStep5() {
     return Positioned(
       left: 20,
-      top: 520, // Adjust this value to position step 5 further down
+      top: 520,
       child: Container(
         width: MediaQuery.of(context).size.width - 40,
-        color:
-            Colors.black.withOpacity(0.1), // Make background nearly transparent
+        color: Colors.black.withOpacity(0.1),
         padding: EdgeInsets.all(16),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
