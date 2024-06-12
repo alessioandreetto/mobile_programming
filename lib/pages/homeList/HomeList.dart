@@ -87,23 +87,24 @@ class _HomeListState extends State<HomeList> {
     super.dispose();
   }
 
-  void _initSelectedWallet() {
-    var walletProvider = Provider.of<WalletProvider>(context, listen: false);
-    if (walletProvider.wallets.isNotEmpty) {
-      setState(() {
-        _selectedWalletId = walletProvider.wallets.first.id!;
-        _selectedValuta =
-            '€'; // Imposta il valore predefinito per _selectedValuta
-      });
-      _loadTransactions(_selectedWalletId);
-    } else {
-      // Se non ci sono wallet disponibili, setta _selectedWalletId a 0
-      setState(() {
-        _selectedWalletId = 0;
-      });
-    }
-    walletProvider.loadAccountName();
+void _initSelectedWallet() {
+  var walletProvider = Provider.of<WalletProvider>(context, listen: false);
+  if (walletProvider.wallets.isNotEmpty) {
+    final selectedWalletIndex = walletProvider.selectedWalletIndex;
+    final selectedWallet = walletProvider.wallets[selectedWalletIndex];
+    setState(() {
+      _selectedWalletId = selectedWallet.id!;
+      _selectedValuta = walletProvider.valuta;
+    });
+    _loadTransactions(selectedWallet.id!);
+  } else {
+    setState(() {
+      _selectedWalletId = 0;
+    });
   }
+  walletProvider.loadAccountName();
+}
+
 
   void _onWalletsChanged() {
     var walletProvider = Provider.of<WalletProvider>(context, listen: false);

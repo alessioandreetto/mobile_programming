@@ -90,13 +90,14 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
       if (_wallets.isNotEmpty) {
         final walletProvider =
             Provider.of<WalletProvider>(context, listen: false);
-        final selectedWalletIndex = walletProvider.selectedWalletIndex;
+        final selectedWallet =
+            walletProvider.wallets[walletProvider.selectedWalletIndex];
         _selectedWallet = widget.transaction != null
             ? _wallets
                 .firstWhere(
                     (wallet) => wallet.id == widget.transaction!.transactionId)
                 .name!
-            : walletProvider.wallets[selectedWalletIndex].name!;
+            : selectedWallet.name!;
       }
     });
   }
@@ -257,27 +258,26 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                     _selectDate(context);
                   },
                 ),
-                DropdownButtonFormField<Wallet>(
-                  value: _wallets.isNotEmpty
-                      ? _wallets.firstWhere(
-                          (wallet) => wallet.name == _selectedWallet)
-                      : null,
-                  onChanged: (newValue) {
-                    if (newValue != null) {
-                      setState(() {
-                        _selectedWallet = newValue.name!;
-                      });
-                      int index = _wallets.indexOf(newValue);
-                      Provider.of<WalletProvider>(context, listen: false)
-                          .updateSelectedWalletIndex(index);
-                    }
-                  },
-                  items: _wallets.map((wallet) {
-                    return DropdownMenuItem(
-                      value: wallet,
-                      child: Text(wallet.name!),
-                    );
-                  }).toList(),
+DropdownButtonFormField<Wallet>(
+  value: _wallets.isNotEmpty
+      ? _wallets.firstWhere(
+          (wallet) => wallet.name == _selectedWallet)
+      : null,
+  onChanged: (newValue) {
+    setState(() {
+      _selectedWallet = newValue!.name!;
+    });
+    int selectedWalletIndex = _wallets.indexOf(newValue!); // Ottieni l'indice del wallet selezionato
+    Provider.of<WalletProvider>(context, listen: false)
+        .updateSelectedWalletIndex(selectedWalletIndex); // Passa l'indice del wallet
+  },
+  items: _wallets.map((wallet) {
+    return DropdownMenuItem(
+      value: wallet,
+      child: Text(wallet.name!),
+    );
+  }).toList(), // Converte la lista in una lista di DropdownMenuItem
+
                   decoration: InputDecoration(
                     labelText: 'Portafoglio',
                   ),
@@ -340,38 +340,6 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                 ),
               ],
             ),
-          ),
-        ),
-        bottomNavigationBar: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: ElevatedButton(
-            style: ElevatedButton.styleFrom(
-              elevation: 0,
-              shape: RoundedRectangleBorder(
-                side: BorderSide(color: Color(0xffb3b3b3), width: 1),
-                borderRadius: BorderRadius.circular(10),
-              ),
-            ),
-            onPressed: () async {
-              if (_validateFields()) {
-                await _performRegularTransaction();
-
-                Provider.of<WalletProvider>(context, listen: false)
-                    .loadWallets();
-
-                _showSnackbar(
-                    context,
-                    widget.transaction == null
-                        ? 'Transazione aggiunta con successo!'
-                        : 'Transazione modificata con successo!');
-                _navigateToHome(context);
-              } else {
-                _showSnackbar(context, 'Inserisci tutti i campi');
-              }
-            },
-            child: Text(widget.transaction == null
-                ? 'Aggiungi Transazione'
-                : 'Modifica Transazione'),
           ),
         ),
       ),
