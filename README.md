@@ -10,12 +10,10 @@ A new Flutter project.
 
 ## New Transaction
 
-
 ## Wallet
 
 ## Settings
 1. rimuovere i due test
-2. sistemare button e scritte button per dark mode
 
 ## Demo
 1. Da completare il tutorial
