@@ -36,6 +36,7 @@ class _ChartsListState extends State<ChartsList> {
     5: Icons.airplanemode_active, // Categoria Viaggio
     6: Icons.category, // Categoria Varie
   };
+  
   @override
   void initState() {
     super.initState();
@@ -286,6 +287,7 @@ class _ChartsListState extends State<ChartsList> {
                         },
                       ),
                     ),
+                 
                   ],
                 );
               },
@@ -320,27 +322,28 @@ class _ChartsListState extends State<ChartsList> {
                   _calculateChartData(transactions, selectedWallet);
 
               return Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: SfCartesianChart(
-                    primaryXAxis: NumericAxis(interval: 1),
-                    primaryYAxis: NumericAxis(),
-                    series: <LineSeries<ChartSampleData, num>>[
-                      LineSeries<ChartSampleData, num>(
-                        dataSource: chartData,
-                        xValueMapper: (ChartSampleData sales, _) => sales.x,
-                        yValueMapper: (ChartSampleData sales, _) => sales.y,
-                        dataLabelMapper: (ChartSampleData data, _) {
-                          // Calcola il bilancio parziale
-                          double partialBalance = data.y;
-                          // Ottieni il valore della transazione
-                          double transactionValue = data.transactionValue;
-                          // Formatta il testo dell'etichetta per includere sia il bilancio parziale che il valore della transazione
-                          return '${partialBalance.toStringAsFixed(2)} ${walletProvider.valuta}\n ${transactionValue.toStringAsFixed(2)} ${walletProvider.valuta}';
-                        },
-                        dataLabelSettings: DataLabelSettings(isVisible: true),
-                      ),
-                    ],
-                  ));
+                padding: const EdgeInsets.all(16.0),
+                child: SfCartesianChart(
+                  primaryXAxis: NumericAxis(interval: 1),
+                  primaryYAxis: NumericAxis(),
+                  series: <LineSeries<ChartSampleData, num>>[
+                    LineSeries<ChartSampleData, num>(
+                      dataSource: chartData,
+                      xValueMapper: (ChartSampleData data, _) => data.x,
+                      yValueMapper: (ChartSampleData data, _) => data.y,
+                      dataLabelMapper: (ChartSampleData data, _) {
+                        // Calcola il bilancio parziale
+                        double partialBalance = data.y;
+                        // Ottieni il valore della transazione
+                        double transactionValue = data.transactionValue;
+                        // Formatta il testo dell'etichetta per includere sia il bilancio parziale che il valore della transazione
+                        return '${partialBalance.toStringAsFixed(2)} ${walletProvider.valuta}\n${transactionValue.toStringAsFixed(2)} ${walletProvider.valuta}';
+                      },
+                      dataLabelSettings: DataLabelSettings(isVisible: true),
+                    ),
+                  ],
+                ),
+              );
             }
           },
         );
@@ -348,22 +351,37 @@ class _ChartsListState extends State<ChartsList> {
     );
   }
 
-  List<ChartSampleData> _calculateChartData(
-      List<Transaction> transactions, Wallet wallet) {
-    List<ChartSampleData> chartData = [];
+List<ChartSampleData> _calculateChartData(
+    List<Transaction> transactions, Wallet wallet) {
+  List<ChartSampleData> chartData = [];
 
-    double balance = wallet.balance ?? 0;
-    double cumulativeSum = 0;
+  // Calculate the initial balance by summing up all transaction values
+  double totalTransactionValue = transactions.fold(0, (acc, transaction) {
+    return acc + (transaction.value ?? 0);
+  });
 
-    for (int i = transactions.length - 1; i >= 0; i--) {
-      cumulativeSum += transactions[i].value!;
-      double currentBalance = balance - cumulativeSum;
-      double transactionValue = transactions[i].value!; // Valore della transazione per il punto dati del grafico
-      chartData.insert(0, ChartSampleData(i.toDouble(), currentBalance, transactionValue));
-    }
+  // Initial balance is the wallet balance minus total transaction value
+  double initialBalance = (wallet.balance ?? 0) - totalTransactionValue;
+  
+  // Add initial balance as the first data point
+  chartData.add(ChartSampleData(0, initialBalance, 0));
 
-    return chartData;
+  // Loop through each transaction and update the balance accordingly
+  double balance = initialBalance;
+  for (int i = 0; i < transactions.length; i++) {
+    // Get the value of the transaction
+    double transactionValue = transactions[i].value!;
+    // Calculate the new balance after applying the transaction
+    balance += transactionValue; // Add or subtract transaction value
+    // Add the data point with the updated balance
+    chartData.add(ChartSampleData(i + 1, balance, transactionValue));
   }
+
+  return chartData;
+}
+
+
+
 
   String _formatDateTime(DateTime dateTime) {
     final formattedDate =
