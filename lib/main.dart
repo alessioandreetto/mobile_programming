@@ -18,6 +18,11 @@ class MyApp extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return MaterialApp(
+            theme: ThemeData(
+              useMaterial3: true,
+              primarySwatch: Colors.blue,
+              
+            ),
             home: Scaffold(
               backgroundColor: Colors.white,
               body: Center(
