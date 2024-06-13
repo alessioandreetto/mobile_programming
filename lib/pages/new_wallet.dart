@@ -115,6 +115,8 @@ class _AddNotePageState extends State<AddNotePage> {
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+
     return GestureDetector(
       onTap: () {
         FocusScope.of(context).unfocus();
@@ -127,7 +129,9 @@ class _AddNotePageState extends State<AddNotePage> {
         child: Scaffold(
           appBar: AppBar(
             backgroundColor: Colors.transparent,
-            systemOverlayStyle: SystemUiOverlayStyle.dark,
+            systemOverlayStyle: isDarkMode
+                ? SystemUiOverlayStyle.light
+                : SystemUiOverlayStyle.dark,
             elevation: 0,
             leading: IconButton(
               icon: Icon(Icons.arrow_back),
@@ -144,12 +148,15 @@ class _AddNotePageState extends State<AddNotePage> {
           body: SingleChildScrollView(
             child: Column(
               children: [
-                Divider(height: 1, color: Color(0xffb3b3b3)),
+                Divider(
+                    height: 1,
+                    color: isDarkMode ? Colors.grey : Color(0xffb3b3b3)),
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Container(
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
+                      border: Border.all(
+                          color: isDarkMode ? Colors.white70 : Colors.grey),
                       borderRadius: BorderRadius.circular(10.0),
                     ),
                     child: Padding(
@@ -159,6 +166,7 @@ class _AddNotePageState extends State<AddNotePage> {
                         style: TextStyle(
                           fontFamily: 'RobotoThin',
                           fontSize: 25,
+                          color: isDarkMode ? Colors.white : Colors.black,
                         ),
                         onChanged: (_) {
                           setState(() {
@@ -170,6 +178,7 @@ class _AddNotePageState extends State<AddNotePage> {
                           hintStyle: TextStyle(
                             fontFamily: 'RobotoThin',
                             fontSize: 25,
+                            color: isDarkMode ? Colors.white70 : Colors.grey,
                           ),
                           border: InputBorder.none,
                         ),
@@ -181,9 +190,14 @@ class _AddNotePageState extends State<AddNotePage> {
                   padding: const EdgeInsets.all(16.0),
                   child: Container(
                     decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
+                      border: Border.all(
+                          color: isDarkMode ? Colors.white70 : Colors.grey),
                       borderRadius: BorderRadius.circular(10.0),
-                      color: _hasTransactions ? Colors.grey.shade200 : null,
+                      color: _hasTransactions
+                          ? (isDarkMode
+                              ? Colors.grey.shade800
+                              : Colors.grey.shade200)
+                          : null,
                     ),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
@@ -192,7 +206,11 @@ class _AddNotePageState extends State<AddNotePage> {
                         style: TextStyle(
                           fontFamily: 'RobotoThin',
                           fontSize: 25,
-                          color: _hasTransactions ? Colors.grey : Colors.black,
+                          color: _hasTransactions
+                              ? (isDarkMode
+                                  ? Colors.grey.shade400
+                                  : Colors.grey)
+                              : (isDarkMode ? Colors.white : Colors.black),
                         ),
                         onChanged: (_) {
                           setState(() {
@@ -205,7 +223,11 @@ class _AddNotePageState extends State<AddNotePage> {
                           hintStyle: TextStyle(
                             fontFamily: 'RobotoThin',
                             fontSize: 25,
-                            color: _hasTransactions ? Colors.grey : null,
+                            color: _hasTransactions
+                                ? (isDarkMode
+                                    ? Colors.grey.shade400
+                                    : Colors.grey)
+                                : (isDarkMode ? Colors.white70 : Colors.grey),
                           ),
                           border: InputBorder.none,
                         ),
@@ -225,7 +247,9 @@ class _AddNotePageState extends State<AddNotePage> {
               style: ElevatedButton.styleFrom(
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-                  side: BorderSide(color: Color(0xffb3b3b3), width: 1),
+                  side: BorderSide(
+                      color: isDarkMode ? Colors.white70 : Color(0xffb3b3b3),
+                      width: 1),
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
