@@ -383,7 +383,7 @@ class _HomeListState extends State<HomeList> {
                     children: [
                       Padding(
                         padding: const EdgeInsets.only(
-                            left: 8.0, right: 8.0, top: 40),
+                            left: 16.0, right: 8.0, top: 40),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
@@ -414,7 +414,7 @@ class _HomeListState extends State<HomeList> {
                           itemBuilder: (context, index) {
                             return Padding(
                               padding: const EdgeInsets.symmetric(
-                                  vertical: 8.0, horizontal: 8.0),
+                                  vertical: 8.0, horizontal: 16.0),
                               child: ElevatedButton(
                                 onPressed: () {
                                   _handleButtonPress(index);
@@ -463,7 +463,7 @@ class _HomeListState extends State<HomeList> {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(left: 8.0, right: 8.0),
+                        padding: const EdgeInsets.only(left: 16.0, right: 16.0),
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
