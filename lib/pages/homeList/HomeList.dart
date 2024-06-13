@@ -377,7 +377,6 @@ class _HomeListState extends State<HomeList> {
                 minHeight: 240.0, // Increased to accommodate additional texts
                 maxHeight: 240.0, // Increased to accommodate additional texts
                 child: Container(
-                  color: Colors.white,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -434,24 +433,32 @@ class _HomeListState extends State<HomeList> {
                                     shape: MaterialStateProperty.all<
                                         RoundedRectangleBorder>(
                                       RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(20.0),
-                                        side: BorderSide(color: Colors.black),
+                                        borderRadius:
+                                            BorderRadius.circular(20.0),
+                                        side: BorderSide(
+                                          color: Theme.of(context).brightness ==
+                                                  Brightness.dark
+                                              ? Colors.white
+                                              : Colors.black,
+                                        ),
                                       ),
                                     ),
-                                    foregroundColor:
-                                        MaterialStateProperty.resolveWith<Color>(
+                                    foregroundColor: MaterialStateProperty
+                                        .resolveWith<Color>(
                                       (Set<MaterialState> states) {
                                         return _selectedWalletId ==
-                                                walletProvider.wallets[index].id!
+                                                walletProvider
+                                                    .wallets[index].id!
                                             ? Colors.white
                                             : Colors.black;
                                       },
                                     ),
-                                    backgroundColor:
-                                        MaterialStateProperty.resolveWith<Color>(
+                                    backgroundColor: MaterialStateProperty
+                                        .resolveWith<Color>(
                                       (Set<MaterialState> states) {
                                         return _selectedWalletId ==
-                                                walletProvider.wallets[index].id!
+                                                walletProvider
+                                                    .wallets[index].id!
                                             ? Colors.black
                                             : Colors.white;
                                       },
@@ -502,92 +509,92 @@ class _HomeListState extends State<HomeList> {
                 ),
               ),
             ),
+            SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (BuildContext context, int index) {
+                  if (transactions.isEmpty) {
+                    return SizedBox(
+                      height: MediaQuery.of(context).size.height / 2,
+                      child: Center(
+                        child: Text(
+                          'Nessuna transazione',
+                          style: TextStyle(fontSize: 18.0),
+                        ),
+                      ),
+                    );
+                  } else {
+                    final Transaction transaction = transactions[index];
+                    final date = DateTime.parse(transaction.date!);
+                    final formattedDate = DateFormat('dd/MM/yyyy').format(date);
 
-          SliverList(
-  delegate: SliverChildBuilderDelegate(
-    (BuildContext context, int index) {
-      if (transactions.isEmpty) {
-        return SizedBox(
-          height: MediaQuery.of(context).size.height / 2,
-          child: Center(
-            child: Text(
-              'Nessuna transazione',
-              style: TextStyle(fontSize: 18.0),
-            ),
-          ),
-        );
-      } else {
-        final Transaction transaction = transactions[index];
-        final date = DateTime.parse(transaction.date!);
-        final formattedDate = DateFormat('dd/MM/yyyy').format(date);
-
-        return Slidable(
-          key: ValueKey(index),
-          startActionPane: ActionPane(
-            extentRatio: 0.25,
-            motion: ScrollMotion(),
-            children: [
-              SlidableAction(
-                borderRadius: BorderRadius.circular(10),
-                padding: EdgeInsets.all(20),
-                onPressed: (context) {
-                  _deleteTransaction(transaction, walletProvider);
-                  setState(() {
-                    transactions.removeAt(index);
-                  });
+                    return Slidable(
+                      key: ValueKey(index),
+                      startActionPane: ActionPane(
+                        extentRatio: 0.25,
+                        motion: ScrollMotion(),
+                        children: [
+                          SlidableAction(
+                            borderRadius: BorderRadius.circular(10),
+                            padding: EdgeInsets.all(20),
+                            onPressed: (context) {
+                              _deleteTransaction(transaction, walletProvider);
+                              setState(() {
+                                transactions.removeAt(index);
+                              });
+                            },
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
+                            icon: Icons.delete,
+                            label: 'Elimina',
+                          ),
+                        ],
+                      ),
+                      child: GestureDetector(
+                        onTap: () {
+                          _navigateToTransactionDetail(context, transaction);
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Container(
+                            height: 70.0,
+                            child: ListTile(
+                              leading: Container(
+                                width: 50,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  color:
+                                      categoryColors[transaction.categoryId] ??
+                                          Colors.grey,
+                                ),
+                                child: Icon(
+                                  categoryIcons[transaction.categoryId] ??
+                                      Icons.category,
+                                  color: Colors.white,
+                                ),
+                              ),
+                              title: Text(transaction.name ?? ''),
+                              subtitle: Text(
+                                "Data: $formattedDate, Valore: ${transaction.value} ${walletProvider.valuta}",
+                              ),
+                            ),
+                            decoration: BoxDecoration(
+                              border: Border.all(
+                                color: Color(0xffb3b3b3),
+                              ),
+                              color: Colors.transparent,
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }
                 },
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
-                icon: Icons.delete,
-                label: 'Elimina',
+                // Assicura che almeno un elemento venga visualizzato, anche se transactions è vuoto
+                childCount: transactions.length == 0 ? 1 : transactions.length,
               ),
-            ],
-          ),
-          child: GestureDetector(
-            onTap: () {
-              _navigateToTransactionDetail(context, transaction);
-            },
-            child: Padding(
-              padding: const EdgeInsets.all(8.0),
-              child: Container(
-                height: 70.0,
-                child: ListTile(
-                  leading: Container(
-                    width: 50,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: categoryColors[transaction.categoryId] ?? Colors.grey,
-                    ),
-                    child: Icon(
-                      categoryIcons[transaction.categoryId] ?? Icons.category,
-                      color: Colors.white,
-                    ),
-                  ),
-                  title: Text(transaction.name ?? ''),
-                  subtitle: Text(
-                    "Data: $formattedDate, Valore: ${transaction.value} ${walletProvider.valuta}",
-                  ),
-                ),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Color(0xffb3b3b3),
-                  ),
-                  color: Colors.transparent,
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-              ),
-            ),
-          ),
-        );
-      }
-    },
-    // Assicura che almeno un elemento venga visualizzato, anche se transactions è vuoto
-    childCount: transactions.length == 0 ? 1 : transactions.length,
-  ),
-)
-
-
+            )
           ],
         ),
       ),
