@@ -47,6 +47,7 @@ class _ChartsListState extends State<ChartsList> {
 
   @override
   Widget build(BuildContext context) {
+    bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
         title: Text('Charts page'),
@@ -138,6 +139,7 @@ class _ChartsListState extends State<ChartsList> {
                             scrollDirection: Axis.horizontal,
                             itemCount: walletProvider.wallets.length,
                             itemBuilder: (context, index) {
+                              bool isSelected = _selectedWalletIndex == index;
                               return Padding(
                                 padding: const EdgeInsets.symmetric(
                                     vertical: 8.0, horizontal: 8.0),
@@ -156,17 +158,25 @@ class _ChartsListState extends State<ChartsList> {
                                     foregroundColor: MaterialStateProperty
                                         .resolveWith<Color>(
                                       (Set<MaterialState> states) {
-                                        return _selectedWalletIndex == index
-                                            ? Colors.white
-                                            : Colors.black;
+                                        return isSelected
+                                            ? isDarkMode
+                                                ? Colors.black
+                                                : Colors.white
+                                            : isDarkMode
+                                                ? Colors.white
+                                                : Colors.black;
                                       },
                                     ),
                                     backgroundColor: MaterialStateProperty
                                         .resolveWith<Color>(
                                       (Set<MaterialState> states) {
-                                        return _selectedWalletIndex == index
-                                            ? Colors.black
-                                            : Colors.white;
+                                        return isSelected
+                                            ? isDarkMode
+                                                ? Colors.white
+                                                : Colors.black
+                                            : isDarkMode
+                                                ? Colors.black
+                                                : Colors.white;
                                       },
                                     ),
                                   ),
