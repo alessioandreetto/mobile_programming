@@ -36,7 +36,7 @@ class _ChartsListState extends State<ChartsList> {
     5: Icons.airplanemode_active, // Categoria Viaggio
     6: Icons.category, // Categoria Varie
   };
-  
+
   @override
   void initState() {
     super.initState();
@@ -287,7 +287,6 @@ class _ChartsListState extends State<ChartsList> {
                         },
                       ),
                     ),
-                 
                   ],
                 );
               },
@@ -336,8 +335,13 @@ class _ChartsListState extends State<ChartsList> {
                         double partialBalance = data.y;
                         // Ottieni il valore della transazione
                         double transactionValue = data.transactionValue;
-                        // Formatta il testo dell'etichetta per includere sia il bilancio parziale che il valore della transazione
-                        return '${partialBalance.toStringAsFixed(2)} ${walletProvider.valuta}\n${transactionValue.toStringAsFixed(2)} ${walletProvider.valuta}';
+                        // Controlla se il valore della transazione è double.nan
+                        if (transactionValue.isNaN) {
+                          return '${partialBalance.toStringAsFixed(2)} ${walletProvider.valuta}';
+                        } else {
+                          // Formatta il testo dell'etichetta per includere sia il bilancio parziale che il valore della transazione
+                          return '${partialBalance.toStringAsFixed(2)} ${walletProvider.valuta}\n${transactionValue.toStringAsFixed(2)} ${walletProvider.valuta}';
+                        }
                       },
                       dataLabelSettings: DataLabelSettings(isVisible: true),
                     ),
@@ -351,37 +355,35 @@ class _ChartsListState extends State<ChartsList> {
     );
   }
 
-List<ChartSampleData> _calculateChartData(
-    List<Transaction> transactions, Wallet wallet) {
-  List<ChartSampleData> chartData = [];
+  List<ChartSampleData> _calculateChartData(
+      List<Transaction> transactions, Wallet wallet) {
+    List<ChartSampleData> chartData = [];
 
-  // Calculate the initial balance by summing up all transaction values
-  double totalTransactionValue = transactions.fold(0, (acc, transaction) {
-    return acc + (transaction.value ?? 0);
-  });
+    // Calculate the initial balance by summing up all transaction values
+    double totalTransactionValue = transactions.fold(0, (acc, transaction) {
+      return acc + (transaction.value ?? 0);
+    });
 
-  // Initial balance is the wallet balance minus total transaction value
-  double initialBalance = (wallet.balance ?? 0) - totalTransactionValue;
-  
-  // Add initial balance as the first data point
-  chartData.add(ChartSampleData(0, initialBalance, 0));
+    // Initial balance is the wallet balance minus total transaction value
+    double initialBalance = (wallet.balance ?? 0) - totalTransactionValue;
 
-  // Loop through each transaction and update the balance accordingly
-  double balance = initialBalance;
-  for (int i = 0; i < transactions.length; i++) {
-    // Get the value of the transaction
-    double transactionValue = transactions[i].value!;
-    // Calculate the new balance after applying the transaction
-    balance += transactionValue; // Add or subtract transaction value
-    // Add the data point with the updated balance
-    chartData.add(ChartSampleData(i + 1, balance, transactionValue));
+    // Add initial balance as the first data point regardless of transactions
+    chartData.add(ChartSampleData(0, initialBalance,
+        double.nan)); // Use double.nan for the first transaction value
+
+    // Loop through each transaction and update the balance accordingly
+    double balance = initialBalance;
+    for (int i = 0; i < transactions.length; i++) {
+      // Get the value of the transaction
+      double transactionValue = transactions[i].value!;
+      // Calculate the new balance after applying the transaction
+      balance += transactionValue; // Add or subtract transaction value
+      // Add the data point with the updated balance
+      chartData.add(ChartSampleData(i + 1, balance, transactionValue));
+    }
+
+    return chartData;
   }
-
-  return chartData;
-}
-
-
-
 
   String _formatDateTime(DateTime dateTime) {
     final formattedDate =
@@ -472,7 +474,8 @@ List<ChartSampleData> _calculateChartData(
 class ChartSampleData {
   final double x;
   final double y;
-  final double transactionValue; // Aggiunto valore della transazione per il punto dati del grafico
+  final double
+      transactionValue; // Aggiunto valore della transazione per il punto dati del grafico
 
   ChartSampleData(this.x, this.y, this.transactionValue);
 }
