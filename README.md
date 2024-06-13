@@ -3,7 +3,6 @@
 A new Flutter project.
 
 ## Home Page
-1. ⁠⁠sliverappbar + sistemazione home
 
 ## Charts Page
 1. ⁠⁠rivedere grafica del grafico a linea

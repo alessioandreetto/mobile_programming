@@ -449,8 +449,8 @@ class _HomeListState extends State<HomeList> {
                                         return _selectedWalletId ==
                                                 walletProvider
                                                     .wallets[index].id!
-                                            ? Colors.white
-                                            : Colors.black;
+                                            ? Colors.black
+                                            : Colors.white;
                                       },
                                     ),
                                     backgroundColor: MaterialStateProperty
@@ -459,8 +459,20 @@ class _HomeListState extends State<HomeList> {
                                         return _selectedWalletId ==
                                                 walletProvider
                                                     .wallets[index].id!
-                                            ? Colors.black
-                                            : Colors.white;
+                                            ? Colors.white
+                                            : Colors.black;
+                                      },
+                                    ),
+                                    textStyle: MaterialStateProperty
+                                        .resolveWith<TextStyle>(
+                                      (Set<MaterialState> states) {
+                                        return TextStyle(
+                                          color: _selectedWalletId ==
+                                                  walletProvider
+                                                      .wallets[index].id!
+                                              ? Colors.black
+                                              : Colors.white,
+                                        );
                                       },
                                     ),
                                   ),
