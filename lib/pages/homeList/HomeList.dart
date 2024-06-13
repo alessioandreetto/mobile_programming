@@ -408,58 +408,61 @@ class _HomeListState extends State<HomeList> {
                       ),
                       Container(
                         height: 50,
-                        child: ListView.builder(
-                          scrollDirection: Axis.horizontal,
-                          itemCount: walletProvider.wallets.length,
-                          itemBuilder: (context, index) {
-                            return Padding(
-                              padding: const EdgeInsets.symmetric(
-                                  vertical: 8.0, horizontal: 16.0),
-                              child: ElevatedButton(
-                                onPressed: () {
-                                  _handleButtonPress(index);
-                                  setState(() {
-                                    _selectedWalletId =
-                                        walletProvider.wallets[index].id!;
-                                  });
-                                  _loadTransactions(
-                                      walletProvider.wallets[index].id!);
-                                  walletProvider
-                                      .updateSelectedWalletIndex(index);
-                                },
-                                style: ButtonStyle(
-                                  elevation: MaterialStateProperty.all(0),
-                                  shape: MaterialStateProperty.all<
-                                      RoundedRectangleBorder>(
-                                    RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20.0),
-                                      side: BorderSide(color: Colors.black),
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 8.0, right: 8),
+                          child: ListView.builder(
+                            scrollDirection: Axis.horizontal,
+                            itemCount: walletProvider.wallets.length,
+                            itemBuilder: (context, index) {
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 8.0, horizontal: 8.0),
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    _handleButtonPress(index);
+                                    setState(() {
+                                      _selectedWalletId =
+                                          walletProvider.wallets[index].id!;
+                                    });
+                                    _loadTransactions(
+                                        walletProvider.wallets[index].id!);
+                                    walletProvider
+                                        .updateSelectedWalletIndex(index);
+                                  },
+                                  style: ButtonStyle(
+                                    elevation: MaterialStateProperty.all(0),
+                                    shape: MaterialStateProperty.all<
+                                        RoundedRectangleBorder>(
+                                      RoundedRectangleBorder(
+                                        borderRadius: BorderRadius.circular(20.0),
+                                        side: BorderSide(color: Colors.black),
+                                      ),
+                                    ),
+                                    foregroundColor:
+                                        MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                        return _selectedWalletId ==
+                                                walletProvider.wallets[index].id!
+                                            ? Colors.white
+                                            : Colors.black;
+                                      },
+                                    ),
+                                    backgroundColor:
+                                        MaterialStateProperty.resolveWith<Color>(
+                                      (Set<MaterialState> states) {
+                                        return _selectedWalletId ==
+                                                walletProvider.wallets[index].id!
+                                            ? Colors.black
+                                            : Colors.white;
+                                      },
                                     ),
                                   ),
-                                  foregroundColor:
-                                      MaterialStateProperty.resolveWith<Color>(
-                                    (Set<MaterialState> states) {
-                                      return _selectedWalletId ==
-                                              walletProvider.wallets[index].id!
-                                          ? Colors.white
-                                          : Colors.black;
-                                    },
-                                  ),
-                                  backgroundColor:
-                                      MaterialStateProperty.resolveWith<Color>(
-                                    (Set<MaterialState> states) {
-                                      return _selectedWalletId ==
-                                              walletProvider.wallets[index].id!
-                                          ? Colors.black
-                                          : Colors.white;
-                                    },
-                                  ),
+                                  child:
+                                      Text(walletProvider.wallets[index].name!),
                                 ),
-                                child:
-                                    Text(walletProvider.wallets[index].name!),
-                              ),
-                            );
-                          },
+                              );
+                            },
+                          ),
                         ),
                       ),
                       Padding(
