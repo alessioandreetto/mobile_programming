@@ -78,7 +78,6 @@ class _HomeListState extends State<HomeList> {
     // Ascolta i cambiamenti nel provider dei wallet
     Provider.of<WalletProvider>(context, listen: false)
         .addListener(_onWalletsChanged);
-
   }
 
   @override
@@ -98,7 +97,7 @@ class _HomeListState extends State<HomeList> {
         //_selectedWalletId = selectedWallet.id!;
         _selectedValuta = walletProvider.valuta;
       });
-      _loadTransactions(selectedWalletIndex+1);
+      _loadTransactions(selectedWalletIndex + 1);
     } else {
       setState(() {
         _selectedWalletId = 0;
@@ -125,7 +124,7 @@ class _HomeListState extends State<HomeList> {
   void _handleSwipe(int index) {
     final walletId =
         Provider.of<WalletProvider>(context, listen: false).wallets[index].id!;
- /*    setState(() {
+    /*    setState(() {
       _selectedWalletId = walletId;
       _selectedCategory = null;
     }); */
@@ -327,7 +326,8 @@ class _HomeListState extends State<HomeList> {
                     child: Center(
                       // Centrato il grafico a torta
                       child: FutureBuilder<List<Transaction>>(
-                        future: _loadTransactions(walletProvider.selectedWalletIndex+1),
+                        future: _loadTransactions(
+                            walletProvider.selectedWalletIndex + 1),
                         builder: (context, snapshot) {
                           if (snapshot.hasError) {
                             return Center(
@@ -390,11 +390,11 @@ class _HomeListState extends State<HomeList> {
                           children: [
                             if (walletProvider.wallets.isNotEmpty)
                               Text(
-                                  "Nome Wallet: ${walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex+1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).name}",
+                                  "Nome Wallet: ${walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).name}",
                                   style: TextStyle(fontSize: 20)),
                             if (walletProvider.wallets.isNotEmpty)
                               Text(
-                                  'Bilancio: ${walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex+1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).balance} ${walletProvider.valuta}',
+                                  'Bilancio: ${walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).balance} ${walletProvider.valuta}',
                                   style: TextStyle(fontSize: 20)),
                             if (nomeCategoria.isNotEmpty) ...[
                               Text(
@@ -425,11 +425,11 @@ class _HomeListState extends State<HomeList> {
                                       _selectedWalletId =
                                           walletProvider.wallets[index].id!;
                                     }); */
-                                   
+
                                     walletProvider
-                                        .updateSelectedWalletIndex(index); 
-                                        _loadTransactions(
-                                       walletProvider.selectedWalletIndex+1);
+                                        .updateSelectedWalletIndex(index);
+                                    _loadTransactions(
+                                        walletProvider.selectedWalletIndex + 1);
                                   },
                                   style: ButtonStyle(
                                     elevation: MaterialStateProperty.all(0),
@@ -451,13 +451,17 @@ class _HomeListState extends State<HomeList> {
                                       (Set<MaterialState> states) {
                                         if (Theme.of(context).brightness ==
                                             Brightness.light) {
-                                          return walletProvider.selectedWalletIndex+1 ==
+                                          return walletProvider
+                                                          .selectedWalletIndex +
+                                                      1 ==
                                                   walletProvider
                                                       .wallets[index].id!
                                               ? Colors.white
                                               : Colors.black;
                                         } else {
-                                          return walletProvider.selectedWalletIndex+1 ==
+                                          return walletProvider
+                                                          .selectedWalletIndex +
+                                                      1 ==
                                                   walletProvider
                                                       .wallets[index].id!
                                               ? Colors.black
@@ -470,13 +474,17 @@ class _HomeListState extends State<HomeList> {
                                       (Set<MaterialState> states) {
                                         if (Theme.of(context).brightness ==
                                             Brightness.light) {
-                                          return walletProvider.selectedWalletIndex+1 ==
+                                          return walletProvider
+                                                          .selectedWalletIndex +
+                                                      1 ==
                                                   walletProvider
                                                       .wallets[index].id!
                                               ? Colors.black
                                               : Colors.white;
                                         } else {
-                                          return walletProvider.selectedWalletIndex+1 ==
+                                          return walletProvider
+                                                          .selectedWalletIndex +
+                                                      1 ==
                                                   walletProvider
                                                       .wallets[index].id!
                                               ? Colors.white
@@ -488,7 +496,9 @@ class _HomeListState extends State<HomeList> {
                                         .resolveWith<TextStyle>(
                                       (Set<MaterialState> states) {
                                         return TextStyle(
-                                          color: walletProvider.selectedWalletIndex+1 ==
+                                          color: walletProvider
+                                                          .selectedWalletIndex +
+                                                      1 ==
                                                   walletProvider
                                                       .wallets[index].id!
                                               ? (Theme.of(context).brightness ==
@@ -518,7 +528,7 @@ class _HomeListState extends State<HomeList> {
                           children: [
                             if (walletProvider.wallets.isNotEmpty)
                               Text(
-                                "Transazioni per ${walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex+1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).name}:",
+                                "Transazioni per ${walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).name}:",
                                 style: TextStyle(fontSize: 16),
                               ),
                             DropdownButton<bool>(
@@ -526,7 +536,8 @@ class _HomeListState extends State<HomeList> {
                               onChanged: (value) {
                                 setState(() {
                                   _showExpenses = value!;
-                                  _loadTransactions(walletProvider.selectedWalletIndex+1);
+                                  _loadTransactions(
+                                      walletProvider.selectedWalletIndex + 1);
                                 });
                               },
                               items: [
@@ -565,7 +576,6 @@ class _HomeListState extends State<HomeList> {
                     final Transaction transaction = transactions[index];
                     final date = DateTime.parse(transaction.date!);
                     final formattedDate = DateFormat('dd/MM/yyyy').format(date);
-
                     return Slidable(
                       key: ValueKey(index),
                       startActionPane: ActionPane(
@@ -593,36 +603,79 @@ class _HomeListState extends State<HomeList> {
                           _navigateToTransactionDetail(context, transaction);
                         },
                         child: Padding(
-                          padding: const EdgeInsets.all(8.0),
+                          padding: const EdgeInsets.all(16.0),
                           child: Container(
-                            height: 70.0,
-                            child: ListTile(
-                              leading: Container(
-                                width: 50,
-                                height: 50,
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(10),
-                                  color:
-                                      categoryColors[transaction.categoryId] ??
-                                          Colors.grey,
-                                ),
-                                child: Icon(
-                                  categoryIcons[transaction.categoryId] ??
-                                      Icons.category,
-                                  color: Colors.white,
-                                ),
-                              ),
-                              title: Text(transaction.name ?? ''),
-                              subtitle: Text(
-                                "Data: $formattedDate, Valore: ${transaction.value} ${walletProvider.valuta}",
-                              ),
-                            ),
                             decoration: BoxDecoration(
-                              border: Border.all(
-                                color: Color(0xffb3b3b3),
-                              ),
-                              color: Colors.transparent,
                               borderRadius: BorderRadius.circular(10.0),
+                              color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: Colors.grey.withOpacity(0.5),
+                                  spreadRadius: 1,
+                                  blurRadius: 2,
+                                  offset: Offset(
+                                      0, 1), // changes position of shadow
+                                ),
+                              ],
+                            ),
+                            child: Row(
+                              children: [
+                                Container(
+                                  margin:
+                                      EdgeInsets.all(8), // Aggiunto margin qui
+                                  padding: EdgeInsets.all(12),
+                                  width: 60,
+                                  height: 60,
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: categoryColors[
+                                            transaction.categoryId] ??
+                                        Colors.grey,
+                                  ),
+                                  child: Center(
+                                    child: Icon(
+                                      categoryIcons[transaction.categoryId] ??
+                                          Icons.category,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                                SizedBox(width: 16),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Text(
+                                        transaction.name ?? '',
+                                        style: TextStyle(
+                                          fontSize: 18.0,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      SizedBox(height: 4),
+                                      Text(
+                                        formattedDate,
+                                        style: TextStyle(color: Colors.black),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Text(
+                                    "${transaction.value} ${walletProvider.valuta}",
+                                    style: TextStyle(
+                                      color: transaction.value! >= 0
+                                          ? Colors.green
+                                          : Colors.red,
+                                      fontWeight: FontWeight.bold,
+                                      fontSize: 16.0,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         ),
