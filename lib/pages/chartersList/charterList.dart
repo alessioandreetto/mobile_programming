@@ -125,7 +125,7 @@ class _ChartsListState extends State<ChartsList> {
                   );
                 }
                 Wallet selectedWallet =
-                    walletProvider.wallets[_selectedWalletIndex];
+                    walletProvider.wallets[walletProvider.selectedWalletIndex];
                 String valuta = walletProvider.valuta;
 
                 return Column(
@@ -139,13 +139,14 @@ class _ChartsListState extends State<ChartsList> {
                             scrollDirection: Axis.horizontal,
                             itemCount: walletProvider.wallets.length,
                             itemBuilder: (context, index) {
-                              bool isSelected = _selectedWalletIndex == index;
+                              bool isSelected = walletProvider.selectedWalletIndex == index;
                               return Padding(
                                 padding: const EdgeInsets.symmetric(
                                     vertical: 8.0, horizontal: 8.0),
                                 child: ElevatedButton(
                                   onPressed: () {
                                     _handleButtonPress(index);
+                                    walletProvider.updateSelectedWalletIndex(index);
                                   },
                                   style: ButtonStyle(
                                     elevation: MaterialStateProperty.all(0),
@@ -315,7 +316,7 @@ class _ChartsListState extends State<ChartsList> {
             child: Text('Nessun portafoglio disponibile'),
           );
         }
-        Wallet selectedWallet = walletProvider.wallets[_selectedWalletIndex];
+        Wallet selectedWallet = walletProvider.wallets[walletProvider.selectedWalletIndex];
         String valuta = walletProvider.valuta;
 
         return FutureBuilder<Map<String, dynamic>>(
