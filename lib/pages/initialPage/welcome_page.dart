@@ -61,12 +61,7 @@ class _WelcomePageState extends State<WelcomePage> {
     return Scaffold(
       body: Padding(
         padding: EdgeInsets.all(20.0),
-        child: PageView(
-          controller: _pageController,
-          physics: _isButtonDisabled
-              ? NeverScrollableScrollPhysics()
-              : AlwaysScrollableScrollPhysics(),
-          children: [
+        child: 
             Form(
               key: _formKey,
               child: Column(
@@ -115,20 +110,6 @@ class _WelcomePageState extends State<WelcomePage> {
               ),
             ),
             // Aggiungi altre pagine qui
-            Center(
-              child: Text('Pagina successiva'),
-            ),
-          ],
-          onPageChanged: (index) {
-            if (index == 1 && _isButtonDisabled) {
-              _pageController.animateToPage(
-                0,
-                duration: Duration(milliseconds: 300),
-                curve: Curves.ease,
-              );
-            }
-          },
-        ),
       ),
     );
   }
