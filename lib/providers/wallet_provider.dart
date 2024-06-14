@@ -107,4 +107,10 @@ int getWalletCount() {
     print (_selectedWalletIndex);
     notifyListeners();
   }
+
+  // Getter per l'indice del wallet selezionato
+  int getSelectedWalletIndex() {
+    print (_selectedWalletIndex);
+    return _selectedWalletIndex;
+  }
 }
