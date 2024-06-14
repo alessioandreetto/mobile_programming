@@ -139,14 +139,16 @@ class _ChartsListState extends State<ChartsList> {
                             scrollDirection: Axis.horizontal,
                             itemCount: walletProvider.wallets.length,
                             itemBuilder: (context, index) {
-                              bool isSelected = walletProvider.selectedWalletIndex == index;
+                              bool isSelected =
+                                  walletProvider.selectedWalletIndex == index;
                               return Padding(
                                 padding: const EdgeInsets.symmetric(
                                     vertical: 8.0, horizontal: 8.0),
                                 child: ElevatedButton(
                                   onPressed: () {
                                     _handleButtonPress(index);
-                                    walletProvider.updateSelectedWalletIndex(index);
+                                    walletProvider
+                                        .updateSelectedWalletIndex(index);
                                   },
                                   style: ButtonStyle(
                                     elevation: MaterialStateProperty.all(0),
@@ -154,7 +156,10 @@ class _ChartsListState extends State<ChartsList> {
                                             RoundedRectangleBorder>(
                                         RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(20.0),
-                                      side: BorderSide(color: Colors.black),
+                                      side: BorderSide(
+                                          color: Colors
+                                              .black, // Contorno del button
+                                          width: 2.0), // Spessore del contorno
                                     )),
                                     foregroundColor: MaterialStateProperty
                                         .resolveWith<Color>(
@@ -225,6 +230,10 @@ class _ChartsListState extends State<ChartsList> {
                                     transactions.reversed.toList()[index];
                                 final date = DateTime.parse(transaction.date!);
                                 final formattedDate = _formatDateTime(date);
+                                final isExpense = (transaction.value ?? 0) < 0;
+                                final valueColor =
+                                    isExpense ? Colors.red : Colors.green;
+
                                 return Slidable(
                                   key: ValueKey(index),
                                   startActionPane: ActionPane(
@@ -257,36 +266,73 @@ class _ChartsListState extends State<ChartsList> {
                                       padding: const EdgeInsets.all(8.0),
                                       child: Container(
                                         height: 70.0,
-                                        child: ListTile(
-                                          leading: Container(
-                                            width: 50,
-                                            height: 50,
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              color: categoryColors[
-                                                      transaction.categoryId] ??
-                                                  Colors.grey,
-                                            ),
-                                            child: Icon(
-                                              categoryIcons[
-                                                      transaction.categoryId] ??
-                                                  Icons.category,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                          title: Text(transaction.name ?? ''),
-                                          subtitle: Text(
-                                            "Data: $formattedDate, Valore: ${transaction.value} ${walletProvider.valuta}",
-                                          ),
-                                        ),
                                         decoration: BoxDecoration(
                                           border: Border.all(
-                                            color: Color(0xffb3b3b3),
+                                            color: Colors
+                                                .black, // Colore del bordo
+                                            width: 1.0, // Spessore del bordo
                                           ),
-                                          color: Colors.transparent,
                                           borderRadius:
                                               BorderRadius.circular(10.0),
+                                        ),
+                                        child: Row(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            Container(
+                                              width: 50,
+                                              height: 50,
+                                              decoration: BoxDecoration(
+                                                borderRadius:
+                                                    BorderRadius.circular(10),
+                                                color: categoryColors[
+                                                        transaction
+                                                            .categoryId] ??
+                                                    Colors.grey,
+                                              ),
+                                              child: Icon(
+                                                categoryIcons[transaction
+                                                        .categoryId] ??
+                                                    Icons.category,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                            SizedBox(width: 10),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Text(transaction.name ?? ''),
+                                                  SizedBox(
+                                                      height:
+                                                          5), // Spazio aggiuntivo tra il testo
+                                                  Text(
+                                                    formattedDate,
+                                                    style: TextStyle(
+                                                        color: Colors.grey,
+                                                        fontSize: 12),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            Spacer(), // Aggiungi questo Spacer
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                      horizontal: 8.0),
+                                              child: Text(
+                                                "${transaction.value} ${walletProvider.valuta}",
+                                                style: TextStyle(
+                                                  color:
+                                                      valueColor, // il colore dipenderà dal valore
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ),
@@ -316,7 +362,8 @@ class _ChartsListState extends State<ChartsList> {
             child: Text('Nessun portafoglio disponibile'),
           );
         }
-        Wallet selectedWallet = walletProvider.wallets[walletProvider.selectedWalletIndex];
+        Wallet selectedWallet =
+            walletProvider.wallets[walletProvider.selectedWalletIndex];
         String valuta = walletProvider.valuta;
 
         return FutureBuilder<Map<String, dynamic>>(
