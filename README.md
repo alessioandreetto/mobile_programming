@@ -3,22 +3,26 @@
 A new Flutter project.
 
 ## Home Page
+1. se aggiungo una transazione, la home mi deve riportare a quel wallet preciso
+2. se mi sposto da home a charts deve mantenere anche li lo stesso wallet
+3. grafica come whatsapp alessio
 
 ## Charts Page
 1. ⁠⁠rivedere grafica del grafico a linea
 
 ## New Transaction
+1. sistemare is dirty
 
 ## Wallet
 
 ## Settings
-1. rimuovere i due test
+1. rimuovere il test del tutorial
 
 ## Demo
-1. Da completare il tutorial iterativo
-2. da sistemare screenshot tutorial iterativo
+1. Sistemare il tutorial iterativo
 
 ## Other
 1. ⁠saveZone per status bar
-2. Sistemazione grafica
-3. ⁠breve relazione che descriva la realizzazione del progetto
+2. colore violetto
+3. Sistemazione grafica
+4. ⁠breve relazione che descriva la realizzazione del progetto
