@@ -3,6 +3,11 @@ import 'package:provider/provider.dart';
 import '../../providers/wallet_provider.dart';
 
 class WelcomePage extends StatefulWidget {
+  final Function(String)
+      onNameEntered; // Callback per notificare il nome inserito
+
+  WelcomePage({required this.onNameEntered});
+
   @override
   _WelcomePageState createState() => _WelcomePageState();
 }
@@ -19,7 +24,7 @@ class _WelcomePageState extends State<WelcomePage> {
     _nameController = TextEditingController();
     _pageController = PageController();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance!.addPostFrameCallback((_) {
       final provider = Provider.of<WalletProvider>(context, listen: false);
       if (provider.name != 'User') {
         _nameController.text = provider.name;
@@ -90,6 +95,7 @@ class _WelcomePageState extends State<WelcomePage> {
                       return null;
                     },
                     onChanged: (value) {
+                      // Aggiorna il nome nel provider quando cambia
                       Provider.of<WalletProvider>(context, listen: false)
                           .updateAccountName(value);
                     },

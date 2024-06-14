@@ -7,7 +7,7 @@ import '../../page-selector.dart';
 import '../../model/database_model.dart';
 import '../../providers/wallet_provider.dart';
 import 'package:provider/provider.dart';
-import 'tutorial.dart'; // Import your HomeList page
+import 'tutorial.dart';
 
 class PageIndicatorDemo extends StatefulWidget {
   @override
@@ -15,15 +15,34 @@ class PageIndicatorDemo extends StatefulWidget {
 }
 
 class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
-  PageController _pageController = PageController();
+  final PageController _pageController = PageController();
   int _currentPageIndex = 0;
-  String walletName = '';
+  String walletName = ''; // Nome del wallet
   double walletBalance = 0.0;
   int? walletId;
 
+  // Creazione dei controller
+  late TextEditingController nameController;
+  late TextEditingController balanceController;
+
+  @override
+  void initState() {
+    super.initState();
+    nameController = TextEditingController();
+    balanceController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    // Rilascia le risorse dei controller
+    nameController.dispose();
+    balanceController.dispose();
+    super.dispose();
+  }
+
   void _updateWalletData(String name, double balance, {int? id}) {
     setState(() {
-      walletName = name;
+      walletName = name; // Aggiorna il nome del wallet
       walletBalance = balance;
       walletId = id;
     });
@@ -61,9 +80,6 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
             child: PageView(
               controller: _pageController,
               onPageChanged: (index) {
-                if (_currentPageIndex == 1) {
-                  _saveWalletData();
-                }
                 setState(() {
                   _currentPageIndex = index;
                 });
@@ -71,12 +87,20 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
               children: [
                 Container(
                   child: Center(
-                    child: WelcomePage(),
+                    child: WelcomePage(
+                      onNameEntered: (name) {
+                        setState(() {
+                          walletName = name;
+                        });
+                      },
+                    ),
                   ),
                 ),
                 Container(
                   child: Center(
                     child: FirstWallet(
+                      nameController: nameController,
+                      balanceController: balanceController,
                       onWalletDataChanged: (name, balance) {
                         _updateWalletData(name, balance);
                       },
@@ -87,6 +111,7 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
                   child: Center(
                     child: InteractiveTutorial(
                       onComplete: () {
+                        _saveWalletData(); // Salva i dati del wallet al completamento
                         _pageController.nextPage(
                           duration: Duration(milliseconds: 300),
                           curve: Curves.ease,
@@ -174,6 +199,7 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
   }
 
   void _onTutorialCompleted() {
+    _saveWalletData();
     _saveTutorialCompletion();
 
     Navigator.of(context).pushReplacement(MaterialPageRoute(

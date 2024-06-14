@@ -1,86 +1,43 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import '../../model/database_model.dart';
-import '../../providers/wallet_provider.dart';
-import 'package:provider/provider.dart';
-
-class FirstWalletPage extends StatefulWidget {
-  @override
-  _FirstWalletPageState createState() => _FirstWalletPageState();
-}
-
-class _FirstWalletPageState extends State<FirstWalletPage> {
-  final PageController _pageController = PageController();
-  int _currentPage = 0;
-
-  void _onPageChanged(int index) {
-    setState(() {
-      _currentPage = index;
-    });
-
-    if (index == 1) {
-      // Assuming the next page index is 1
-      // Trigger the saving process here
-      _saveWalletData();
-    }
-  }
-
-  void _saveWalletData() {
-    // You can access the data from the FirstWallet widget here
-    // Implement your save logic here
-    print('Save wallet data');
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: PageView(
-        controller: _pageController,
-        onPageChanged: _onPageChanged,
-        children: [
-          FirstWallet(
-            onWalletDataChanged: (name, balance) {
-              // Handle the data change if needed
-            },
-          ),
-          // Add other pages here
-          Container(
-            color: Colors.blue,
-            child: Center(child: Text('Next Page')),
-          ),
-        ],
-      ),
-    );
-  }
-}
 
 class FirstWallet extends StatefulWidget {
+  final TextEditingController nameController;
+  final TextEditingController balanceController;
   final Function(String, double) onWalletDataChanged;
 
-  FirstWallet({required this.onWalletDataChanged});
+  FirstWallet({
+    required this.nameController,
+    required this.balanceController,
+    required this.onWalletDataChanged,
+  });
 
   @override
   _FirstWalletState createState() => _FirstWalletState();
 }
 
 class _FirstWalletState extends State<FirstWallet> {
-  final TextEditingController titleController = TextEditingController();
-  final TextEditingController bodyController = TextEditingController();
   bool _isDirty = false;
 
   @override
   void initState() {
     super.initState();
-    titleController.addListener(_onDataChanged);
-    bodyController.addListener(_onDataChanged);
+    widget.nameController.addListener(_onDataChanged);
+    widget.balanceController.addListener(_onDataChanged);
   }
 
   void _onDataChanged() {
     widget.onWalletDataChanged(
-      bodyController.text,
-      double.tryParse(titleController.text) ?? 0.0,
+      widget.nameController.text,
+      double.tryParse(widget.balanceController.text) ?? 0.0,
     );
+  }
+
+  @override
+  void dispose() {
+    widget.nameController.removeListener(_onDataChanged);
+    widget.balanceController.removeListener(_onDataChanged);
+    super.dispose();
   }
 
   @override
@@ -126,7 +83,7 @@ class _FirstWalletState extends State<FirstWallet> {
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
                           child: TextField(
-                            controller: bodyController,
+                            controller: widget.nameController,
                             style: TextStyle(
                               fontFamily: 'RobotoThin',
                               fontSize: 25,
@@ -156,7 +113,7 @@ class _FirstWalletState extends State<FirstWallet> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Imposta un saldo iniziale da cui parti e da dove inizierai a tener traccia delle tue spese e dei tuoi guadagni:',
+                        'Imposta un saldo iniziale da cui parti e da dove inizierai a tener traccia delle tue spese e delle tue entrate.',
                         style: TextStyle(
                           fontSize: 18,
                         ),
@@ -170,7 +127,8 @@ class _FirstWalletState extends State<FirstWallet> {
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
                           child: TextField(
-                            controller: titleController,
+                            controller: widget.balanceController,
+                            keyboardType: TextInputType.number,
                             style: TextStyle(
                               fontFamily: 'RobotoThin',
                               fontSize: 25,
@@ -180,9 +138,8 @@ class _FirstWalletState extends State<FirstWallet> {
                                 _isDirty = true;
                               });
                             },
-                            keyboardType: TextInputType.number,
                             decoration: InputDecoration(
-                              hintText: 'Inserisci il saldo iniziale',
+                              hintText: '0.00 €',
                               hintStyle: TextStyle(
                                 fontFamily: 'RobotoThin',
                                 fontSize: 25,
@@ -195,7 +152,6 @@ class _FirstWalletState extends State<FirstWallet> {
                     ],
                   ),
                 ),
-                SizedBox(height: 16.0),
               ],
             ),
           ),
@@ -206,40 +162,25 @@ class _FirstWalletState extends State<FirstWallet> {
 
   Future<bool> _onWillPop() async {
     if (_isDirty) {
-      // Mostra un dialogo di conferma per chiedere all'utente se desidera salvare
       return await showDialog(
-            context: context,
-            builder: (context) => AlertDialog(
-              title: Text('Salvare le modifiche?'),
-              content: Text(
-                  'Hai delle modifiche non salvate. Vuoi salvarle prima di uscire?'),
-              actions: <Widget>[
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context)
-                        .pop(false); // L'utente non vuole salvare
-                  },
-                  child: Text('No'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context)
-                        .pop(true); // L'utente vuole salvare e uscire
-                  },
-                  child: Text('Sì'),
-                ),
-              ],
+        context: context,
+        builder: (context) => AlertDialog(
+          title: Text('Conferma uscita'),
+          content: Text(
+              'Hai delle modifiche non salvate. Sei sicuro di voler uscire?'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(false),
+              child: Text('No'),
             ),
-          ) ??
-          false;
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(true),
+              child: Text('Si'),
+            ),
+          ],
+        ),
+      );
     }
-    return true; // Nessuna modifica da salvare, permetti l'uscita
-  }
-
-  @override
-  void dispose() {
-    titleController.dispose();
-    bodyController.dispose();
-    super.dispose();
+    return true;
   }
 }
