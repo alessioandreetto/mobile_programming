@@ -72,11 +72,13 @@ class _HomeListState extends State<HomeList> {
   @override
   void initState() {
     super.initState();
+    _selectedWalletId = 0;
     // Inizializza lo stato selezionando il primo wallet se presente
     _initSelectedWallet();
     // Ascolta i cambiamenti nel provider dei wallet
     Provider.of<WalletProvider>(context, listen: false)
         .addListener(_onWalletsChanged);
+
   }
 
   @override
@@ -90,13 +92,13 @@ class _HomeListState extends State<HomeList> {
   void _initSelectedWallet() {
     var walletProvider = Provider.of<WalletProvider>(context, listen: false);
     if (walletProvider.wallets.isNotEmpty) {
-      final selectedWalletIndex = walletProvider.selectedWalletIndex;
+      final selectedWalletIndex = walletProvider.getSelectedWalletIndex();
       final selectedWallet = walletProvider.wallets[selectedWalletIndex];
       setState(() {
-        _selectedWalletId = selectedWallet.id!;
+        //_selectedWalletId = selectedWallet.id!;
         _selectedValuta = walletProvider.valuta;
       });
-      _loadTransactions(selectedWallet.id!);
+      _loadTransactions(selectedWalletIndex+1);
     } else {
       setState(() {
         _selectedWalletId = 0;
@@ -106,7 +108,7 @@ class _HomeListState extends State<HomeList> {
   }
 
   void _onWalletsChanged() {
-    var walletProvider = Provider.of<WalletProvider>(context, listen: false);
+/*     var walletProvider = Provider.of<WalletProvider>(context, listen: false);
     // Controlla se il wallet attualmente selezionato è stato eliminato
     if (!walletProvider.wallets
         .any((wallet) => wallet.id == _selectedWalletId)) {
@@ -117,16 +119,16 @@ class _HomeListState extends State<HomeList> {
             : 0;
       });
       _loadTransactions(_selectedWalletId);
-    }
+    } */
   }
 
   void _handleSwipe(int index) {
     final walletId =
         Provider.of<WalletProvider>(context, listen: false).wallets[index].id!;
-    setState(() {
+ /*    setState(() {
       _selectedWalletId = walletId;
       _selectedCategory = null;
-    });
+    }); */
     _loadTransactions(walletId);
     Provider.of<WalletProvider>(context, listen: false)
         .updateSelectedWalletIndex(index);
@@ -325,7 +327,7 @@ class _HomeListState extends State<HomeList> {
                     child: Center(
                       // Centrato il grafico a torta
                       child: FutureBuilder<List<Transaction>>(
-                        future: _loadTransactions(_selectedWalletId),
+                        future: _loadTransactions(walletProvider.selectedWalletIndex+1),
                         builder: (context, snapshot) {
                           if (snapshot.hasError) {
                             return Center(
@@ -388,11 +390,11 @@ class _HomeListState extends State<HomeList> {
                           children: [
                             if (walletProvider.wallets.isNotEmpty)
                               Text(
-                                  "Nome Wallet: ${walletProvider.wallets.firstWhere((wallet) => wallet.id == _selectedWalletId, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).name}",
+                                  "Nome Wallet: ${walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex+1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).name}",
                                   style: TextStyle(fontSize: 20)),
                             if (walletProvider.wallets.isNotEmpty)
                               Text(
-                                  'Bilancio: ${walletProvider.wallets.firstWhere((wallet) => wallet.id == _selectedWalletId, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).balance} ${walletProvider.valuta}',
+                                  'Bilancio: ${walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex+1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).balance} ${walletProvider.valuta}',
                                   style: TextStyle(fontSize: 20)),
                             if (nomeCategoria.isNotEmpty) ...[
                               Text(
@@ -419,14 +421,15 @@ class _HomeListState extends State<HomeList> {
                                 child: ElevatedButton(
                                   onPressed: () {
                                     _handleButtonPress(index);
-                                    setState(() {
+                                    /* setState(() {
                                       _selectedWalletId =
                                           walletProvider.wallets[index].id!;
-                                    });
-                                    _loadTransactions(
-                                        walletProvider.wallets[index].id!);
+                                    }); */
+                                   
                                     walletProvider
-                                        .updateSelectedWalletIndex(index);
+                                        .updateSelectedWalletIndex(index); 
+                                        _loadTransactions(
+                                       walletProvider.selectedWalletIndex+1);
                                   },
                                   style: ButtonStyle(
                                     elevation: MaterialStateProperty.all(0),
@@ -448,13 +451,13 @@ class _HomeListState extends State<HomeList> {
                                       (Set<MaterialState> states) {
                                         if (Theme.of(context).brightness ==
                                             Brightness.light) {
-                                          return _selectedWalletId ==
+                                          return walletProvider.selectedWalletIndex+1 ==
                                                   walletProvider
                                                       .wallets[index].id!
                                               ? Colors.white
                                               : Colors.black;
                                         } else {
-                                          return _selectedWalletId ==
+                                          return walletProvider.selectedWalletIndex+1 ==
                                                   walletProvider
                                                       .wallets[index].id!
                                               ? Colors.black
@@ -467,13 +470,13 @@ class _HomeListState extends State<HomeList> {
                                       (Set<MaterialState> states) {
                                         if (Theme.of(context).brightness ==
                                             Brightness.light) {
-                                          return _selectedWalletId ==
+                                          return walletProvider.selectedWalletIndex+1 ==
                                                   walletProvider
                                                       .wallets[index].id!
                                               ? Colors.black
                                               : Colors.white;
                                         } else {
-                                          return _selectedWalletId ==
+                                          return walletProvider.selectedWalletIndex+1 ==
                                                   walletProvider
                                                       .wallets[index].id!
                                               ? Colors.white
@@ -485,7 +488,7 @@ class _HomeListState extends State<HomeList> {
                                         .resolveWith<TextStyle>(
                                       (Set<MaterialState> states) {
                                         return TextStyle(
-                                          color: _selectedWalletId ==
+                                          color: walletProvider.selectedWalletIndex+1 ==
                                                   walletProvider
                                                       .wallets[index].id!
                                               ? (Theme.of(context).brightness ==
@@ -515,7 +518,7 @@ class _HomeListState extends State<HomeList> {
                           children: [
                             if (walletProvider.wallets.isNotEmpty)
                               Text(
-                                "Transazioni per ${walletProvider.wallets.firstWhere((wallet) => wallet.id == _selectedWalletId, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).name}:",
+                                "Transazioni per ${walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex+1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).name}:",
                                 style: TextStyle(fontSize: 16),
                               ),
                             DropdownButton<bool>(
@@ -523,7 +526,7 @@ class _HomeListState extends State<HomeList> {
                               onChanged: (value) {
                                 setState(() {
                                   _showExpenses = value!;
-                                  _loadTransactions(_selectedWalletId);
+                                  _loadTransactions(walletProvider.selectedWalletIndex+1);
                                 });
                               },
                               items: [
