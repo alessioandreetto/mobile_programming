@@ -3,7 +3,6 @@ import '../model/database_model.dart';
 import '../providers/wallet_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 
 class Category {
   final int id;
@@ -27,12 +26,15 @@ class NewTransactionPage extends StatefulWidget {
         ),
         dateController = TextEditingController(
             text: transaction?.date != null
-                ? DateFormat('yyyy/MM/dd')
-                    .format(DateTime.parse(transaction!.date!))
+                ? formatDate(DateTime.parse(transaction!.date!))
                 : '');
 
   @override
   _NewTransactionPageState createState() => _NewTransactionPageState();
+
+  static String formatDate(DateTime dateTime) {
+    return '${dateTime.year}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.day.toString().padLeft(2, '0')}';
+  }
 }
 
 class _NewTransactionPageState extends State<NewTransactionPage> {
@@ -46,7 +48,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
 
   String? _initialName;
   String? _initialValue;
-  String? _initialDate;
+  DateTime? _initialDate;
   String? _initialWallet;
   int? _initialCategoryId;
   int? _initialActionIndex;
@@ -78,11 +80,11 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
               ? (widget.transaction!.value! * -1)
               : widget.transaction!.value)
           .toString();
-      _initialDate = widget.transaction!.date;
+      _initialDate = _selectedDate;
       _initialCategoryId = widget.transaction!.categoryId;
       _initialActionIndex = _selectedActionIndex;
 
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+      WidgetsBinding.instance!.addPostFrameCallback((_) {
         setState(() {
           Wallet originalWallet = _wallets.firstWhere(
               (wallet) => wallet.id == widget.transaction!.transactionId);
@@ -93,10 +95,10 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
     } else {
       _selectedDate = DateTime.now();
       widget.dateController.text =
-          "${_selectedDate!.year}/${_selectedDate!.month.toString().padLeft(2, '0')}/${_selectedDate!.day.toString().padLeft(2, '0')}";
+          NewTransactionPage.formatDate(_selectedDate!);
       _initialName = '';
       _initialValue = '';
-      _initialDate = widget.dateController.text;
+      _initialDate = _selectedDate;
       _initialCategoryId = 0;
       _initialActionIndex = 0;
     }
@@ -105,7 +107,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
   bool isDirty() {
     return widget.nameController.text != _initialName ||
         widget.valueController.text != _initialValue ||
-        widget.dateController.text != _initialDate ||
+        _selectedDate != _initialDate || // Cambiato confronto qui
         _selectedWallet != _initialWallet ||
         _selectedCategoryId != _initialCategoryId ||
         _selectedActionIndex != _initialActionIndex;
@@ -145,7 +147,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
       setState(() {
         _selectedDate = picked;
         widget.dateController.text =
-            "${_selectedDate!.year}/${_selectedDate!.month.toString().padLeft(2, '0')}/${_selectedDate!.day.toString().padLeft(2, '0')}";
+            NewTransactionPage.formatDate(_selectedDate!);
       });
     }
   }
