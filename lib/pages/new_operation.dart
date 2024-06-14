@@ -3,6 +3,7 @@ import '../model/database_model.dart';
 import '../providers/wallet_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
+import 'package:intl/intl.dart';
 
 class Category {
   final int id;
@@ -24,7 +25,11 @@ class NewTransactionPage extends StatefulWidget {
               ? (transaction.value! * -1).toString()
               : transaction?.value.toString(),
         ),
-        dateController = TextEditingController(text: transaction?.date ?? '');
+        dateController = TextEditingController(
+            text: transaction?.date != null
+                ? DateFormat('yyyy/MM/dd')
+                    .format(DateTime.parse(transaction!.date!))
+                : '');
 
   @override
   _NewTransactionPageState createState() => _NewTransactionPageState();
@@ -88,7 +93,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
     } else {
       _selectedDate = DateTime.now();
       widget.dateController.text =
-          "${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}";
+          "${_selectedDate!.year}/${_selectedDate!.month.toString().padLeft(2, '0')}/${_selectedDate!.day.toString().padLeft(2, '0')}";
       _initialName = '';
       _initialValue = '';
       _initialDate = widget.dateController.text;
@@ -140,7 +145,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
       setState(() {
         _selectedDate = picked;
         widget.dateController.text =
-            "${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}";
+            "${_selectedDate!.year}/${_selectedDate!.month.toString().padLeft(2, '0')}/${_selectedDate!.day.toString().padLeft(2, '0')}";
       });
     }
   }
