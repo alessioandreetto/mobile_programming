@@ -95,7 +95,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ),
           ),
-          Container(
+  /*         Container(
             margin: EdgeInsets.only(bottom: 10, left: 10, right: 10),
             decoration: BoxDecoration(
               border: Border.all(
@@ -112,7 +112,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 );
               },
             ),
-          ),
+          ), */
           Container(
             margin: EdgeInsets.only(bottom: 10, left: 10, right: 10),
             decoration: BoxDecoration(
