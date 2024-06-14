@@ -1,15 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:adaptive_theme/adaptive_theme.dart';
-import 'package:flutter_application_1/main.dart';
-import 'package:flutter_application_1/model/database_model.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../providers/wallet_provider.dart';
-import 'SettingsPage/change_name.dart'; // Assicurati che il percorso sia corretto
-import 'initialPage/welcome_page.dart';
+import 'SettingsPage/change_name.dart';
 import 'initialPage/demo.dart';
-import '../sliverbar_test.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -113,24 +109,6 @@ class _SettingsPageState extends State<SettingsPage> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(builder: (context) => PageIndicatorDemo()),
-                );
-              },
-            ),
-          ),
-          Container(
-            margin: EdgeInsets.only(bottom: 10, left: 10, right: 10),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Color(0xffb3b3b3),
-              ),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: ListTile(
-              title: Text('test sliver '),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => WalletSliverScreen()),
                 );
               },
             ),
