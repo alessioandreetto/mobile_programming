@@ -446,21 +446,39 @@ class _HomeListState extends State<HomeList> {
                                     foregroundColor: MaterialStateProperty
                                         .resolveWith<Color>(
                                       (Set<MaterialState> states) {
-                                        return _selectedWalletId ==
-                                                walletProvider
-                                                    .wallets[index].id!
-                                            ? Colors.black
-                                            : Colors.white;
+                                        if (Theme.of(context).brightness ==
+                                            Brightness.light) {
+                                          return _selectedWalletId ==
+                                                  walletProvider
+                                                      .wallets[index].id!
+                                              ? Colors.white
+                                              : Colors.black;
+                                        } else {
+                                          return _selectedWalletId ==
+                                                  walletProvider
+                                                      .wallets[index].id!
+                                              ? Colors.black
+                                              : Colors.white;
+                                        }
                                       },
                                     ),
                                     backgroundColor: MaterialStateProperty
                                         .resolveWith<Color>(
                                       (Set<MaterialState> states) {
-                                        return _selectedWalletId ==
-                                                walletProvider
-                                                    .wallets[index].id!
-                                            ? Colors.white
-                                            : Colors.black;
+                                        if (Theme.of(context).brightness ==
+                                            Brightness.light) {
+                                          return _selectedWalletId ==
+                                                  walletProvider
+                                                      .wallets[index].id!
+                                              ? Colors.black
+                                              : Colors.white;
+                                        } else {
+                                          return _selectedWalletId ==
+                                                  walletProvider
+                                                      .wallets[index].id!
+                                              ? Colors.white
+                                              : Colors.black;
+                                        }
                                       },
                                     ),
                                     textStyle: MaterialStateProperty
@@ -470,8 +488,14 @@ class _HomeListState extends State<HomeList> {
                                           color: _selectedWalletId ==
                                                   walletProvider
                                                       .wallets[index].id!
-                                              ? Colors.black
-                                              : Colors.white,
+                                              ? (Theme.of(context).brightness ==
+                                                      Brightness.light
+                                                  ? Colors.white
+                                                  : Colors.black)
+                                              : (Theme.of(context).brightness ==
+                                                      Brightness.light
+                                                  ? Colors.black
+                                                  : Colors.white),
                                         );
                                       },
                                     ),
