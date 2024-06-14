@@ -11,7 +11,6 @@ A new Flutter project.
 1. ⁠⁠rivedere grafica del grafico a linea
 
 ## New Transaction
-1. sistemare is dirty
 
 ## Wallet
 

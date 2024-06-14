@@ -24,10 +24,17 @@ class NewTransactionPage extends StatefulWidget {
               ? (transaction.value! * -1).toString()
               : transaction?.value.toString(),
         ),
-        dateController = TextEditingController(text: transaction?.date ?? '');
+        dateController = TextEditingController(
+            text: transaction?.date != null
+                ? formatDate(DateTime.parse(transaction!.date!))
+                : '');
 
   @override
   _NewTransactionPageState createState() => _NewTransactionPageState();
+
+  static String formatDate(DateTime dateTime) {
+    return '${dateTime.year}/${dateTime.month.toString().padLeft(2, '0')}/${dateTime.day.toString().padLeft(2, '0')}';
+  }
 }
 
 class _NewTransactionPageState extends State<NewTransactionPage> {
@@ -38,6 +45,13 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
   int _selectedActionIndex = 0;
   DateTime? _selectedDate;
   bool _deleteButtonVisible = false;
+
+  String? _initialName;
+  String? _initialValue;
+  DateTime? _initialDate;
+  String? _initialWallet;
+  int? _initialCategoryId;
+  int? _initialActionIndex;
 
   List<Category> categories = [
     Category(id: 0, name: 'Auto'),
@@ -59,28 +73,44 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
     if (widget.transaction != null) {
       _selectedCategoryId = widget.transaction!.categoryId!;
       _selectedDate = DateTime.parse(widget.transaction!.date!);
+      _selectedActionIndex = widget.transaction!.value! < 0 ? 1 : 0;
 
-      widget.dateController.text =
-          "${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}";
+      _initialName = widget.transaction!.name;
+      _initialValue = (widget.transaction!.value! < 0
+              ? (widget.transaction!.value! * -1)
+              : widget.transaction!.value)
+          .toString();
+      _initialDate = _selectedDate;
+      _initialCategoryId = widget.transaction!.categoryId;
+      _initialActionIndex = _selectedActionIndex;
 
-      if (widget.transaction!.value! < 0) {
-        _selectedActionIndex = 1; // Uscita
-        widget.valueController.text =
-            (widget.transaction!.value! * -1).toString();
-      }
-
-      WidgetsBinding.instance.addPostFrameCallback((_) {
+      WidgetsBinding.instance!.addPostFrameCallback((_) {
         setState(() {
           Wallet originalWallet = _wallets.firstWhere(
               (wallet) => wallet.id == widget.transaction!.transactionId);
           _selectedWallet = originalWallet.name!;
+          _initialWallet = _selectedWallet;
         });
       });
     } else {
       _selectedDate = DateTime.now();
       widget.dateController.text =
-          "${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}";
+          NewTransactionPage.formatDate(_selectedDate!);
+      _initialName = '';
+      _initialValue = '';
+      _initialDate = _selectedDate;
+      _initialCategoryId = 0;
+      _initialActionIndex = 0;
     }
+  }
+
+  bool isDirty() {
+    return widget.nameController.text != _initialName ||
+        widget.valueController.text != _initialValue ||
+        _selectedDate != _initialDate || // Cambiato confronto qui
+        _selectedWallet != _initialWallet ||
+        _selectedCategoryId != _initialCategoryId ||
+        _selectedActionIndex != _initialActionIndex;
   }
 
   Future<void> _loadWallets() async {
@@ -98,6 +128,9 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                     (wallet) => wallet.id == widget.transaction!.transactionId)
                 .name!
             : selectedWallet.name!;
+        if (_initialWallet == null) {
+          _initialWallet = _selectedWallet;
+        }
       }
     });
   }
@@ -114,7 +147,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
       setState(() {
         _selectedDate = picked;
         widget.dateController.text =
-            "${_selectedDate!.year}-${_selectedDate!.month.toString().padLeft(2, '0')}-${_selectedDate!.day.toString().padLeft(2, '0')}";
+            NewTransactionPage.formatDate(_selectedDate!);
       });
     }
   }
@@ -155,54 +188,33 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
     Navigator.of(context).popUntil((route) => route.isFirst);
   }
 
-  Future<bool> _onWillPop() async {
-    bool hasUnsavedChanges = _hasUnsavedChanges();
-
-    if (hasUnsavedChanges) {
-      return await showDialog<bool>(
+  @override
+  Widget build(BuildContext context) {
+    return WillPopScope(
+      onWillPop: () async {
+        if (isDirty()) {
+          bool? discardChanges = await showDialog<bool>(
             context: context,
             builder: (context) => AlertDialog(
-              title: Text('Conferma'),
+              title: Text('Conferma uscita'),
               content: Text(
-                  'Sei sicuro di voler tornare indietro e non effettuare quindi le modifiche?'),
+                  'Hai delle modifiche non salvate. Sei sicuro di voler tornare indietro senza salvare?'),
               actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(false),
-                  child: Text('No'),
-                ),
                 TextButton(
                   onPressed: () => Navigator.of(context).pop(true),
                   child: Text('Si'),
                 ),
+                TextButton(
+                  onPressed: () => Navigator.of(context).pop(false),
+                  child: Text('No'),
+                ),
               ],
             ),
-          ) ??
-          false;
-    } else {
-      return true;
-    }
-  }
-
-  bool _hasUnsavedChanges() {
-    return widget.nameController.text.isNotEmpty ||
-        widget.valueController.text.isNotEmpty ||
-        widget.dateController.text.isNotEmpty ||
-        _selectedCategoryId != (widget.transaction?.categoryId ?? 0) ||
-        _selectedWallet !=
-            (_wallets.isNotEmpty && widget.transaction != null
-                ? _wallets
-                    .firstWhere((wallet) =>
-                        wallet.id == widget.transaction!.transactionId)
-                    .name!
-                : '') ||
-        _selectedDate?.toIso8601String() !=
-            (widget.transaction?.date ?? DateTime.now().toIso8601String());
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: _onWillPop,
+          );
+          return discardChanges ?? false;
+        }
+        return true;
+      },
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: Colors.transparent,
@@ -212,8 +224,31 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
           elevation: 0,
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
-            onPressed: () async {
-              if (await _onWillPop()) {
+            onPressed: () {
+              if (isDirty()) {
+                showDialog<bool>(
+                  context: context,
+                  builder: (context) => AlertDialog(
+                    title: Text('Modifiche non salvate'),
+                    content: Text(
+                        'Hai delle modifiche non salvate. Vuoi davvero uscire?'),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(true),
+                        child: Text('Si'),
+                      ),
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(false),
+                        child: Text('No'),
+                      ),
+                    ],
+                  ),
+                ).then((discardChanges) {
+                  if (discardChanges ?? false) {
+                    Navigator.of(context).pop();
+                  }
+                });
+              } else {
                 Navigator.of(context).pop();
               }
             },
@@ -258,26 +293,27 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                     _selectDate(context);
                   },
                 ),
-DropdownButtonFormField<Wallet>(
-  value: _wallets.isNotEmpty
-      ? _wallets.firstWhere(
-          (wallet) => wallet.name == _selectedWallet)
-      : null,
-  onChanged: (newValue) {
-    setState(() {
-      _selectedWallet = newValue!.name!;
-    });
-    int selectedWalletIndex = _wallets.indexOf(newValue!); // Ottieni l'indice del wallet selezionato
-    Provider.of<WalletProvider>(context, listen: false)
-        .updateSelectedWalletIndex(selectedWalletIndex); // Passa l'indice del wallet
-  },
-  items: _wallets.map((wallet) {
-    return DropdownMenuItem(
-      value: wallet,
-      child: Text(wallet.name!),
-    );
-  }).toList(), // Converte la lista in una lista di DropdownMenuItem
-
+                DropdownButtonFormField<Wallet>(
+                  value: _wallets.isNotEmpty
+                      ? _wallets.firstWhere(
+                          (wallet) => wallet.name == _selectedWallet)
+                      : null,
+                  onChanged: (newValue) {
+                    setState(() {
+                      _selectedWallet = newValue!.name!;
+                    });
+                    int selectedWalletIndex = _wallets.indexOf(
+                        newValue!); // Ottieni l'indice del wallet selezionato
+                    Provider.of<WalletProvider>(context, listen: false)
+                        .updateSelectedWalletIndex(
+                            selectedWalletIndex); // Passa l'indice del wallet
+                  },
+                  items: _wallets.map((wallet) {
+                    return DropdownMenuItem(
+                      value: wallet,
+                      child: Text(wallet.name!),
+                    );
+                  }).toList(), // Converte la lista in una lista di DropdownMenuItem
                   decoration: InputDecoration(
                     labelText: 'Portafoglio',
                   ),
@@ -422,12 +458,12 @@ DropdownButtonFormField<Wallet>(
         content: Text('Sei sicuro di voler eliminare questa transazione?'),
         actions: [
           TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text('No'),
-          ),
-          TextButton(
             onPressed: () => Navigator.of(context).pop(true),
             child: Text('Si'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(false),
+            child: Text('No'),
           ),
         ],
       ),
