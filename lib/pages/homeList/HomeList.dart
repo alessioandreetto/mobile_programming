@@ -33,7 +33,7 @@ class _HomeListState extends State<HomeList> {
   late List<Transaction> transactions = [];
   late int _selectedWalletId;
   late String _selectedValuta;
-  bool _showExpenses = true;
+  bool _showExpenses = WalletProvider().getTipologiaMovimento();
   double valoreCategoria = 0;
   String nomeCategoria = '';
   String? _selectedCategory;
@@ -90,6 +90,8 @@ class _HomeListState extends State<HomeList> {
 
   void _initSelectedWallet() {
     var walletProvider = Provider.of<WalletProvider>(context, listen: false);
+
+    _showExpenses =  walletProvider.getTipologiaMovimento();
     if (walletProvider.wallets.isNotEmpty) {
       final selectedWalletIndex = walletProvider.getSelectedWalletIndex();
       final selectedWallet = walletProvider.wallets[selectedWalletIndex];
@@ -138,7 +140,7 @@ class _HomeListState extends State<HomeList> {
       List<Transaction> loadedTransactions =
           await DatabaseHelper().getTransactionsForWallet(walletId);
 
-      if (_showExpenses) {
+      if (Provider.of<WalletProvider>(context, listen: false).getTipologiaMovimento()){
         loadedTransactions = loadedTransactions
             .where((transaction) => transaction.value! < 0)
             .toList();
@@ -532,10 +534,11 @@ class _HomeListState extends State<HomeList> {
                                 style: TextStyle(fontSize: 16),
                               ),
                             DropdownButton<bool>(
-                              value: _showExpenses,
+                              value: walletProvider.getTipologiaMovimento(),
                               onChanged: (value) {
                                 setState(() {
                                   _showExpenses = value!;
+                                  walletProvider.updateTipologia(_showExpenses);
                                   _loadTransactions(
                                       walletProvider.selectedWalletIndex + 1);
                                 });

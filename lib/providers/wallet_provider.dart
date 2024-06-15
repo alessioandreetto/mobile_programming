@@ -7,6 +7,7 @@ class WalletProvider with ChangeNotifier {
   String _name = 'User';
   String _valuta = '€';
   int _selectedWalletIndex = 0; // Indice del wallet selezionato
+  bool _tipologiaMovimento = true;
 
   // Getter per i dati
   List<Wallet> get wallets => _wallets;
@@ -112,5 +113,15 @@ int getWalletCount() {
   int getSelectedWalletIndex() {
     print (_selectedWalletIndex);
     return _selectedWalletIndex;
+  }
+
+    void updateTipologia(bool value) {
+    _tipologiaMovimento= value;
+    print (_tipologiaMovimento);
+    notifyListeners();
+  }
+
+    bool getTipologiaMovimento() {
+    return _tipologiaMovimento;
   }
 }

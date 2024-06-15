@@ -100,7 +100,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
       _initialValue = '';
       _initialDate = _selectedDate;
       _initialCategoryId = 0;
-      _initialActionIndex = 0;
+      _initialActionIndex =  0; 
     }
   }
 
@@ -346,6 +346,13 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                           : actionTypes.length - 1,
                       (index) => _selectedActionIndex == index),
                   onPressed: (index) {
+                    if(index==0){
+                     Provider.of<WalletProvider>(context, listen: false).updateTipologia(false);
+                    }
+                    if(index ==1){
+
+                     Provider.of<WalletProvider>(context, listen: false).updateTipologia(true);
+                    }
                     setState(() {
                       _selectedActionIndex = index;
                     });
