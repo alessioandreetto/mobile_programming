@@ -607,12 +607,16 @@ class _HomeListState extends State<HomeList> {
                           child: Container(
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10.0),
-                              color: Colors.white,
+                              color: Theme.of(context).brightness ==
+                                      Brightness.light
+                                  ? Colors.white
+                                  : Colors
+                                      .black, // Imposta il colore di sfondo in base alla modalità
                               boxShadow: [
                                 BoxShadow(
                                   color: Colors.grey.withOpacity(0.5),
-                                  spreadRadius: 1,
-                                  blurRadius: 2,
+                                  spreadRadius: 3,
+                                  blurRadius: 5,
                                   offset: Offset(
                                       0, 1), // changes position of shadow
                                 ),
@@ -655,10 +659,16 @@ class _HomeListState extends State<HomeList> {
                                         ),
                                       ),
                                       SizedBox(height: 4),
-                                      Text(
-                                        formattedDate,
-                                        style: TextStyle(color: Colors.black),
-                                      ),
+                                      Text(formattedDate,
+                                          style: TextStyle(
+                                            color: Theme.of(context)
+                                                        .brightness ==
+                                                    Brightness.light
+                                                ? Colors
+                                                    .black // Colore del testo per la modalità chiara
+                                                : Colors
+                                                    .white, // Colore del testo per la modalità scura
+                                          )),
                                     ],
                                   ),
                                 ),

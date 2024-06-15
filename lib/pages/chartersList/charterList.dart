@@ -139,45 +139,96 @@ class _ChartsListState extends State<ChartsList> {
                             scrollDirection: Axis.horizontal,
                             itemCount: walletProvider.wallets.length,
                             itemBuilder: (context, index) {
-                              bool isSelected = walletProvider.selectedWalletIndex == index;
+                              bool isSelected =
+                                  walletProvider.selectedWalletIndex == index;
                               return Padding(
                                 padding: const EdgeInsets.symmetric(
                                     vertical: 8.0, horizontal: 8.0),
                                 child: ElevatedButton(
                                   onPressed: () {
                                     _handleButtonPress(index);
-                                    walletProvider.updateSelectedWalletIndex(index);
+                                    walletProvider
+                                        .updateSelectedWalletIndex(index);
                                   },
                                   style: ButtonStyle(
                                     elevation: MaterialStateProperty.all(0),
                                     shape: MaterialStateProperty.all<
-                                            RoundedRectangleBorder>(
-                                        RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(20.0),
-                                      side: BorderSide(color: Colors.black),
-                                    )),
+                                        RoundedRectangleBorder>(
+                                      RoundedRectangleBorder(
+                                        borderRadius:
+                                            BorderRadius.circular(20.0),
+                                        side: BorderSide(
+                                          color: Theme.of(context).brightness ==
+                                                  Brightness.dark
+                                              ? Colors.white
+                                              : Colors.black,
+                                        ),
+                                      ),
+                                    ),
                                     foregroundColor: MaterialStateProperty
                                         .resolveWith<Color>(
                                       (Set<MaterialState> states) {
-                                        return isSelected
-                                            ? isDarkMode
-                                                ? Colors.black
-                                                : Colors.white
-                                            : isDarkMode
-                                                ? Colors.white
-                                                : Colors.black;
+                                        if (Theme.of(context).brightness ==
+                                            Brightness.light) {
+                                          return walletProvider
+                                                          .selectedWalletIndex +
+                                                      1 ==
+                                                  walletProvider
+                                                      .wallets[index].id!
+                                              ? Colors.white
+                                              : Colors.black;
+                                        } else {
+                                          return walletProvider
+                                                          .selectedWalletIndex +
+                                                      1 ==
+                                                  walletProvider
+                                                      .wallets[index].id!
+                                              ? Colors.black
+                                              : Colors.white;
+                                        }
                                       },
                                     ),
                                     backgroundColor: MaterialStateProperty
                                         .resolveWith<Color>(
                                       (Set<MaterialState> states) {
-                                        return isSelected
-                                            ? isDarkMode
-                                                ? Colors.white
-                                                : Colors.black
-                                            : isDarkMode
-                                                ? Colors.black
-                                                : Colors.white;
+                                        if (Theme.of(context).brightness ==
+                                            Brightness.light) {
+                                          return walletProvider
+                                                          .selectedWalletIndex +
+                                                      1 ==
+                                                  walletProvider
+                                                      .wallets[index].id!
+                                              ? Colors.black
+                                              : Colors.white;
+                                        } else {
+                                          return walletProvider
+                                                          .selectedWalletIndex +
+                                                      1 ==
+                                                  walletProvider
+                                                      .wallets[index].id!
+                                              ? Colors.white
+                                              : Colors.black;
+                                        }
+                                      },
+                                    ),
+                                    textStyle: MaterialStateProperty
+                                        .resolveWith<TextStyle>(
+                                      (Set<MaterialState> states) {
+                                        return TextStyle(
+                                          color: walletProvider
+                                                          .selectedWalletIndex +
+                                                      1 ==
+                                                  walletProvider
+                                                      .wallets[index].id!
+                                              ? (Theme.of(context).brightness ==
+                                                      Brightness.light
+                                                  ? Colors.white
+                                                  : Colors.black)
+                                              : (Theme.of(context).brightness ==
+                                                      Brightness.light
+                                                  ? Colors.black
+                                                  : Colors.white),
+                                        );
                                       },
                                     ),
                                   ),
@@ -254,39 +305,96 @@ class _ChartsListState extends State<ChartsList> {
                                           context, transaction);
                                     },
                                     child: Padding(
-                                      padding: const EdgeInsets.all(8.0),
+                                      padding: const EdgeInsets.all(16.0),
                                       child: Container(
-                                        height: 70.0,
-                                        child: ListTile(
-                                          leading: Container(
-                                            width: 50,
-                                            height: 50,
-                                            decoration: BoxDecoration(
-                                              borderRadius:
-                                                  BorderRadius.circular(10),
-                                              color: categoryColors[
-                                                      transaction.categoryId] ??
-                                                  Colors.grey,
-                                            ),
-                                            child: Icon(
-                                              categoryIcons[
-                                                      transaction.categoryId] ??
-                                                  Icons.category,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                          title: Text(transaction.name ?? ''),
-                                          subtitle: Text(
-                                            "Data: $formattedDate, Valore: ${transaction.value} ${walletProvider.valuta}",
-                                          ),
-                                        ),
                                         decoration: BoxDecoration(
-                                          border: Border.all(
-                                            color: Color(0xffb3b3b3),
-                                          ),
-                                          color: Colors.transparent,
                                           borderRadius:
                                               BorderRadius.circular(10.0),
+                                          color: Theme.of(context).brightness ==
+                                                  Brightness.light
+                                              ? Colors.white
+                                              : Colors
+                                                  .black, // Imposta il colore di sfondo in base alla modalità
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color:
+                                                  Colors.grey.withOpacity(0.5),
+                                              spreadRadius: 3,
+                                              blurRadius: 5,
+                                              offset: Offset(0,
+                                                  1), // changes position of shadow
+                                            ),
+                                          ],
+                                        ),
+                                        child: Row(
+                                          children: [
+                                            Container(
+                                              margin: EdgeInsets.all(
+                                                  8), // Aggiunto margin qui
+                                              padding: EdgeInsets.all(12),
+                                              width: 60,
+                                              height: 60,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: categoryColors[
+                                                        transaction
+                                                            .categoryId] ??
+                                                    Colors.grey,
+                                              ),
+                                              child: Center(
+                                                child: Icon(
+                                                  categoryIcons[transaction
+                                                          .categoryId] ??
+                                                      Icons.category,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ),
+                                            SizedBox(width: 16),
+                                            Expanded(
+                                              child: Column(
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                children: [
+                                                  Text(
+                                                    transaction.name ?? '',
+                                                    style: TextStyle(
+                                                      fontSize: 18.0,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                                  SizedBox(height: 4),
+                                                  Text(formattedDate,
+                                                      style: TextStyle(
+                                                        color: Theme.of(context)
+                                                                    .brightness ==
+                                                                Brightness.light
+                                                            ? Colors
+                                                                .black // Colore del testo per la modalità chiara
+                                                            : Colors
+                                                                .white, // Colore del testo per la modalità scura
+                                                      )),
+                                                ],
+                                              ),
+                                            ),
+                                            Padding(
+                                              padding:
+                                                  const EdgeInsets.all(8.0),
+                                              child: Text(
+                                                "${transaction.value} ${walletProvider.valuta}",
+                                                style: TextStyle(
+                                                  color: transaction.value! >= 0
+                                                      ? Colors.green
+                                                      : Colors.red,
+                                                  fontWeight: FontWeight.bold,
+                                                  fontSize: 16.0,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ),
@@ -316,7 +424,8 @@ class _ChartsListState extends State<ChartsList> {
             child: Text('Nessun portafoglio disponibile'),
           );
         }
-        Wallet selectedWallet = walletProvider.wallets[walletProvider.selectedWalletIndex];
+        Wallet selectedWallet =
+            walletProvider.wallets[walletProvider.selectedWalletIndex];
         String valuta = walletProvider.valuta;
 
         return FutureBuilder<Map<String, dynamic>>(
