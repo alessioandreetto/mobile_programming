@@ -91,7 +91,7 @@ class _HomeListState extends State<HomeList> {
   void _initSelectedWallet() {
     var walletProvider = Provider.of<WalletProvider>(context, listen: false);
 
-    _showExpenses =  walletProvider.getTipologiaMovimento();
+    _showExpenses = walletProvider.getTipologiaMovimento();
     if (walletProvider.wallets.isNotEmpty) {
       final selectedWalletIndex = walletProvider.getSelectedWalletIndex();
       final selectedWallet = walletProvider.wallets[selectedWalletIndex];
@@ -140,7 +140,8 @@ class _HomeListState extends State<HomeList> {
       List<Transaction> loadedTransactions =
           await DatabaseHelper().getTransactionsForWallet(walletId);
 
-      if (Provider.of<WalletProvider>(context, listen: false).getTipologiaMovimento()){
+      if (Provider.of<WalletProvider>(context, listen: false)
+          .getTipologiaMovimento()) {
         loadedTransactions = loadedTransactions
             .where((transaction) => transaction.value! < 0)
             .toList();
@@ -391,21 +392,51 @@ class _HomeListState extends State<HomeList> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             if (walletProvider.wallets.isNotEmpty)
-                              Text(
-                                  "Nome Wallet: ${walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).name}",
-                                  style: TextStyle(fontSize: 20)),
+                              Row(
+                                children: [
+                                  Icon(Icons.account_balance_wallet, size: 24),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    walletProvider.wallets
+                                        .firstWhere(
+                                            (wallet) =>
+                                                wallet.id ==
+                                                walletProvider
+                                                        .selectedWalletIndex +
+                                                    1,
+                                            orElse: () => Wallet(
+                                                id: 0, name: 'N/A', balance: 0))
+                                        .name!,
+                                    style: TextStyle(
+                                      fontSize: 25,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            SizedBox(
+                                height: 8), // Add some space between the rows
                             if (walletProvider.wallets.isNotEmpty)
-                              Text(
+                              Padding(
+                                padding: const EdgeInsets.only(left: 32.0),
+                                child: Text(
                                   'Bilancio: ${walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).balance} ${walletProvider.valuta}',
-                                  style: TextStyle(fontSize: 20)),
-                            if (nomeCategoria.isNotEmpty) ...[
-                              Text(
+                                  style: TextStyle(fontSize: 20),
+                                ),
+                              ),
+                            if (nomeCategoria.isNotEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(left: 32.0),
+                                child: Text(
                                   '$nomeCategoria : $valoreCategoria ${walletProvider.valuta}',
-                                  style: TextStyle(fontSize: 20)),
-                            ],
-                            if (nomeCategoria.isEmpty) ...[
-                              Text(' ', style: TextStyle(fontSize: 20))
-                            ],
+                                  style: TextStyle(fontSize: 20),
+                                ),
+                              ),
+                            if (nomeCategoria.isEmpty)
+                              Padding(
+                                padding: const EdgeInsets.only(left: 32.0),
+                                child:
+                                    Text(' ', style: TextStyle(fontSize: 20)),
+                              ),
                           ],
                         ),
                       ),
