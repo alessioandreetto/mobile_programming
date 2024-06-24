@@ -111,7 +111,6 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
                   child: Center(
                     child: InteractiveTutorial(
                       onComplete: () {
-                        _saveWalletData(); // Salva i dati del wallet al completamento
                         _pageController.nextPage(
                           duration: Duration(milliseconds: 300),
                           curve: Curves.ease,
