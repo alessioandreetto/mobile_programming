@@ -4,6 +4,7 @@ A new Flutter project.
 
 ## Home Page
 1. aggiungere bold in button selected wallet
+2. **delte da slide non aggiorna valore**
 ## Charts Page
 1. ⁠⁠rivedere grafica del grafico a linea
 
@@ -18,6 +19,5 @@ A new Flutter project.
 
 ## Other
 1. ⁠saveZone per status bar
-2. colore violetto
 3. Sistemazione grafica generale
 4. ⁠breve relazione che descriva la realizzazione del progetto

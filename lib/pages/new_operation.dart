@@ -100,14 +100,16 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
       _initialValue = '';
       _initialDate = _selectedDate;
       _initialCategoryId = 0;
-      _initialActionIndex =  0; 
+      _initialActionIndex =
+          Provider.of<WalletProvider>(context, listen: false).getTipologiaMovimento() ? 1: 0;
+      _selectedActionIndex = _initialActionIndex!;
     }
   }
 
   bool isDirty() {
     return widget.nameController.text != _initialName ||
         widget.valueController.text != _initialValue ||
-        _selectedDate != _initialDate || // Cambiato confronto qui
+        _selectedDate != _initialDate ||
         _selectedWallet != _initialWallet ||
         _selectedCategoryId != _initialCategoryId ||
         _selectedActionIndex != _initialActionIndex;
@@ -302,8 +304,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                     setState(() {
                       _selectedWallet = newValue!.name!;
                     });
-                    int selectedWalletIndex = _wallets.indexOf(
-                        newValue!); // Ottieni l'indice del wallet selezionato
+                    int selectedWalletIndex = _wallets.indexOf(newValue!); // Ottieni l'indice del wallet selezionato
                     Provider.of<WalletProvider>(context, listen: false)
                         .updateSelectedWalletIndex(
                             selectedWalletIndex); // Passa l'indice del wallet
@@ -346,16 +347,16 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                           : actionTypes.length - 1,
                       (index) => _selectedActionIndex == index),
                   onPressed: (index) {
-                    if(index==0){
-                     Provider.of<WalletProvider>(context, listen: false).updateTipologia(false);
-                    }
-                    if(index ==1){
-
-                     Provider.of<WalletProvider>(context, listen: false).updateTipologia(true);
-                    }
                     setState(() {
                       _selectedActionIndex = index;
+                     
                     });
+
+                    if (index == 0) {
+                      Provider.of<WalletProvider>(context, listen: false).updateTipologia(false);                   }
+
+                    if (index == 1) {
+                      Provider.of<WalletProvider>(context, listen: false).updateTipologia(true);                   }
                   },
                 ),
                 SizedBox(height: 16.0),
