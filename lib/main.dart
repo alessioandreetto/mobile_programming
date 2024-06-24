@@ -20,8 +20,7 @@ class MyApp extends StatelessWidget {
           return MaterialApp(
             theme: ThemeData(
               useMaterial3: true,
-              primarySwatch: Colors.blue,
-              
+              colorSchemeSeed: Colors.blue,
             ),
             home: Scaffold(
               backgroundColor: Colors.white,
@@ -33,6 +32,10 @@ class MyApp extends StatelessWidget {
         }
         if (snapshot.hasError) {
           return MaterialApp(
+            theme: ThemeData(
+              useMaterial3: true,
+              colorSchemeSeed: Colors.blue,
+            ),
             home: Scaffold(
               body: Center(
                 child: Text(
@@ -49,8 +52,9 @@ class MyApp extends StatelessWidget {
           ],
           child: AdaptiveTheme(
             light: ThemeData(
+              useMaterial3: true,
+              colorSchemeSeed: Colors.blue,
               brightness: Brightness.light,
-              primarySwatch: Colors.blue,
               scaffoldBackgroundColor: Colors.white,
               cardColor: Colors.white,
               appBarTheme: AppBarTheme(
@@ -61,7 +65,7 @@ class MyApp extends StatelessWidget {
             ),
             dark: ThemeData(
               brightness: Brightness.dark,
-              primarySwatch: Colors.blue,
+              colorSchemeSeed: Colors.blue,
               scaffoldBackgroundColor: Colors.black,
               cardColor: Colors.grey[900],
               appBarTheme: AppBarTheme(
