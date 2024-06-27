@@ -590,7 +590,8 @@ class _HomeListState extends State<HomeList> {
                         children: [
                           SlidableAction(
                             borderRadius: BorderRadius.circular(10),
-                            padding: EdgeInsets.all(20),
+                            padding: EdgeInsets.all(
+                                5), // Riduce il padding del pulsante
                             onPressed: (context) {
                               _deleteTransaction(transaction, walletProvider);
                               setState(() {
@@ -601,6 +602,8 @@ class _HomeListState extends State<HomeList> {
                             foregroundColor: Colors.white,
                             icon: Icons.delete,
                             label: 'Elimina',
+                            // Nota: iconSize non è un parametro direttamente supportato.
+                            // Dovrai accettare che l'icona sarà della dimensione predefinita.
                           ),
                         ],
                       ),
@@ -609,7 +612,8 @@ class _HomeListState extends State<HomeList> {
                           _navigateToTransactionDetail(context, transaction);
                         },
                         child: Padding(
-                          padding: const EdgeInsets.only(left: 5.0, right: 5.0, bottom: 5.0),
+                          padding: const EdgeInsets.only(
+                              left: 5.0, right: 5.0, bottom: 5.0),
                           child: Card(
                             /* decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10.0),

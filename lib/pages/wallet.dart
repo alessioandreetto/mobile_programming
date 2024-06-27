@@ -232,7 +232,10 @@ class _WalletPageState extends State<WalletPage> {
                               children: [
                                 Icon(
                                   Icons.add,
-                                  color: Color(0xffb3b3b3),
+                                  color: Theme.of(context).brightness ==
+                                          Brightness.dark
+                                      ? Colors.white
+                                      : Color(0xffb3b3b3),
                                   size: 50,
                                 ),
                               ],
