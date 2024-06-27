@@ -91,7 +91,7 @@ class _HomeListState extends State<HomeList> {
   void _initSelectedWallet() {
     var walletProvider = Provider.of<WalletProvider>(context, listen: false);
 
-    _showExpenses =  walletProvider.getTipologiaMovimento();
+    _showExpenses = walletProvider.getTipologiaMovimento();
     if (walletProvider.wallets.isNotEmpty) {
       final selectedWalletIndex = walletProvider.getSelectedWalletIndex();
       final selectedWallet = walletProvider.wallets[selectedWalletIndex];
@@ -109,7 +109,7 @@ class _HomeListState extends State<HomeList> {
   }
 
   void _onWalletsChanged() {
-/*     var walletProvider = Provider.of<WalletProvider>(context, listen: false);
+    var walletProvider = Provider.of<WalletProvider>(context, listen: false);
     // Controlla se il wallet attualmente selezionato è stato eliminato
     if (!walletProvider.wallets
         .any((wallet) => wallet.id == _selectedWalletId)) {
@@ -120,7 +120,7 @@ class _HomeListState extends State<HomeList> {
             : 0;
       });
       _loadTransactions(_selectedWalletId);
-    } */
+    }
   }
 
   void _handleSwipe(int index) {
@@ -140,7 +140,8 @@ class _HomeListState extends State<HomeList> {
       List<Transaction> loadedTransactions =
           await DatabaseHelper().getTransactionsForWallet(walletId);
 
-      if (Provider.of<WalletProvider>(context, listen: false).getTipologiaMovimento()){
+      if (Provider.of<WalletProvider>(context, listen: false)
+          .getTipologiaMovimento()) {
         loadedTransactions = loadedTransactions
             .where((transaction) => transaction.value! < 0)
             .toList();
@@ -258,21 +259,23 @@ class _HomeListState extends State<HomeList> {
 
   void _deleteTransaction(
       Transaction transaction, WalletProvider walletProvider) async {
-// Recupera il valore della transazione eliminata
+    // Recupera il valore della transazione eliminata
     double deletedTransactionValue = transaction.value ?? 0.0;
-// Elimina la transazione dal database
+
+    // Elimina la transazione dal database
     await DatabaseHelper().deleteTransaction(transaction.id!);
 
-// Aggiorna il bilancio del wallet corrispondente
+    // Aggiorna il bilancio del wallet corrispondente
     Wallet selectedWallet = walletProvider.wallets
         .firstWhere((wallet) => wallet.id == _selectedWalletId);
     selectedWallet.balance = selectedWallet.balance! - deletedTransactionValue;
 
-// Aggiorna il bilancio del wallet nel database
+    // Aggiorna il bilancio del wallet nel database
     await DatabaseHelper().updateWallet(selectedWallet);
 
-// Aggiorna i wallet nel WalletProvider
+    // Aggiorna i wallet nel WalletProvider e notifica i cambiamenti
     walletProvider.refreshWallets();
+    walletProvider.notifyListeners();
   }
 
   Map<String, double> _calculateCategoryAmounts(
