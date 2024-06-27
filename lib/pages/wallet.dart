@@ -327,7 +327,6 @@ class _WalletPageState extends State<WalletPage> {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontFamily: 'RobotoThin',
                       fontSize: 40,
                     ),
                   ),
@@ -342,14 +341,12 @@ class _WalletPageState extends State<WalletPage> {
                       Text(
                         "Balance: ",
                         style: TextStyle(
-                          fontFamily: 'RobotoThin',
                           fontSize: 10,
                         ),
                       ),
                       Text(
                         "$title $valuta",
                         style: TextStyle(
-                          fontFamily: 'RobotoThin',
                           fontSize: 20,
                         ),
                       ),
