@@ -21,6 +21,7 @@ class MyApp extends StatelessWidget {
             theme: ThemeData(
               useMaterial3: true,
               colorSchemeSeed: Colors.blue,
+              fontFamily: 'Poppins', // Imposta il font qui
             ),
             home: Scaffold(
               backgroundColor: Colors.white,
@@ -35,6 +36,7 @@ class MyApp extends StatelessWidget {
             theme: ThemeData(
               useMaterial3: true,
               colorSchemeSeed: Colors.blue,
+              fontFamily: 'Poppins', // Imposta il font qui
             ),
             home: Scaffold(
               body: Center(
@@ -57,6 +59,7 @@ class MyApp extends StatelessWidget {
               brightness: Brightness.light,
               scaffoldBackgroundColor: Colors.white,
               cardColor: Colors.white,
+              fontFamily: 'Poppins', // Imposta il font qui
               appBarTheme: AppBarTheme(
                 backgroundColor: Colors.transparent,
                 elevation: 0,
@@ -68,6 +71,7 @@ class MyApp extends StatelessWidget {
               colorSchemeSeed: Colors.blue,
               scaffoldBackgroundColor: Colors.black,
               cardColor: Colors.grey[900],
+              fontFamily: 'Poppins', // Imposta il font qui
               appBarTheme: AppBarTheme(
                 backgroundColor: Colors.transparent,
                 elevation: 0,
