@@ -211,6 +211,7 @@ class _WalletPageState extends State<WalletPage> {
                         );
                       },
                       child: Card(
+                        color: Colors.transparent,
                         elevation: 0,
                         margin: EdgeInsets.all(0),
                         shape: RoundedRectangleBorder(
@@ -231,7 +232,7 @@ class _WalletPageState extends State<WalletPage> {
                               children: [
                                 Icon(
                                   Icons.add,
-                                  color: Color(0xff262626),
+                                  color: Color(0xffb3b3b3),
                                   size: 50,
                                 ),
                               ],
