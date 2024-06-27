@@ -609,7 +609,7 @@ class _HomeListState extends State<HomeList> {
                           _navigateToTransactionDetail(context, transaction);
                         },
                         child: Padding(
-                          padding: const EdgeInsets.all(16.0),
+                          padding: const EdgeInsets.all(10.0),
                           child: Container(
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10.0),
@@ -633,7 +633,7 @@ class _HomeListState extends State<HomeList> {
                                 Container(
                                   margin:
                                       EdgeInsets.all(8), // Aggiunto margin qui
-                                  padding: EdgeInsets.all(12),
+                                  padding: EdgeInsets.all(2),
                                   width: 60,
                                   height: 60,
                                   decoration: BoxDecoration(
