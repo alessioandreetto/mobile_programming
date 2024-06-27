@@ -11,6 +11,32 @@ class Category {
   Category({required this.id, required this.name});
 }
 
+class DecimalTextInputFormatter extends TextInputFormatter {
+  final int decimalRange;
+
+  DecimalTextInputFormatter({required this.decimalRange})
+      : assert(decimalRange > 0);
+
+  @override
+  TextEditingValue formatEditUpdate(
+      TextEditingValue oldValue, TextEditingValue newValue) {
+    if (newValue.text == '') {
+      return newValue;
+    }
+
+    final newValueText = newValue.text;
+    if (double.tryParse(newValueText) == null) {
+      return oldValue;
+    }
+
+    final List<String> parts = newValueText.split('.');
+    if (parts.length > 1 && parts[1].length > decimalRange) {
+      return oldValue;
+    }
+    return newValue;
+  }
+}
+
 class NewTransactionPage extends StatefulWidget {
   final TextEditingController nameController;
   final TextEditingController valueController;
@@ -100,8 +126,10 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
       _initialValue = '';
       _initialDate = _selectedDate;
       _initialCategoryId = 0;
-      _initialActionIndex =
-          Provider.of<WalletProvider>(context, listen: false).getTipologiaMovimento() ? 1: 0;
+      _initialActionIndex = Provider.of<WalletProvider>(context, listen: false)
+              .getTipologiaMovimento()
+          ? 1
+          : 0;
       _selectedActionIndex = _initialActionIndex!;
     }
   }
@@ -279,9 +307,11 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                 TextField(
                   controller: widget.valueController,
                   decoration: InputDecoration(labelText: 'Valore'),
-                  keyboardType: TextInputType.number,
+                  keyboardType: TextInputType.numberWithOptions(decimal: true),
                   inputFormatters: [
-                    FilteringTextInputFormatter.allow(RegExp(r'[0-9.]')),
+                    FilteringTextInputFormatter.allow(
+                        RegExp(r'^\d*\.?\d{0,2}')),
+                    DecimalTextInputFormatter(decimalRange: 2),
                   ],
                 ),
                 TextField(
@@ -304,7 +334,8 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                     setState(() {
                       _selectedWallet = newValue!.name!;
                     });
-                    int selectedWalletIndex = _wallets.indexOf(newValue!); // Ottieni l'indice del wallet selezionato
+                    int selectedWalletIndex = _wallets.indexOf(
+                        newValue!); // Ottieni l'indice del wallet selezionato
                     Provider.of<WalletProvider>(context, listen: false)
                         .updateSelectedWalletIndex(
                             selectedWalletIndex); // Passa l'indice del wallet
@@ -349,14 +380,17 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                   onPressed: (index) {
                     setState(() {
                       _selectedActionIndex = index;
-                     
                     });
 
                     if (index == 0) {
-                      Provider.of<WalletProvider>(context, listen: false).updateTipologia(false);                   }
+                      Provider.of<WalletProvider>(context, listen: false)
+                          .updateTipologia(false);
+                    }
 
                     if (index == 1) {
-                      Provider.of<WalletProvider>(context, listen: false).updateTipologia(true);                   }
+                      Provider.of<WalletProvider>(context, listen: false)
+                          .updateTipologia(true);
+                    }
                   },
                 ),
                 SizedBox(height: 16.0),

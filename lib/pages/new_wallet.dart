@@ -20,7 +20,8 @@ class AddNotePage extends StatefulWidget {
     this.initialBody,
     required this.walletId,
   })  : titleController = TextEditingController(
-            text: initialTitle != null ? initialTitle.toString() : null),
+            text:
+                initialTitle != null ? initialTitle.toStringAsFixed(2) : null),
         bodyController = TextEditingController(text: initialBody);
 
   @override
@@ -218,6 +219,10 @@ class _AddNotePageState extends State<AddNotePage> {
                           });
                         },
                         keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          FilteringTextInputFormatter.allow(
+                              RegExp(r'^\d+\.?\d{0,2}')),
+                        ],
                         decoration: InputDecoration(
                           hintText: 'Start Balance (€)',
                           hintStyle: TextStyle(
