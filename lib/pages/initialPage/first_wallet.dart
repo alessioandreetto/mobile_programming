@@ -24,6 +24,12 @@ class _FirstWalletState extends State<FirstWallet> {
     super.initState();
     widget.nameController.addListener(_onDataChanged);
     widget.balanceController.addListener(_onDataChanged);
+
+    // Initialize balanceController with a formatted value
+    if (widget.balanceController.text.isNotEmpty) {
+      double initialBalance = double.parse(widget.balanceController.text);
+      widget.balanceController.text = initialBalance.toStringAsFixed(2);
+    }
   }
 
   void _onDataChanged() {
@@ -133,6 +139,10 @@ class _FirstWalletState extends State<FirstWallet> {
                               fontFamily: 'RobotoThin',
                               fontSize: 25,
                             ),
+                            inputFormatters: [
+                              FilteringTextInputFormatter.allow(
+                                  RegExp(r'^\d+\.?\d{0,2}')),
+                            ],
                             onChanged: (_) {
                               setState(() {
                                 _isDirty = true;
