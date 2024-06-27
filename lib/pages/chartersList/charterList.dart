@@ -305,9 +305,9 @@ class _ChartsListState extends State<ChartsList> {
                                           context, transaction);
                                     },
                                     child: Padding(
-                                      padding: const EdgeInsets.all(16.0),
-                                      child: Container(
-                                        decoration: BoxDecoration(
+                                      padding: const EdgeInsets.only(left: 5.0, right: 5.0, bottom: 5.0),
+                                      child: Card(
+                                     /*    decoration: BoxDecoration(
                                           borderRadius:
                                               BorderRadius.circular(10.0),
                                           color: Theme.of(context).brightness ==
@@ -325,7 +325,7 @@ class _ChartsListState extends State<ChartsList> {
                                                   1), // changes position of shadow
                                             ),
                                           ],
-                                        ),
+                                        ), */
                                         child: Row(
                                           children: [
                                             Container(

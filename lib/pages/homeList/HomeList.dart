@@ -609,9 +609,9 @@ class _HomeListState extends State<HomeList> {
                           _navigateToTransactionDetail(context, transaction);
                         },
                         child: Padding(
-                          padding: const EdgeInsets.all(10.0),
-                          child: Container(
-                            decoration: BoxDecoration(
+                          padding: const EdgeInsets.only(left: 5.0, right: 5.0, bottom: 5.0),
+                          child: Card(
+                            /* decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10.0),
                               color: Theme.of(context).brightness ==
                                       Brightness.light
@@ -627,7 +627,7 @@ class _HomeListState extends State<HomeList> {
                                       0, 1), // changes position of shadow
                                 ),
                               ],
-                            ),
+                            ), */
                             child: Row(
                               children: [
                                 Container(
