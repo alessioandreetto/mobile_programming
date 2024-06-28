@@ -33,7 +33,10 @@ dev_dependencies:
 flutter:
   uses-material-design: true
   assets:
-    - assets/images/sfondo_tutorial.jpg # Aggiungi questa linea
+    - assets/images/sfondo_tutorial.jpg
+    - assets/images/uk_flag.jpg
+    - assets/images/it_flag.jpg
+    
   fonts:
     - family: Poppins
       fonts:

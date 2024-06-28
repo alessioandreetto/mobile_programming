@@ -45,6 +45,24 @@ class _SettingsPageState extends State<SettingsPage> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
+        actions: <Widget>[
+          // Italy Flag Icon
+          IconButton(
+            icon: Image.asset(
+                'assets/images/it_flag.jpg'), // Replace with your asset path
+            onPressed: () {
+              // Add functionality if needed
+            },
+          ),
+          // England Flag Icon
+          IconButton(
+            icon: Image.asset(
+                'assets/images/uk_flag.jpg'), // Replace with your asset path
+            onPressed: () {
+              // Add functionality if needed
+            },
+          ),
+        ],
       ),
       body: ListView(
         children: <Widget>[
@@ -95,24 +113,6 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ),
           ),
-  /*         Container(
-            margin: EdgeInsets.only(bottom: 10, left: 10, right: 10),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Color(0xffb3b3b3),
-              ),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: ListTile(
-              title: Text('test tutorial iniziale'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => PageIndicatorDemo()),
-                );
-              },
-            ),
-          ), */
           Container(
             margin: EdgeInsets.only(bottom: 10, left: 10, right: 10),
             decoration: BoxDecoration(
