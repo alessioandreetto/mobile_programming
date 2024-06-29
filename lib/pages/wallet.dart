@@ -172,10 +172,6 @@ class _WalletPageState extends State<WalletPage> {
           return Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Divider(
-                height: 0.5,
-                color: Color(0xffb3b3b3),
-              ),
               Expanded(
                 child: ReorderableGridView.count(
                   crossAxisSpacing: 0,

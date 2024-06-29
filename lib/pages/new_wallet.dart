@@ -129,6 +129,9 @@ class _AddNotePageState extends State<AddNotePage> {
         },
         child: Scaffold(
           appBar: AppBar(
+            title: widget.initialTitle == null && widget.initialBody == null
+                  ? Text("Nuovo Wallet", style: TextStyle(fontSize: 25))
+                  : Text("Modifica Wallet", style: TextStyle(fontSize: 25)),
             backgroundColor: Colors.transparent,
             systemOverlayStyle: isDarkMode
                 ? SystemUiOverlayStyle.light
@@ -149,24 +152,14 @@ class _AddNotePageState extends State<AddNotePage> {
           body: SingleChildScrollView(
             child: Column(
               children: [
-                Divider(
-                    height: 1,
-                    color: isDarkMode ? Colors.grey : Color(0xffb3b3b3)),
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(
-                          color: isDarkMode ? Colors.white70 : Colors.grey),
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: TextField(
                         controller: widget.bodyController,
                         style: TextStyle(
-                          fontFamily: 'RobotoThin',
-                          fontSize: 25,
                           color: isDarkMode ? Colors.white : Colors.black,
                         ),
                         onChanged: (_) {
@@ -175,13 +168,7 @@ class _AddNotePageState extends State<AddNotePage> {
                           });
                         },
                         decoration: InputDecoration(
-                          hintText: 'Wallet Name',
-                          hintStyle: TextStyle(
-                            fontFamily: 'RobotoThin',
-                            fontSize: 25,
-                            color: isDarkMode ? Colors.white70 : Colors.grey,
-                          ),
-                          border: InputBorder.none,
+                          labelText: 'Wallet Name',
                         ),
                       ),
                     ),
@@ -191,9 +178,7 @@ class _AddNotePageState extends State<AddNotePage> {
                   padding: const EdgeInsets.all(16.0),
                   child: Container(
                     decoration: BoxDecoration(
-                      border: Border.all(
-                          color: isDarkMode ? Colors.white70 : Colors.grey),
-                      borderRadius: BorderRadius.circular(10.0),
+                      
                       color: _hasTransactions
                           ? (isDarkMode
                               ? Colors.grey.shade800
@@ -205,8 +190,6 @@ class _AddNotePageState extends State<AddNotePage> {
                       child: TextField(
                         controller: widget.titleController,
                         style: TextStyle(
-                          fontFamily: 'RobotoThin',
-                          fontSize: 25,
                           color: _hasTransactions
                               ? (isDarkMode
                                   ? Colors.grey.shade400
@@ -224,17 +207,9 @@ class _AddNotePageState extends State<AddNotePage> {
                               RegExp(r'^\d+\.?\d{0,2}')),
                         ],
                         decoration: InputDecoration(
-                          hintText: 'Start Balance (€)',
-                          hintStyle: TextStyle(
-                            fontFamily: 'RobotoThin',
-                            fontSize: 25,
-                            color: _hasTransactions
-                                ? (isDarkMode
-                                    ? Colors.grey.shade400
-                                    : Colors.grey)
-                                : (isDarkMode ? Colors.white70 : Colors.grey),
-                          ),
-                          border: InputBorder.none,
+                          labelText: 'Bilancio iniziale ',
+                        
+                         
                         ),
                         enabled:
                             !_hasTransactions, // Disabilita se ci sono transazioni
