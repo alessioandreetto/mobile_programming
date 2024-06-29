@@ -50,7 +50,7 @@ class _ChartsListState extends State<ChartsList> {
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Charts page'),
+        title: Text('Charts page', style: TextStyle(fontSize: 25)),
         elevation: 0,
         backgroundColor: Colors.transparent,
         shadowColor: Colors.transparent,

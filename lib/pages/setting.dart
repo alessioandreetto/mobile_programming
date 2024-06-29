@@ -41,11 +41,11 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Impostazioni'),
+        title: Text('Impostazioni', style: TextStyle(fontSize: 25)),
         backgroundColor: Colors.transparent,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
-        actions: <Widget>[
+       /*  actions: <Widget>[
           // Italy Flag Icon
           IconButton(
             icon: Image.asset(
@@ -62,7 +62,7 @@ class _SettingsPageState extends State<SettingsPage> {
               // Add functionality if needed
             },
           ),
-        ],
+        ], */
       ),
       body: ListView(
         children: <Widget>[

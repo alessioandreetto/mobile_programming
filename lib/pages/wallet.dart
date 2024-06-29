@@ -148,6 +148,7 @@ class _WalletPageState extends State<WalletPage> {
             Expanded(
               child: Text(
                 'Wallets',
+                style: TextStyle(fontSize: 25),
                 textAlign: TextAlign.start,
               ),
             ),

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import '../../providers/wallet_provider.dart';
 import 'package:provider/provider.dart';
 import '../../model/database_model.dart';
@@ -318,7 +319,33 @@ class _HomeListState extends State<HomeList> {
               surfaceTintColor: Colors.transparent,
               pinned: true,
               snap: true,
-              title: Text('Benvenuto ${walletProvider.name} !'),
+              title: RichText(
+                text: TextSpan(
+                  text: 'Benvenuto ',
+                  style: TextStyle(
+                      fontFamily: 'Poppins',
+                      fontSize: 25.0, // Dimensione del testo
+                      color: (Theme.of(context).brightness == Brightness.light
+                          ? Colors.black
+                          : Colors.white)),
+                  children: <TextSpan>[
+                    TextSpan(
+                      text: '${walletProvider.name}',
+                      style: TextStyle(
+                        fontWeight:
+                            FontWeight.bold, // Imposta il testo in grassetto
+                      ),
+                    ),
+                    TextSpan(
+                      text: '!',
+                      style: TextStyle(
+                        fontWeight:
+                            FontWeight.normal, // Imposta il testo come regular
+                      ),
+                    ),
+                  ],
+                ),
+              ),
               floating: true,
               flexibleSpace: FlexibleSpaceBar(
                   background: PageView.builder(
@@ -381,8 +408,8 @@ class _HomeListState extends State<HomeList> {
             SliverPersistentHeader(
               pinned: true,
               delegate: _SliverPersistentHeaderDelegate(
-                minHeight: 240.0, // Increased to accommodate additional texts
-                maxHeight: 240.0, // Increased to accommodate additional texts
+                minHeight: 250.0, // Increased to accommodate additional texts
+                maxHeight: 250.0, // Increased to accommodate additional texts
                 child: Container(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -394,20 +421,85 @@ class _HomeListState extends State<HomeList> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             if (walletProvider.wallets.isNotEmpty)
-                              Text(
-                                  "Nome Wallet: ${walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).name}",
-                                  style: TextStyle(fontSize: 20)),
+                              RichText(
+                                text: TextSpan(
+                                  text: 'Nome Wallet: ',
+                                  style: TextStyle(
+                                      fontFamily: 'Poppins',
+                                      fontSize: 12.0, // Dimensione del testo
+                                      color: (Theme.of(context).brightness ==
+                                              Brightness.light
+                                          ? Colors.black
+                                          : Colors.white)),
+                                  children: <TextSpan>[
+                                    TextSpan(
+                                      text:
+                                          '${walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).name}',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight
+                                            .bold, // Imposta il testo in grassetto
+                                            fontSize: 25.0
+                                      ),
+                                    ),
+                                   
+                                  ],
+                                ),
+                              ),
                             if (walletProvider.wallets.isNotEmpty)
-                              Text(
-                                  'Bilancio: ${walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).balance} ${walletProvider.valuta}',
-                                  style: TextStyle(fontSize: 20)),
+                            
+                                   RichText(
+                                text: TextSpan(
+                                  text: 'Bilancio: ',
+                                  style: TextStyle(
+                                      fontFamily: 'Poppins',
+                                      fontSize: 12.0, // Dimensione del testo
+                                      color: (Theme.of(context).brightness ==
+                                              Brightness.light
+                                          ? Colors.black
+                                          : Colors.white)),
+                                  children: <TextSpan>[
+                                    TextSpan(
+                                      text:
+                                          '${walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).balance} ${walletProvider.valuta}',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight
+                                            .bold, // Imposta il testo in grassetto
+                                            fontSize: 25.0
+                                      ),
+                                    ),
+                                   
+                                  ],
+                                ),
+                              ),
                             if (nomeCategoria.isNotEmpty) ...[
-                              Text(
-                                  '$nomeCategoria : $valoreCategoria ${walletProvider.valuta}',
-                                  style: TextStyle(fontSize: 20)),
+
+  RichText(
+                                text: TextSpan(
+                                  text: '$nomeCategoria: ',
+                                  style: TextStyle(
+                                      fontFamily: 'Poppins',
+                                      fontSize: 12.0, // Dimensione del testo
+                                      color: (Theme.of(context).brightness ==
+                                              Brightness.light
+                                          ? Colors.black
+                                          : Colors.white)),
+                                  children: <TextSpan>[
+                                    TextSpan(
+                                      text:
+                                          '$valoreCategoria ${walletProvider.valuta}',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight
+                                            .bold, // Imposta il testo in grassetto
+                                            fontSize: 25.0
+                                      ),
+                                    ),
+                                   
+                                  ],
+                                ),
+                              ),
                             ],
                             if (nomeCategoria.isEmpty) ...[
-                              Text(' ', style: TextStyle(fontSize: 20))
+                              Text(' ', style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),),
                             ],
                           ],
                         ),
@@ -585,10 +677,10 @@ class _HomeListState extends State<HomeList> {
                     return Slidable(
                       key: ValueKey(index),
                       startActionPane: ActionPane(
-                        extentRatio: 0.25,
+                        extentRatio: 0.205,
                         motion: ScrollMotion(),
                         children: [
-                          SlidableAction(
+                          /* SlidableAction(
                             borderRadius: BorderRadius.circular(10),
                             padding: EdgeInsets.all(
                                 5), // Riduce il padding del pulsante
@@ -604,7 +696,35 @@ class _HomeListState extends State<HomeList> {
                             label: 'Elimina',
                             // Nota: iconSize non è un parametro direttamente supportato.
                             // Dovrai accettare che l'icona sarà della dimensione predefinita.
-                          ),
+                          ), */
+
+                          GestureDetector(
+                            onTap: () {
+                              _deleteTransaction(transaction, walletProvider);
+                              setState(() {
+                                transactions.removeAt(index);
+                              });
+                            },
+                            child: Card(
+                                color: Colors.red,
+                                child: Container(
+                                  height: 76,
+                                  width: 76,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(
+                                        Icons.delete,
+                                        color: Colors.white,
+                                      ),
+                                      Text(
+                                        'Elimina',
+                                        style: TextStyle(color: Colors.white),
+                                      )
+                                    ],
+                                  ),
+                                )),
+                          )
                         ],
                       ),
                       child: GestureDetector(
@@ -613,7 +733,7 @@ class _HomeListState extends State<HomeList> {
                         },
                         child: Padding(
                           padding: const EdgeInsets.only(
-                              left: 5.0, right: 5.0, bottom: 5.0),
+                              left: 3.0, right: 5.0, bottom: 3.0),
                           child: Card(
                             /* decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(10.0),
@@ -637,7 +757,7 @@ class _HomeListState extends State<HomeList> {
                                 Container(
                                   margin:
                                       EdgeInsets.all(8), // Aggiunto margin qui
-                                  padding: EdgeInsets.all(2),
+                                  // padding: EdgeInsets.all(2),
                                   width: 60,
                                   height: 60,
                                   decoration: BoxDecoration(
