@@ -143,7 +143,7 @@ class _ChartsListState extends State<ChartsList> {
                                   walletProvider.selectedWalletIndex == index;
                               return Padding(
                                 padding: const EdgeInsets.symmetric(
-                                    vertical: 8.0, horizontal: 8.0),
+                                    vertical: 8.0, horizontal: 16.0),
                                 child: ElevatedButton(
                                   onPressed: () {
                                     _handleButtonPress(index);
@@ -242,8 +242,8 @@ class _ChartsListState extends State<ChartsList> {
                       },
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(left: 8.0),
-                      child: Text("Transazioni per ${selectedWallet.name}:"),
+                      padding: const EdgeInsets.only(left: 16, top: 8.0),
+                      child: Text("Transazioni per ${selectedWallet.name}:", style: TextStyle(fontSize: 16),),
                     ),
                     Expanded(
                       child: FutureBuilder<List<Transaction>>(

@@ -490,7 +490,8 @@ class _HomeListState extends State<HomeList> {
                                       style: TextStyle(
                                         fontWeight: FontWeight
                                             .bold, // Imposta il testo in grassetto
-                                            fontSize: 25.0
+                                            fontSize: 25.0,
+                                            color: valoreCategoria < 0 ? Colors.red : Colors.green
                                       ),
                                     ),
                                    
