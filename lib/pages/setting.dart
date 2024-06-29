@@ -66,32 +66,21 @@ class _SettingsPageState extends State<SettingsPage> {
       ),
       body: ListView(
         children: <Widget>[
-          Container(
-            margin: EdgeInsets.only(bottom: 10, left: 10, right: 10),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Color(0xffb3b3b3),
+ 
+          Card(
+              child: ListTile(
+                title: Text('Modifica nome account'),
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ChangeNamePage()),
+                  );
+                },
               ),
-              borderRadius: BorderRadius.circular(10),
             ),
-            child: ListTile(
-              title: Text('Modifica nome account'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => ChangeNamePage()),
-                );
-              },
-            ),
-          ),
-          Container(
-            margin: EdgeInsets.only(bottom: 10, left: 10, right: 10),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Color(0xffb3b3b3),
-              ),
-              borderRadius: BorderRadius.circular(10),
-            ),
+          
+          Card(
+           
             child: ListTile(
               title: Text('Cambia valuta'),
               onTap: () {},
@@ -113,14 +102,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ),
           ),
-          Container(
-            margin: EdgeInsets.only(bottom: 10, left: 10, right: 10),
-            decoration: BoxDecoration(
-              border: Border.all(
-                color: Color(0xffb3b3b3),
-              ),
-              borderRadius: BorderRadius.circular(10),
-            ),
+          Card(
             child: ListTile(
               title: Text('Modalità scura'),
               trailing: Switch(

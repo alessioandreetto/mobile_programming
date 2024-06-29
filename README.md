@@ -7,13 +7,12 @@ A new Flutter project.
 ## Charts Page
 1. ⁠⁠rivedere grafica del grafico a linea
 ## New Transaction
-1. bottone aggiungi in basso 
 2. rivedere parte exchange e modifica
 3. tasto indietro da gesture non va 
 
 
 ## Wallet
-1. adeguare form new wallet grafica a quelli di nuova transazione
+1. new wallet se focus su bilancio e back errore fab 
 ## Settings
 
 ## Demo
@@ -24,3 +23,9 @@ A new Flutter project.
 1. ⁠saveZone per status bar
 3. Sistemazione grafica generale
 4. ⁠breve relazione che descriva la realizzazione del progetto
+
+
+aggiungere nome categoria nella card oltre all'icona 
+
+
+slide di grafico wallet a torta ha dei problemi quando swipe, vedo lo stesso 2 volte prima che carichi il prossimo
