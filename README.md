@@ -3,7 +3,6 @@
 A new Flutter project.
 
 ## Home Page
-1. aggiungere bold in button selected wallet
 ## Charts Page
 1. ⁠⁠rivedere grafica del grafico a linea
 ## New Transaction

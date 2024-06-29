@@ -40,27 +40,21 @@ class _ChangeNamePageState extends State<ChangeNamePage> {
         onWillPop: _onWillPop,
         child: Scaffold(
           appBar: AppBar(
+            title: Text("Modifica nome account"),
             backgroundColor: Colors.transparent,
             elevation: 0,
           ),
           body: SingleChildScrollView(
             child: Column(
               children: [
-                Divider(height: 1, color: Color(0xffb3b3b3)),
                 Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: Container(
-                    decoration: BoxDecoration(
-                      border: Border.all(color: Colors.grey),
-                      borderRadius: BorderRadius.circular(10.0),
-                    ),
+                
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: TextField(
                         controller: _nameController,
                         style: TextStyle(
-                          fontFamily: 'RobotoThin',
-                          fontSize: 25,
                         ),
                         onChanged: (_) {
                           setState(() {
@@ -68,16 +62,12 @@ class _ChangeNamePageState extends State<ChangeNamePage> {
                           });
                         },
                         decoration: InputDecoration(
-                          hintText: 'Account Name',
-                          hintStyle: TextStyle(
-                            fontFamily: 'RobotoThin',
-                            fontSize: 25,
-                          ),
-                          border: InputBorder.none,
+                          labelText: 'Nome account',
+
                         ),
                       ),
                     ),
-                  ),
+                  
                 ),
               ],
             ),
