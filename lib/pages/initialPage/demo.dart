@@ -8,6 +8,7 @@ import '../../model/database_model.dart';
 import '../../providers/wallet_provider.dart';
 import 'package:provider/provider.dart';
 import 'tutorial.dart';
+import 'package:flutter/services.dart';
 
 class PageIndicatorDemo extends StatefulWidget {
   @override
@@ -30,6 +31,11 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
     super.initState();
     nameController = TextEditingController();
     balanceController = TextEditingController();
+
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Colors.white, // Status bar color
+      statusBarIconBrightness: Brightness.dark, // Dark icons for light status bar
+    ));
   }
 
   @override
