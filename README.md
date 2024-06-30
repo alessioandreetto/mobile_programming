@@ -29,3 +29,5 @@ rivedere slide to delete
 
 
 slide di grafico wallet a torta ha dei problemi quando swipe, vedo lo stesso 2 volte prima che carichi il prossimo
+
+RIVEDERE TUTTI I TESTI IN ITALIANO
