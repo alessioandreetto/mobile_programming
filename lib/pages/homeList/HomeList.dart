@@ -436,18 +436,15 @@ class _HomeListState extends State<HomeList> {
                                       text:
                                           '${walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).name}',
                                       style: TextStyle(
-                                        fontWeight: FontWeight
-                                            .bold, // Imposta il testo in grassetto
-                                            fontSize: 25.0
-                                      ),
+                                          fontWeight: FontWeight
+                                              .bold, // Imposta il testo in grassetto
+                                          fontSize: 25.0),
                                     ),
-                                   
                                   ],
                                 ),
                               ),
                             if (walletProvider.wallets.isNotEmpty)
-                            
-                                   RichText(
+                              RichText(
                                 text: TextSpan(
                                   text: 'Bilancio: ',
                                   style: TextStyle(
@@ -462,18 +459,15 @@ class _HomeListState extends State<HomeList> {
                                       text:
                                           '${walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).balance} ${walletProvider.valuta}',
                                       style: TextStyle(
-                                        fontWeight: FontWeight
-                                            .bold, // Imposta il testo in grassetto
-                                            fontSize: 25.0
-                                      ),
+                                          fontWeight: FontWeight
+                                              .bold, // Imposta il testo in grassetto
+                                          fontSize: 25.0),
                                     ),
-                                   
                                   ],
                                 ),
                               ),
                             if (nomeCategoria.isNotEmpty) ...[
-
-  RichText(
+                              RichText(
                                 text: TextSpan(
                                   text: '$nomeCategoria: ',
                                   style: TextStyle(
@@ -488,19 +482,23 @@ class _HomeListState extends State<HomeList> {
                                       text:
                                           '$valoreCategoria ${walletProvider.valuta}',
                                       style: TextStyle(
-                                        fontWeight: FontWeight
-                                            .bold, // Imposta il testo in grassetto
-                                            fontSize: 25.0,
-                                            color: valoreCategoria < 0 ? Colors.red : Colors.green
-                                      ),
+                                          fontWeight: FontWeight
+                                              .bold, // Imposta il testo in grassetto
+                                          fontSize: 25.0,
+                                          color: valoreCategoria < 0
+                                              ? Colors.red
+                                              : Colors.green),
                                     ),
-                                   
                                   ],
                                 ),
                               ),
                             ],
                             if (nomeCategoria.isEmpty) ...[
-                              Text(' ', style: TextStyle(fontSize: 26, fontWeight: FontWeight.bold),),
+                              Text(
+                                ' ',
+                                style: TextStyle(
+                                    fontSize: 26, fontWeight: FontWeight.bold),
+                              ),
                             ],
                           ],
                         ),
@@ -782,11 +780,42 @@ class _HomeListState extends State<HomeList> {
                                         CrossAxisAlignment.start,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Text(
-                                        transaction.name ?? '',
+                                      /*  Text(
+                                        transaction.name! + ' - ' + categories[int.parse(transaction.categoryId.toString())].name  ?? '',
                                         style: TextStyle(
                                           fontSize: 18.0,
                                           fontWeight: FontWeight.bold,
+                                        ),
+                                      ), */
+                                      RichText(
+                                        text: TextSpan(
+                                          text: transaction.name ,
+                                          style: TextStyle(
+                                            fontFamily: 'Poppins',
+                                            color:
+                                                (Theme.of(context).brightness ==
+                                                        Brightness.light
+                                                    ? Colors.black
+                                                    : Colors.white),
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          children: <TextSpan>[
+                                            TextSpan(
+                                              text: ' - ' + categories[int.parse(
+                                                      transaction.categoryId
+                                                          .toString())]
+                                                  .name,
+                                              style: TextStyle(
+                                                fontFamily: 'Poppins',
+                                                color: (Theme.of(context)
+                                                            .brightness ==
+                                                        Brightness.light
+                                                    ? Colors.black
+                                                    : Colors.white),
+                                                fontWeight: FontWeight.normal,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                       SizedBox(height: 4),

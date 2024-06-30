@@ -3,11 +3,13 @@
 A new Flutter project.
 
 ## Home Page
+rivedere slide to delete 
 ## Charts Page
 1. ⁠⁠rivedere grafica del grafico a linea
+2. rivedere slide to delete 
 ## New Transaction
-2. rivedere parte exchange e modifica
-3. tasto indietro da gesture non va 
+1. rivedere parte exchange e modifica
+2. tasto indietro da gesture non va 
 
 
 ## Wallet
@@ -24,8 +26,6 @@ A new Flutter project.
 3. Sistemazione grafica generale
 4. ⁠breve relazione che descriva la realizzazione del progetto
 
-
-aggiungere nome categoria nella card oltre all'icona 
 
 
 slide di grafico wallet a torta ha dei problemi quando swipe, vedo lo stesso 2 volte prima che carichi il prossimo

@@ -27,6 +27,16 @@ class _ChartsListState extends State<ChartsList> {
     6: Colors.brown, // Categoria Varie
   };
 
+  List<Category> categories = [
+    Category(id: 1, name: 'Auto'),
+    Category(id: 2, name: 'Banca'),
+    Category(id: 3, name: 'Casa'),
+    Category(id: 4, name: 'Intrattenimento'),
+    Category(id: 5, name: 'Shopping'),
+    Category(id: 6, name: 'Viaggio'),
+    Category(id: 7, name: 'Varie'),
+  ];
+
   Map<int, IconData> categoryIcons = {
     0: Icons.directions_car, // Categoria Auto
     1: Icons.account_balance, // Categoria Banca
@@ -243,7 +253,10 @@ class _ChartsListState extends State<ChartsList> {
                     ),
                     Padding(
                       padding: const EdgeInsets.only(left: 16, top: 8.0),
-                      child: Text("Transazioni per ${selectedWallet.name}:", style: TextStyle(fontSize: 16),),
+                      child: Text(
+                        "Transazioni per ${selectedWallet.name}:",
+                        style: TextStyle(fontSize: 16),
+                      ),
                     ),
                     Expanded(
                       child: FutureBuilder<List<Transaction>>(
@@ -305,9 +318,10 @@ class _ChartsListState extends State<ChartsList> {
                                           context, transaction);
                                     },
                                     child: Padding(
-                                      padding: const EdgeInsets.only(left: 5.0, right: 5.0, bottom: 5.0),
+                                      padding: const EdgeInsets.only(
+                                          left: 5.0, right: 5.0, bottom: 5.0),
                                       child: Card(
-                                     /*    decoration: BoxDecoration(
+                                        /*    decoration: BoxDecoration(
                                           borderRadius:
                                               BorderRadius.circular(10.0),
                                           color: Theme.of(context).brightness ==
@@ -358,12 +372,53 @@ class _ChartsListState extends State<ChartsList> {
                                                 mainAxisAlignment:
                                                     MainAxisAlignment.center,
                                                 children: [
-                                                  Text(
+                                                  /* Text(
                                                     transaction.name ?? '',
                                                     style: TextStyle(
                                                       fontSize: 18.0,
                                                       fontWeight:
                                                           FontWeight.bold,
+                                                    ),
+                                                  ), */
+
+                                                  RichText(
+                                                    text: TextSpan(
+                                                      text: transaction.name
+                                                          ,
+                                                      style: TextStyle(
+                                                        fontFamily: 'Poppins',
+                                                        color: (Theme.of(
+                                                                        context)
+                                                                    .brightness ==
+                                                                Brightness.light
+                                                            ? Colors.black
+                                                            : Colors.white),
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                      ),
+                                                      children: <TextSpan>[
+                                                        TextSpan(
+                                                          text: ' - ' + categories[int
+                                                                  .parse(transaction
+                                                                      .categoryId
+                                                                      .toString())]
+                                                              .name,
+                                                          style: TextStyle(
+                                                            fontFamily:
+                                                                'Poppins',
+                                                            color: (Theme.of(
+                                                                            context)
+                                                                        .brightness ==
+                                                                    Brightness
+                                                                        .light
+                                                                ? Colors.black
+                                                                : Colors.white),
+                                                            fontWeight:
+                                                                FontWeight
+                                                                    .normal,
+                                                          ),
+                                                        ),
+                                                      ],
                                                     ),
                                                   ),
                                                   SizedBox(height: 4),
