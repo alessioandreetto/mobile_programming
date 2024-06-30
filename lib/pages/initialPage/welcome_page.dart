@@ -59,6 +59,7 @@ class _WelcomePageState extends State<WelcomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+       resizeToAvoidBottomInset: false,
       body: Padding(
         padding: EdgeInsets.all(20.0),
         child: 
@@ -81,7 +82,7 @@ class _WelcomePageState extends State<WelcomePage> {
                     controller: _nameController,
                     decoration: InputDecoration(
                       labelText: 'Inserisci il tuo nome per iniziare',
-                      border: OutlineInputBorder(),
+                      
                     ),
                     validator: (value) {
                       if (value == null || value.isEmpty) {

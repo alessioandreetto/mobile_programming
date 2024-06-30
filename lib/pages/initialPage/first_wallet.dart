@@ -82,30 +82,20 @@ class _FirstWalletState extends State<FirstWallet> {
                       ),
                       SizedBox(height: 8),
                       Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
+                       
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
                           child: TextField(
                             controller: widget.nameController,
-                            style: TextStyle(
-                              fontFamily: 'RobotoThin',
-                              fontSize: 25,
-                            ),
+                            
                             onChanged: (_) {
                               setState(() {
                                 _isDirty = true;
                               });
                             },
                             decoration: InputDecoration(
-                              hintText: 'Inserisci il nome del portafoglio',
-                              hintStyle: TextStyle(
-                                fontFamily: 'RobotoThin',
-                                fontSize: 25,
-                              ),
-                              border: InputBorder.none,
+                              labelText: 'Inserisci il nome del portafoglio',
+                          
                             ),
                           ),
                         ),
@@ -126,19 +116,14 @@ class _FirstWalletState extends State<FirstWallet> {
                       ),
                       SizedBox(height: 8),
                       Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey),
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
+                       
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
                           child: TextField(
                             controller: widget.balanceController,
                             keyboardType: TextInputType.number,
-                            style: TextStyle(
-                              fontFamily: 'RobotoThin',
-                              fontSize: 25,
-                            ),
+                           
+                            
                             inputFormatters: [
                               FilteringTextInputFormatter.allow(
                                   RegExp(r'^\d+\.?\d{0,2}')),
@@ -149,12 +134,8 @@ class _FirstWalletState extends State<FirstWallet> {
                               });
                             },
                             decoration: InputDecoration(
-                              hintText: '0.00 €',
-                              hintStyle: TextStyle(
-                                fontFamily: 'RobotoThin',
-                                fontSize: 25,
-                              ),
-                              border: InputBorder.none,
+                              labelText: 'bilancio iniziale',
+                             
                             ),
                           ),
                         ),

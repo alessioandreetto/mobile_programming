@@ -15,10 +15,9 @@ A new Flutter project.
 ## Settings
 
 ## Demo
-1. inserimento nome sposta su la schermata 
 2. glich effetto blur sfocato quando tonro indietro 
 3. bloccare la possibilità di finire il tutorial se non si è fatto il portafogli
-4. se tastiera è aperta e cambio pagina glich grafico demo 
+
 
 
 ## Other

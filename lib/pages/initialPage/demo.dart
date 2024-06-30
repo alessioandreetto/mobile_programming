@@ -26,6 +26,8 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
   late TextEditingController nameController;
   late TextEditingController balanceController;
 
+    FocusScopeNode _focusScopeNode = FocusScopeNode();
+
   @override
   void initState() {
     super.initState();
@@ -43,6 +45,7 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
     // Rilascia le risorse dei controller
     nameController.dispose();
     balanceController.dispose();
+        _focusScopeNode.dispose(); // Disponi del nodo FocusScope
     super.dispose();
   }
 
@@ -80,120 +83,134 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
   Widget build(BuildContext context) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
-      body: Column(
-        children: [
-          Expanded(
-            child: PageView(
-              controller: _pageController,
-              onPageChanged: (index) {
-                setState(() {
-                  _currentPageIndex = index;
-                });
-              },
-              children: [
-                Container(
-                  child: Center(
-                    child: WelcomePage(
-                      onNameEntered: (name) {
-                        setState(() {
-                          walletName = name;
-                        });
-                      },
+      body: GestureDetector(
+        onTap: () {
+          // Chiudi la tastiera se è aperta
+          if (!_focusScopeNode.hasPrimaryFocus) {
+            _focusScopeNode.unfocus();
+          }
+        },
+        child: Column(
+          children: [
+            Expanded(
+              child: FocusScope(
+                node: _focusScopeNode,
+                child: PageView(
+                  controller: _pageController,
+                  onPageChanged: (index) {
+                    setState(() {
+                      _currentPageIndex = index;
+                    });
+                    // Chiudi la tastiera quando cambia la pagina
+                    _focusScopeNode.unfocus();
+                  },
+                  children: [
+                    Container(
+                      child: Center(
+                        child: WelcomePage(
+                          onNameEntered: (name) {
+                            setState(() {
+                              walletName = name;
+                            });
+                          },
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-                Container(
-                  child: Center(
-                    child: FirstWallet(
-                      nameController: nameController,
-                      balanceController: balanceController,
-                      onWalletDataChanged: (name, balance) {
-                        _updateWalletData(name, balance);
-                      },
+                    Container(
+                      child: Center(
+                        child: FirstWallet(
+                          nameController: nameController,
+                          balanceController: balanceController,
+                          onWalletDataChanged: (name, balance) {
+                            _updateWalletData(name, balance);
+                          },
+                        ),
+                      ),
                     ),
-                  ),
+                    Container(
+                      child: Center(
+                        child: InteractiveTutorial(
+                          onComplete: () {
+                            _pageController.nextPage(
+                              duration: Duration(milliseconds: 300),
+                              curve: Curves.ease,
+                            );
+                          },
+                        ),
+                      ),
+                    ),
+                    Container(
+                      color: Colors.white,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Bene, è tutto pronto\nIniziamo!',
+                            style: TextStyle(
+                                fontSize: 24, fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.center,
+                          ),
+                          SizedBox(height: 20),
+                          Container(
+                            decoration: BoxDecoration(
+                              border:
+                                  Border.all(color: Colors.black, width: 1),
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                            child: TextButton(
+                              onPressed: _onTutorialCompleted,
+                              child: Text(
+                                'Fine tutorial',
+                                style: TextStyle(color: Colors.black),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
-                Container(
-                  child: Center(
-                    child: InteractiveTutorial(
-                      onComplete: () {
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(8.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  if (_currentPageIndex != 0)
+                    IconButton(
+                      icon: Icon(Icons.arrow_back),
+                      onPressed: () {
+                        _pageController.previousPage(
+                          duration: Duration(milliseconds: 300),
+                          curve: Curves.ease,
+                        );
+                      },
+                    )
+                  else
+                    SizedBox(width: 48),
+                  SmoothPageIndicator(
+                    controller: _pageController,
+                    count: 4,
+                    effect: WormEffect(),
+                  ),
+                  if (_currentPageIndex != 3)
+                    IconButton(
+                      icon: Icon(Icons.arrow_forward),
+                      onPressed: () {
                         _pageController.nextPage(
                           duration: Duration(milliseconds: 300),
                           curve: Curves.ease,
                         );
                       },
-                    ),
-                  ),
-                ),
-                Container(
-                  color: Colors.white,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Bene, è tutto pronto\nIniziamo!',
-                        style: TextStyle(
-                            fontSize: 24, fontWeight: FontWeight.bold),
-                        textAlign: TextAlign.center,
-                      ),
-                      SizedBox(height: 20),
-                      Container(
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.black, width: 1),
-                          borderRadius: BorderRadius.circular(30),
-                        ),
-                        child: TextButton(
-                          onPressed: _onTutorialCompleted,
-                          child: Text(
-                            'Fine tutorial',
-                            style: TextStyle(color: Colors.black),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
+                    )
+                  else
+                    SizedBox(width: 48),
+                ],
+              ),
             ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(8.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                if (_currentPageIndex != 0)
-                  IconButton(
-                    icon: Icon(Icons.arrow_back),
-                    onPressed: () {
-                      _pageController.previousPage(
-                        duration: Duration(milliseconds: 300),
-                        curve: Curves.ease,
-                      );
-                    },
-                  )
-                else
-                  SizedBox(width: 48),
-                SmoothPageIndicator(
-                  controller: _pageController,
-                  count: 4,
-                  effect: WormEffect(),
-                ),
-                if (_currentPageIndex != 3)
-                  IconButton(
-                    icon: Icon(Icons.arrow_forward),
-                    onPressed: () {
-                      _pageController.nextPage(
-                        duration: Duration(milliseconds: 300),
-                        curve: Curves.ease,
-                      );
-                    },
-                  )
-                else
-                  SizedBox(width: 48),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
