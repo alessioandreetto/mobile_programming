@@ -21,12 +21,14 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
   String walletName = ''; // Nome del wallet
   double walletBalance = 0.0;
   int? walletId;
+  bool _isNameValid = true;
+  bool _isBalanceValid = true;
 
   // Creazione dei controller
   late TextEditingController nameController;
   late TextEditingController balanceController;
 
-    FocusScopeNode _focusScopeNode = FocusScopeNode();
+  FocusScopeNode _focusScopeNode = FocusScopeNode();
 
   @override
   void initState() {
@@ -36,7 +38,8 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
 
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.white, // Status bar color
-      statusBarIconBrightness: Brightness.dark, // Dark icons for light status bar
+      statusBarIconBrightness:
+          Brightness.dark, // Dark icons for light status bar
     ));
   }
 
@@ -45,7 +48,7 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
     // Rilascia le risorse dei controller
     nameController.dispose();
     balanceController.dispose();
-        _focusScopeNode.dispose(); // Disponi del nodo FocusScope
+    _focusScopeNode.dispose(); // Disponi del nodo FocusScope
     super.dispose();
   }
 
@@ -76,6 +79,46 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
           Provider.of<WalletProvider>(context, listen: false).loadWallets();
         });
       }
+    }
+  }
+
+  void _showErrorMessages() {
+    setState(() {
+      _isNameValid = walletName.isNotEmpty;
+      _isBalanceValid = walletBalance > 0;
+    });
+
+    if (!_isNameValid || !_isBalanceValid) {
+      // Show an error message using an overlay
+      final overlay = Overlay.of(context);
+      final overlayEntry = OverlayEntry(
+        builder: (context) => Positioned(
+          top: 50.0,
+          left: MediaQuery.of(context).size.width * 0.1,
+          width: MediaQuery.of(context).size.width * 0.8,
+          child: Material(
+            color: Colors.transparent,
+            child: Container(
+              decoration: BoxDecoration(
+                color: Colors.blueAccent,
+                borderRadius: BorderRadius.circular(10.0),
+              ),
+              padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
+              child: Text(
+                'Inserisci i dati per creare il primo wallet.',
+                style: TextStyle(color: Colors.white),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        ),
+      );
+
+      overlay.insert(overlayEntry);
+
+      Future.delayed(Duration(seconds: 2), () {
+        overlayEntry.remove();
+      });
     }
   }
 
@@ -153,8 +196,7 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
                           SizedBox(height: 20),
                           Container(
                             decoration: BoxDecoration(
-                              border:
-                                  Border.all(color: Colors.black, width: 1),
+                              border: Border.all(color: Colors.black, width: 1),
                               borderRadius: BorderRadius.circular(30),
                             ),
                             child: TextButton(
@@ -198,10 +240,15 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
                     IconButton(
                       icon: Icon(Icons.arrow_forward),
                       onPressed: () {
-                        _pageController.nextPage(
-                          duration: Duration(milliseconds: 300),
-                          curve: Curves.ease,
-                        );
+                        if (_currentPageIndex == 1 &&
+                            (walletName.isEmpty || walletBalance <= 0)) {
+                          _showErrorMessages();
+                        } else {
+                          _pageController.nextPage(
+                            duration: Duration(milliseconds: 300),
+                            curve: Curves.ease,
+                          );
+                        }
                       },
                     )
                   else

@@ -18,6 +18,8 @@ class FirstWallet extends StatefulWidget {
 
 class _FirstWalletState extends State<FirstWallet> {
   bool _isDirty = false;
+  bool _isNameValid = true;
+  bool _isBalanceValid = true;
 
   @override
   void initState() {
@@ -25,7 +27,6 @@ class _FirstWalletState extends State<FirstWallet> {
     widget.nameController.addListener(_onDataChanged);
     widget.balanceController.addListener(_onDataChanged);
 
-    // Initialize balanceController with a formatted value
     if (widget.balanceController.text.isNotEmpty) {
       double initialBalance = double.parse(widget.balanceController.text);
       widget.balanceController.text = initialBalance.toStringAsFixed(2);
@@ -33,10 +34,27 @@ class _FirstWalletState extends State<FirstWallet> {
   }
 
   void _onDataChanged() {
-    widget.onWalletDataChanged(
-      widget.nameController.text,
-      double.tryParse(widget.balanceController.text) ?? 0.0,
-    );
+    setState(() {
+      _isNameValid = widget.nameController.text.isNotEmpty;
+      _isBalanceValid =
+          double.tryParse(widget.balanceController.text) != null &&
+              double.parse(widget.balanceController.text) > 0;
+      widget.onWalletDataChanged(
+        widget.nameController.text,
+        double.tryParse(widget.balanceController.text) ?? 0.0,
+      );
+    });
+  }
+
+  bool validateInputs() {
+    setState(() {
+      _isNameValid = widget.nameController.text.isNotEmpty;
+      _isBalanceValid =
+          double.tryParse(widget.balanceController.text) != null &&
+              double.parse(widget.balanceController.text) > 0;
+    });
+
+    return _isNameValid && _isBalanceValid;
   }
 
   @override
@@ -82,12 +100,10 @@ class _FirstWalletState extends State<FirstWallet> {
                       ),
                       SizedBox(height: 8),
                       Container(
-                       
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
                           child: TextField(
                             controller: widget.nameController,
-                            
                             onChanged: (_) {
                               setState(() {
                                 _isDirty = true;
@@ -95,7 +111,12 @@ class _FirstWalletState extends State<FirstWallet> {
                             },
                             decoration: InputDecoration(
                               labelText: 'Inserisci il nome del portafoglio',
-                          
+                              errorText: _isNameValid
+                                  ? null
+                                  : 'Questo campo è obbligatorio',
+                              suffixIcon: _isNameValid
+                                  ? null
+                                  : Icon(Icons.error, color: Colors.red),
                             ),
                           ),
                         ),
@@ -116,14 +137,11 @@ class _FirstWalletState extends State<FirstWallet> {
                       ),
                       SizedBox(height: 8),
                       Container(
-                       
                         child: Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 8.0),
                           child: TextField(
                             controller: widget.balanceController,
                             keyboardType: TextInputType.number,
-                           
-                            
                             inputFormatters: [
                               FilteringTextInputFormatter.allow(
                                   RegExp(r'^\d+\.?\d{0,2}')),
@@ -134,8 +152,13 @@ class _FirstWalletState extends State<FirstWallet> {
                               });
                             },
                             decoration: InputDecoration(
-                              labelText: 'bilancio iniziale',
-                             
+                              labelText: 'Bilancio iniziale',
+                              errorText: _isBalanceValid
+                                  ? null
+                                  : 'Inserisci un saldo valido maggiore di 0',
+                              suffixIcon: _isBalanceValid
+                                  ? null
+                                  : Icon(Icons.error, color: Colors.red),
                             ),
                           ),
                         ),
