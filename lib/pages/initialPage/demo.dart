@@ -105,7 +105,7 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
               ),
               padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
               child: Text(
-                'Inserisci i dati per creare il primo wallet.',
+                'Inserisci i dati per creare il primo wallet',
                 style: TextStyle(color: Colors.white),
                 textAlign: TextAlign.center,
               ),
@@ -119,6 +119,16 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
       Future.delayed(Duration(seconds: 2), () {
         overlayEntry.remove();
       });
+    }
+  }
+
+  void _validateFormAndProceed() {
+    _showErrorMessages();
+    if (_isNameValid && _isBalanceValid) {
+      _pageController.nextPage(
+        duration: Duration(milliseconds: 300),
+        curve: Curves.ease,
+      );
     }
   }
 
@@ -167,6 +177,8 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
                           onWalletDataChanged: (name, balance) {
                             _updateWalletData(name, balance);
                           },
+                          isNameValid: _isNameValid,
+                          isBalanceValid: _isBalanceValid,
                         ),
                       ),
                     ),
@@ -240,9 +252,8 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
                     IconButton(
                       icon: Icon(Icons.arrow_forward),
                       onPressed: () {
-                        if (_currentPageIndex == 1 &&
-                            (walletName.isEmpty || walletBalance <= 0)) {
-                          _showErrorMessages();
+                        if (_currentPageIndex == 1) {
+                          _validateFormAndProceed();
                         } else {
                           _pageController.nextPage(
                             duration: Duration(milliseconds: 300),

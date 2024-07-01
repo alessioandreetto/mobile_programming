@@ -5,11 +5,15 @@ class FirstWallet extends StatefulWidget {
   final TextEditingController nameController;
   final TextEditingController balanceController;
   final Function(String, double) onWalletDataChanged;
+  final bool isNameValid;
+  final bool isBalanceValid;
 
   FirstWallet({
     required this.nameController,
     required this.balanceController,
     required this.onWalletDataChanged,
+    required this.isNameValid,
+    required this.isBalanceValid,
   });
 
   @override
@@ -18,43 +22,22 @@ class FirstWallet extends StatefulWidget {
 
 class _FirstWalletState extends State<FirstWallet> {
   bool _isDirty = false;
-  bool _isNameValid = true;
-  bool _isBalanceValid = true;
 
   @override
   void initState() {
     super.initState();
     widget.nameController.addListener(_onDataChanged);
     widget.balanceController.addListener(_onDataChanged);
-
-    if (widget.balanceController.text.isNotEmpty) {
-      double initialBalance = double.parse(widget.balanceController.text);
-      widget.balanceController.text = initialBalance.toStringAsFixed(2);
-    }
   }
 
   void _onDataChanged() {
     setState(() {
-      _isNameValid = widget.nameController.text.isNotEmpty;
-      _isBalanceValid =
-          double.tryParse(widget.balanceController.text) != null &&
-              double.parse(widget.balanceController.text) > 0;
-      widget.onWalletDataChanged(
-        widget.nameController.text,
-        double.tryParse(widget.balanceController.text) ?? 0.0,
-      );
+      _isDirty = true;
     });
-  }
-
-  bool validateInputs() {
-    setState(() {
-      _isNameValid = widget.nameController.text.isNotEmpty;
-      _isBalanceValid =
-          double.tryParse(widget.balanceController.text) != null &&
-              double.parse(widget.balanceController.text) > 0;
-    });
-
-    return _isNameValid && _isBalanceValid;
+    widget.onWalletDataChanged(
+      widget.nameController.text,
+      double.tryParse(widget.balanceController.text) ?? 0.0,
+    );
   }
 
   @override
@@ -111,10 +94,10 @@ class _FirstWalletState extends State<FirstWallet> {
                             },
                             decoration: InputDecoration(
                               labelText: 'Inserisci il nome del portafoglio',
-                              errorText: _isNameValid
+                              errorText: widget.isNameValid
                                   ? null
                                   : 'Questo campo è obbligatorio',
-                              suffixIcon: _isNameValid
+                              suffixIcon: widget.isNameValid
                                   ? null
                                   : Icon(Icons.error, color: Colors.red),
                             ),
@@ -153,10 +136,10 @@ class _FirstWalletState extends State<FirstWallet> {
                             },
                             decoration: InputDecoration(
                               labelText: 'Bilancio iniziale',
-                              errorText: _isBalanceValid
+                              errorText: widget.isBalanceValid
                                   ? null
-                                  : 'Inserisci un saldo valido maggiore di 0',
-                              suffixIcon: _isBalanceValid
+                                  : 'Questo campo è obbligatorio',
+                              suffixIcon: widget.isBalanceValid
                                   ? null
                                   : Icon(Icons.error, color: Colors.red),
                             ),
@@ -176,25 +159,30 @@ class _FirstWalletState extends State<FirstWallet> {
 
   Future<bool> _onWillPop() async {
     if (_isDirty) {
-      return await showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Conferma uscita'),
-          content: Text(
-              'Hai delle modifiche non salvate. Sei sicuro di voler uscire?'),
-          actions: <Widget>[
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(false),
-              child: Text('No'),
-            ),
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(true),
-              child: Text('Si'),
-            ),
-          ],
-        ),
-      );
+      return await _showConfirmationDialog();
     }
     return true;
+  }
+
+  Future<bool> _showConfirmationDialog() async {
+    return (await showDialog(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text('Conferma'),
+            content: Text(
+                'Sei sicuro di voler tornare indietro? I dati inseriti andranno persi.'),
+            actions: <Widget>[
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: Text('No'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                child: Text('Sì'),
+              ),
+            ],
+          ),
+        )) ??
+        false;
   }
 }
