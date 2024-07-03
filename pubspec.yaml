@@ -21,9 +21,13 @@ dependencies:
   smooth_page_indicator: ^1.1.0
   flutter_slidable: ^3.0.0
   animations: ^2.0.2
-  intl: ^0.17.0
+  intl: any
   syncfusion_flutter_charts: ^21.1.0
   adaptive_theme: ^3.6.0 # Aggiungi questa linea
+  flutter_localizations: 
+    sdk: flutter
+
+
 
 dev_dependencies:
   flutter_test:

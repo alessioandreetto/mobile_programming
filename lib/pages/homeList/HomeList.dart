@@ -423,7 +423,7 @@ class _HomeListState extends State<HomeList> {
                             if (walletProvider.wallets.isNotEmpty)
                               RichText(
                                 text: TextSpan(
-                                  text: 'Nome Wallet: ',
+                                  text: 'Nome Portafoglio: ',
                                   style: TextStyle(
                                       fontFamily: 'Poppins',
                                       fontSize: 12.0, // Dimensione del testo
@@ -438,7 +438,7 @@ class _HomeListState extends State<HomeList> {
                                       style: TextStyle(
                                           fontWeight: FontWeight
                                               .bold, // Imposta il testo in grassetto
-                                          fontSize: 25.0),
+                                          fontSize: 20.0),
                                     ),
                                   ],
                                 ),
@@ -461,7 +461,7 @@ class _HomeListState extends State<HomeList> {
                                       style: TextStyle(
                                           fontWeight: FontWeight
                                               .bold, // Imposta il testo in grassetto
-                                          fontSize: 25.0),
+                                          fontSize: 20.0),
                                     ),
                                   ],
                                 ),
@@ -484,7 +484,7 @@ class _HomeListState extends State<HomeList> {
                                       style: TextStyle(
                                           fontWeight: FontWeight
                                               .bold, // Imposta il testo in grassetto
-                                          fontSize: 25.0,
+                                          fontSize: 20.0,
                                           color: valoreCategoria < 0
                                               ? Colors.red
                                               : Colors.green),
@@ -497,7 +497,7 @@ class _HomeListState extends State<HomeList> {
                               Text(
                                 ' ',
                                 style: TextStyle(
-                                    fontSize: 26, fontWeight: FontWeight.bold),
+                                    fontSize: 21, fontWeight: FontWeight.bold),
                               ),
                             ],
                           ],

@@ -69,7 +69,7 @@ class _FirstWalletState extends State<FirstWallet> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text('Crea qui il tuo primo wallet!',
+                      Text('Crea qui il tuo primo portafoglio!',
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -93,7 +93,7 @@ class _FirstWalletState extends State<FirstWallet> {
                               });
                             },
                             decoration: InputDecoration(
-                              labelText: 'Inserisci il nome del portafoglio',
+                              labelText: 'Nome del portafoglio',
                               errorText: widget.isNameValid
                                   ? null
                                   : 'Questo campo è obbligatorio',

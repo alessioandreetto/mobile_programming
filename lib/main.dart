@@ -5,6 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'providers/wallet_provider.dart';
 import 'page-selector.dart';
 import 'pages/initialPage/demo.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
 
 void main() {
   runApp(MyApp());
@@ -18,6 +19,12 @@ class MyApp extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return MaterialApp(
+            localizationsDelegates: [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+       
             theme: ThemeData(
               useMaterial3: true,
               colorSchemeSeed: Colors.blue,
@@ -33,6 +40,11 @@ class MyApp extends StatelessWidget {
         }
         if (snapshot.hasError) {
           return MaterialApp(
+                        localizationsDelegates: [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
             theme: ThemeData(
               useMaterial3: true,
               colorSchemeSeed: Colors.blue,
@@ -80,6 +92,11 @@ class MyApp extends StatelessWidget {
             ),
             initial: AdaptiveThemeMode.light,
             builder: (theme, darkTheme) => MaterialApp(
+                          localizationsDelegates: [
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
               theme: theme,
               darkTheme: darkTheme,
               debugShowCheckedModeBanner: false,

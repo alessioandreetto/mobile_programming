@@ -130,8 +130,8 @@ class _AddNotePageState extends State<AddNotePage> {
         child: Scaffold(
           appBar: AppBar(
             title: widget.initialTitle == null && widget.initialBody == null
-                  ? Text("Nuovo Wallet", style: TextStyle(fontSize: 25))
-                  : Text("Modifica Wallet", style: TextStyle(fontSize: 25)),
+                  ? Text("Nuovo Portafoglio", style: TextStyle(fontSize: 25))
+                  : Text("Modifica Portafiglio", style: TextStyle(fontSize: 25)),
             backgroundColor: Colors.transparent,
             systemOverlayStyle: isDarkMode
                 ? SystemUiOverlayStyle.light
@@ -168,7 +168,7 @@ class _AddNotePageState extends State<AddNotePage> {
                           });
                         },
                         decoration: InputDecoration(
-                          labelText: 'Wallet Name',
+                          labelText: 'Nome portafoglio',
                         ),
                       ),
                     ),
@@ -261,8 +261,8 @@ class _AddNotePageState extends State<AddNotePage> {
       _showSnackbar(
           context,
           widget.initialTitle == null && widget.initialBody == null
-              ? 'Wallet creato con successo'
-              : 'Wallet modificato con successo');
+              ? 'Portafoglio creato con successo'
+              : 'Portafoglio modificato con successo');
     } else {
       _showSnackbar(context, 'Inserire tutti i campi');
     }
@@ -274,7 +274,7 @@ class _AddNotePageState extends State<AddNotePage> {
       builder: (context) => AlertDialog(
         title: Text('Conferma Eliminazione'),
         content: Text(
-            'Sei sicuro di voler eliminare questo wallet? Questa azione non può essere annullata.'),
+            'Sei sicuro di voler eliminare questo portafoglio? Questa azione non può essere annullata.'),
         actions: <Widget>[
           TextButton(
             onPressed: () {
@@ -294,7 +294,7 @@ class _AddNotePageState extends State<AddNotePage> {
 
     if (confirmed == true && widget.onDelete != null) {
       widget.onDelete!();
-      _showSnackbar(context, 'Wallet eliminato con successo');
+      _showSnackbar(context, 'Portafoglio eliminato con successo');
       Navigator.of(context).popUntil;
     }
   }

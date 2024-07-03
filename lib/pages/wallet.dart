@@ -147,7 +147,7 @@ class _WalletPageState extends State<WalletPage> {
           children: [
             Expanded(
               child: Text(
-                'Wallets',
+                'Portafogli',
                 style: TextStyle(fontSize: 25),
                 textAlign: TextAlign.start,
               ),
@@ -339,7 +339,7 @@ class _WalletPageState extends State<WalletPage> {
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
                       Text(
-                        "Balance: ",
+                        "Bilancio: ",
                         style: TextStyle(
                           fontSize: 10,
                         ),

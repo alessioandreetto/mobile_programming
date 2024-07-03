@@ -50,7 +50,7 @@ class _ChartsListState extends State<ChartsList> {
   @override
   void initState() {
     super.initState();
-    _selectedButton = 'Today';
+    _selectedButton = 'Oggi';
     _selectedWalletIndex = 0;
     _pageController = PageController(initialPage: 0);
   }
@@ -60,7 +60,7 @@ class _ChartsListState extends State<ChartsList> {
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Charts page', style: TextStyle(fontSize: 25)),
+        title: Text('Grafico finanze', style: TextStyle(fontSize: 25)),
         elevation: 0,
         backgroundColor: Colors.transparent,
         shadowColor: Colors.transparent,
@@ -70,13 +70,13 @@ class _ChartsListState extends State<ChartsList> {
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: ['Today', 'Weekly', 'Monthly', 'Yearly'].map((period) {
+            children: ['Oggi', 'Settimana', 'Mese', 'Anno'].map((period) {
               return ElevatedButton(
                 onPressed: () {
                   setState(() {
                     _selectedButton = period;
                     _pageController.animateToPage(
-                      ['Today', 'Weekly', 'Monthly', 'Yearly'].indexOf(period),
+                      ['Oggi', 'Settimana', 'Mese', 'Anno'].indexOf(period),
                       duration: Duration(milliseconds: 500),
                       curve: Curves.easeInOut,
                     );
@@ -115,14 +115,14 @@ class _ChartsListState extends State<ChartsList> {
               onPageChanged: (index) {
                 setState(() {
                   _selectedButton =
-                      ['Today', 'Weekly', 'Monthly', 'Yearly'][index];
+                      ['Oggi', 'Settimana', 'Mese', 'Anno'][index];
                 });
               },
               children: [
-                _buildChart('Today'),
-                _buildChart('Weekly'),
-                _buildChart('Monthly'),
-                _buildChart('Yearly'),
+                _buildChart('Oggi'),
+                _buildChart('Settimana'),
+                _buildChart('Mese'),
+                _buildChart('Anno'),
               ],
             ),
           ),
@@ -383,8 +383,7 @@ class _ChartsListState extends State<ChartsList> {
 
                                                   RichText(
                                                     text: TextSpan(
-                                                      text: transaction.name
-                                                          ,
+                                                      text: transaction.name,
                                                       style: TextStyle(
                                                         fontFamily: 'Poppins',
                                                         color: (Theme.of(
@@ -398,11 +397,12 @@ class _ChartsListState extends State<ChartsList> {
                                                       ),
                                                       children: <TextSpan>[
                                                         TextSpan(
-                                                          text: ' - ' + categories[int
-                                                                  .parse(transaction
-                                                                      .categoryId
-                                                                      .toString())]
-                                                              .name,
+                                                          text: ' - ' +
+                                                              categories[int.parse(
+                                                                      transaction
+                                                                          .categoryId
+                                                                          .toString())]
+                                                                  .name,
                                                           style: TextStyle(
                                                             fontFamily:
                                                                 'Poppins',
@@ -586,13 +586,13 @@ class _ChartsListState extends State<ChartsList> {
       int walletId, String selectedButton) async {
     DateTime startDate = DateTime.now();
     DateTime now = DateTime.now();
-    if (selectedButton == 'Today') {
+    if (selectedButton == 'Oggi') {
       startDate = DateTime(now.year, now.month, now.day);
-    } else if (selectedButton == 'Weekly') {
+    } else if (selectedButton == 'Settimana') {
       startDate = now.subtract(Duration(days: now.weekday - 1));
-    } else if (selectedButton == 'Monthly') {
+    } else if (selectedButton == 'Mese') {
       startDate = DateTime(now.year, now.month, 1);
-    } else if (selectedButton == 'Yearly') {
+    } else if (selectedButton == 'Anno') {
       startDate = DateTime(now.year, 1, 1);
     }
 

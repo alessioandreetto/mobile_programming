@@ -44,10 +44,10 @@ class _BottomBarDemoState extends State<BottomBarDemo> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
             _buildNavBarItem(Icons.home, 0, 'Home'),
-            _buildNavBarItem(Icons.show_chart, 1, 'Charts'),
+            _buildNavBarItem(Icons.show_chart, 1, 'Grafico'),
             SizedBox(width: 40), // Spazio vuoto per il notch centrale
-            _buildNavBarItem(Icons.wallet, 2, 'Wallet'),
-            _buildNavBarItem(Icons.settings, 3, 'Settings'),
+            _buildNavBarItem(Icons.wallet, 2, 'Portafogli'),
+            _buildNavBarItem(Icons.settings, 3, 'Impostazioni'),
           ],
         ),
       ),
@@ -83,32 +83,37 @@ class _BottomBarDemoState extends State<BottomBarDemo> {
     );
   }
 
-  Widget _buildNavBarItem(IconData icon, int index, String label) {
-    return MouseRegion(
-      cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-        onTap: () => _onItemTapped(index),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(
-              icon,
+ Widget _buildNavBarItem(IconData icon, int index, String label) {
+  return MouseRegion(
+    cursor: SystemMouseCursors.click,
+    child: GestureDetector(
+      onTap: () => _onItemTapped(index),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            color: _selectedIndex == index ? Colors.blue : Colors.grey,
+          ),
+          Text(
+            label.length > 7 ? '${label.substring(0, 6)}...' : label,
+            style: TextStyle(
+              fontSize: 10,
               color: _selectedIndex == index ? Colors.blue : Colors.grey,
+              fontWeight: _selectedIndex == index
+                  ? FontWeight.bold
+                  : FontWeight.normal,
             ),
-            Text(
-              label,
-              style: TextStyle(
-                color: _selectedIndex == index ? Colors.blue : Colors.grey,
-                fontWeight: _selectedIndex == index
-                    ? FontWeight.bold
-                    : FontWeight.normal,
-              ),
-            ),
-          ],
-        ),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+            softWrap: false,
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
+
 
   void _showSnackbar(BuildContext context, String message) {
     final overlay = Overlay.of(context);

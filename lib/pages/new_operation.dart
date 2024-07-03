@@ -3,6 +3,8 @@ import '../model/database_model.dart';
 import '../providers/wallet_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+
 
 class Category {
   final int id;
@@ -119,6 +121,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
         });
       });
     } else {
+      
       _selectedDate = DateTime.now();
       widget.dateController.text =
           NewTransactionPage.formatDate(_selectedDate!);
@@ -166,8 +169,10 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
   }
 
   Future<void> _selectDate(BuildContext context) async {
+    
     DateTime selectedDate = _selectedDate ?? DateTime.now();
     final DateTime? picked = await showDatePicker(
+      locale:  Locale('it', "IT"),
       context: context,
       initialDate: selectedDate,
       firstDate: DateTime(2000),
