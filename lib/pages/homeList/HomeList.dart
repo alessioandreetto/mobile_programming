@@ -708,7 +708,7 @@ class _HomeListState extends State<HomeList> {
                                 color: Colors.red,
                                 child: Container(
                                   height: 76,
-                                  width: 76,
+                                  width: 70,
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
@@ -789,7 +789,7 @@ class _HomeListState extends State<HomeList> {
                                       ), */
                                       RichText(
                                         text: TextSpan(
-                                          text: transaction.name ,
+                                          text: transaction.name,
                                           style: TextStyle(
                                             fontFamily: 'Poppins',
                                             color:
@@ -801,10 +801,11 @@ class _HomeListState extends State<HomeList> {
                                           ),
                                           children: <TextSpan>[
                                             TextSpan(
-                                              text: ' - ' + categories[int.parse(
-                                                      transaction.categoryId
-                                                          .toString())]
-                                                  .name,
+                                              text: ' - ' +
+                                                  categories[int.parse(
+                                                          transaction.categoryId
+                                                              .toString())]
+                                                      .name,
                                               style: TextStyle(
                                                 fontFamily: 'Poppins',
                                                 color: (Theme.of(context)
