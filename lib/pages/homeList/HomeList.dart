@@ -676,10 +676,10 @@ class _HomeListState extends State<HomeList> {
                     return Slidable(
                       key: ValueKey(index),
                       startActionPane: ActionPane(
-                        extentRatio: 0.205,
+                        extentRatio: 0.25,
                         motion: ScrollMotion(),
                         children: [
-                          /* SlidableAction(
+                           SlidableAction(
                             borderRadius: BorderRadius.circular(10),
                             padding: EdgeInsets.all(
                                 5), // Riduce il padding del pulsante
@@ -689,41 +689,17 @@ class _HomeListState extends State<HomeList> {
                                 transactions.removeAt(index);
                               });
                             },
-                            backgroundColor: Colors.red,
-                            foregroundColor: Colors.white,
+                            backgroundColor: Theme.of(context).brightness ==
+                                    Brightness.light
+                                ? Colors.white: Colors.black,
+                            foregroundColor: Colors.red,
                             icon: Icons.delete,
                             label: 'Elimina',
                             // Nota: iconSize non è un parametro direttamente supportato.
                             // Dovrai accettare che l'icona sarà della dimensione predefinita.
-                          ), */
+                          ), 
 
-                          GestureDetector(
-                            onTap: () {
-                              _deleteTransaction(transaction, walletProvider);
-                              setState(() {
-                                transactions.removeAt(index);
-                              });
-                            },
-                            child: Card(
-                                color: Colors.red,
-                                child: Container(
-                                  height: 76,
-                                  width: 70,
-                                  child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      Icon(
-                                        Icons.delete,
-                                        color: Colors.white,
-                                      ),
-                                      Text(
-                                        'Elimina',
-                                        style: TextStyle(color: Colors.white),
-                                      )
-                                    ],
-                                  ),
-                                )),
-                          )
+                         
                         ],
                       ),
                       child: GestureDetector(

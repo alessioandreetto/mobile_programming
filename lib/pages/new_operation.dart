@@ -378,7 +378,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                 ToggleButtons(
                   children: _buildToggleButtons(),
                   isSelected: List.generate(
-                      _wallets.length >= 2
+                    (  _wallets.length >= 2 && widget.transaction == null)
                           ? actionTypes.length
                           : actionTypes.length - 1,
                       (index) => _selectedActionIndex == index),
@@ -477,7 +477,7 @@ bottomNavigationBar: Padding(
         child: Text(type),
       );
     }).toList();
-    if (_wallets.length < 2) {
+    if (_wallets.length < 2 || widget.transaction != null) {
       buttons.removeLast();
     }
     return buttons;

@@ -305,8 +305,10 @@ class _ChartsListState extends State<ChartsList> {
                                             transactions.removeAt(index);
                                           });
                                         },
-                                        backgroundColor: Colors.red,
-                                        foregroundColor: Colors.white,
+                                        backgroundColor: Theme.of(context).brightness ==
+                                    Brightness.light
+                                ? Colors.white: Colors.black,
+                            foregroundColor: Colors.red,
                                         icon: Icons.delete,
                                         label: 'Elimina',
                                       ),
