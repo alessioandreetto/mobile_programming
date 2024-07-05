@@ -31,4 +31,6 @@ slide di grafico wallet a torta ha dei problemi quando swipe, vedo lo stesso 2 v
 
 No items found aggiungere icona e sistemare messaggio
 
+SYSTEM UI in LIGHT mode non si vede
+
 
