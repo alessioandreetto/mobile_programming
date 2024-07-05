@@ -26,3 +26,5 @@ A new Flutter project.
 
 slide di grafico wallet a torta ha dei problemi quando swipe, vedo lo stesso 2 volte prima che carichi il prossimo
 
+
+BLOCCO ROTAZIONE
