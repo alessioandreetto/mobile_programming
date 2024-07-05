@@ -35,4 +35,6 @@ SYSTEM UI in LIGHT mode non si vede
 
 IMPORTANTE se click della categoria nel grafico a torta allora filtro lista per categoria
 
+EXCHANGE NUOVA TRANSAZIONE NON MOSTRA IL SECONDO MENù con wallet destinazione 
+
 

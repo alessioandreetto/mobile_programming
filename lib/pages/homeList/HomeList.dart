@@ -321,7 +321,7 @@ class _HomeListState extends State<HomeList> {
               snap: true,
               title: RichText(
                 text: TextSpan(
-                  text: 'Benvenuto ',
+                  text: 'Ti do il benvenuto, ',
                   style: TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 25.0, // Dimensione del testo
