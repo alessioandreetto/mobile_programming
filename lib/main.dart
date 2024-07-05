@@ -6,10 +6,17 @@ import 'providers/wallet_provider.dart';
 import 'page-selector.dart';
 import 'pages/initialPage/demo.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-
+import 'package:flutter/services.dart';
 void main() {
-  runApp(MyApp());
+  WidgetsFlutterBinding.ensureInitialized(); // Assicurati che i binding siano inizializzati
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]).then((_) {
+    runApp(MyApp());
+  });
 }
+
 
 class MyApp extends StatelessWidget {
   @override
