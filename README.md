@@ -22,9 +22,13 @@ A new Flutter project.
 ## Other
 4. ⁠breve relazione che descriva la realizzazione del progetto
 
+5. Export e import di dati 
+
+
 
 
 slide di grafico wallet a torta ha dei problemi quando swipe, vedo lo stesso 2 volte prima che carichi il prossimo
 
+No items found aggiungere icona e sistemare messaggio
 
 
