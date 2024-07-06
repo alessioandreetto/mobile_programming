@@ -73,6 +73,8 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
   int _selectedActionIndex = 0;
   DateTime? _selectedDate;
   bool _deleteButtonVisible = false;
+    String _selectedWalletForExchangeOut = '';
+  String _selectedWalletForExchangeIn = '';
 
   String? _initialName;
   String? _initialValue;
@@ -164,6 +166,8 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
         if (_initialWallet == null) {
           _initialWallet = _selectedWallet;
         }
+                _selectedWalletForExchangeOut = _selectedWallet;
+        _selectedWalletForExchangeIn = _selectedWallet;
       }
     });
   }
@@ -330,6 +334,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                     _selectDate(context);
                   },
                 ),
+                 if (_selectedActionIndex != 2 && _wallets.isNotEmpty)
                 DropdownButtonFormField<Wallet>(
                   value: _wallets.isNotEmpty
                       ? _wallets.firstWhere(
@@ -355,6 +360,45 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                     labelText: 'Portafoglio',
                   ),
                 ),
+ if (_selectedActionIndex == 2 && _wallets.length > 1) ...[
+              SizedBox(height: 16.0),
+              DropdownButtonFormField<String>(
+                value: _selectedWalletForExchangeOut,
+                onChanged: (newValue) {
+                  setState(() {
+                    _selectedWalletForExchangeOut = newValue!;
+                  });
+                },
+                items: _wallets.map((wallet) {
+                  return DropdownMenuItem(
+                    value: wallet.name!,
+                    child: Text(wallet.name!),
+                  );
+                }).toList(),
+                decoration: InputDecoration(
+                  labelText: 'Portafoglio Uscita',
+                ),
+              ),
+              DropdownButtonFormField<String>(
+                value: _selectedWalletForExchangeIn,
+                onChanged: (newValue) {
+                  setState(() {
+                    _selectedWalletForExchangeIn = newValue!;
+                  });
+                },
+                items: _wallets.map((wallet) {
+                  return DropdownMenuItem(
+                    value: wallet.name!,
+                    child: Text(wallet.name!),
+                  );
+                }).toList(),
+                decoration: InputDecoration(
+                  labelText: 'Portafoglio Entrata',
+                ),
+              ),
+ ],
+
+
                 SizedBox(height: 16.0),
                 DropdownButtonFormField<Category>(
                   value: categories.firstWhere(
@@ -439,7 +483,12 @@ bottomNavigationBar: Padding(
               ),
               onPressed:  () async {
                     if (_validateFields()) {
+                        if (_selectedActionIndex == 2) {
+                    await _performExchangeTransaction(
+                        double.parse(widget.valueController.text));
+                  } else {
                       await _performRegularTransaction();
+                  }
 
                       Provider.of<WalletProvider>(context, listen: false)
                           .loadWallets();
@@ -481,6 +530,56 @@ bottomNavigationBar: Padding(
       buttons.removeLast();
     }
     return buttons;
+  }
+
+
+
+Future<void> _performExchangeTransaction(double value) async {
+    Wallet selectedWalletForExchangeOut = _wallets
+        .firstWhere((wallet) => wallet.name == _selectedWalletForExchangeOut);
+    Wallet selectedWalletForExchangeIn = _wallets
+        .firstWhere((wallet) => wallet.name == _selectedWalletForExchangeIn);
+
+    // Transazione di uscita
+    double outValue = -value;
+    Transaction outgoingTransaction = Transaction(
+      name: widget.nameController.text,
+      categoryId: _selectedCategoryId,
+      date:
+          _selectedDate?.toIso8601String() ?? DateTime.now().toIso8601String(),
+      value: outValue,
+      transactionId: selectedWalletForExchangeOut.id,
+    );
+
+    await dbHelper.insertTransaction(outgoingTransaction);
+    double newOutgoingBalance =
+        selectedWalletForExchangeOut.balance! + outgoingTransaction.value!;
+    Wallet updatedOutgoingWallet = Wallet(
+      id: selectedWalletForExchangeOut.id,
+      name: selectedWalletForExchangeOut.name,
+      balance: newOutgoingBalance,
+    );
+    await dbHelper.updateWallet(updatedOutgoingWallet);
+
+    // Transazione di ingresso
+    Transaction incomingTransaction = Transaction(
+      name: widget.nameController.text,
+      categoryId: _selectedCategoryId,
+      date:
+          _selectedDate?.toIso8601String() ?? DateTime.now().toIso8601String(),
+      value: value,
+      transactionId: selectedWalletForExchangeIn.id,
+    );
+
+    await dbHelper.insertTransaction(incomingTransaction);
+    double newIncomingBalance =
+        selectedWalletForExchangeIn.balance! + incomingTransaction.value!;
+    Wallet updatedIncomingWallet = Wallet(
+      id: selectedWalletForExchangeIn.id,
+      name: selectedWalletForExchangeIn.name,
+      balance: newIncomingBalance,
+    );
+    await dbHelper.updateWallet(updatedIncomingWallet);
   }
 
   Future<void> _performRegularTransaction() async {
