@@ -15,7 +15,7 @@ A new Flutter project.
 
 ## Demo
 2. glich effetto blur sfocato quando tonro indietro 
-3. bloccare la possibilità di finire il tutorial se non si è fatto il portafogli
+3. bloccare la possibilità di finire il tutorial se non si è fatto il portafogli -> dice campo obbligatorio ma quando faccio swipe e clicco fine ti fa comunque andare avanti senza portafogli
 
 
 
@@ -35,6 +35,5 @@ SYSTEM UI in LIGHT mode non si vede
 
 IMPORTANTE se click della categoria nel grafico a torta allora filtro lista per categoria
 
-EXCHANGE NUOVA TRANSAZIONE NON MOSTRA IL SECONDO MENù con wallet destinazione 
 
 

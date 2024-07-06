@@ -256,7 +256,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
       },
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.transparent,
+          backgroundColor:  Colors.transparent,
           title: widget.transaction == null
               ? Text('Nuova Transazione')
               : Text('Modifica Transazione'),

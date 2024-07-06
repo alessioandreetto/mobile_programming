@@ -36,11 +36,6 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
     nameController = TextEditingController();
     balanceController = TextEditingController();
 
-    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
-      statusBarColor: Colors.white, // Status bar color
-      statusBarIconBrightness:
-          Brightness.dark, // Dark icons for light status bar
-    ));
   }
 
   @override

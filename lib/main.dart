@@ -7,8 +7,10 @@ import 'page-selector.dart';
 import 'pages/initialPage/demo.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/services.dart';
+
 void main() {
-  WidgetsFlutterBinding.ensureInitialized(); // Assicurati che i binding siano inizializzati
+  WidgetsFlutterBinding
+      .ensureInitialized(); // Assicurati che i binding siano inizializzati
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
@@ -16,7 +18,6 @@ void main() {
     runApp(MyApp());
   });
 }
-
 
 class MyApp extends StatelessWidget {
   @override
@@ -31,7 +32,6 @@ class MyApp extends StatelessWidget {
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
             ],
-       
             theme: ThemeData(
               useMaterial3: true,
               colorSchemeSeed: Colors.blue,
@@ -47,7 +47,7 @@ class MyApp extends StatelessWidget {
         }
         if (snapshot.hasError) {
           return MaterialApp(
-                        localizationsDelegates: [
+            localizationsDelegates: [
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
@@ -79,11 +79,11 @@ class MyApp extends StatelessWidget {
               scaffoldBackgroundColor: Colors.white,
               cardColor: Colors.white,
               fontFamily: 'Poppins', // Imposta il font qui
-              appBarTheme: AppBarTheme(
+          appBarTheme: AppBarTheme(
                 backgroundColor: Colors.transparent,
                 elevation: 0,
                 surfaceTintColor: Colors.transparent,
-              ),
+              ), 
             ),
             dark: ThemeData(
               brightness: Brightness.dark,
@@ -99,11 +99,11 @@ class MyApp extends StatelessWidget {
             ),
             initial: AdaptiveThemeMode.light,
             builder: (theme, darkTheme) => MaterialApp(
-                          localizationsDelegates: [
-              GlobalMaterialLocalizations.delegate,
-              GlobalWidgetsLocalizations.delegate,
-              GlobalCupertinoLocalizations.delegate,
-            ],
+              localizationsDelegates: [
+                GlobalMaterialLocalizations.delegate,
+                GlobalWidgetsLocalizations.delegate,
+                GlobalCupertinoLocalizations.delegate,
+              ],
               theme: theme,
               darkTheme: darkTheme,
               debugShowCheckedModeBanner: false,

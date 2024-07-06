@@ -9,21 +9,7 @@ import '../new_operation.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
-void main() {
-  runApp(MyApp());
-}
 
-class MyApp extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: ChangeNotifierProvider(
-        create: (_) => WalletProvider(),
-        child: HomeList(),
-      ),
-    );
-  }
-}
 
 class HomeList extends StatefulWidget {
   @override

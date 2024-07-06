@@ -133,9 +133,7 @@ class _AddNotePageState extends State<AddNotePage> {
                   ? Text("Nuovo Portafoglio", style: TextStyle(fontSize: 25))
                   : Text("Modifica Portafiglio", style: TextStyle(fontSize: 25)),
             backgroundColor: Colors.transparent,
-            systemOverlayStyle: isDarkMode
-                ? SystemUiOverlayStyle.light
-                : SystemUiOverlayStyle.dark,
+            
             elevation: 0,
             leading: IconButton(
               icon: Icon(Icons.arrow_back),
