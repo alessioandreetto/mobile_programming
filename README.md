@@ -33,7 +33,9 @@ No items found aggiungere icona e sistemare messaggio
 
 SYSTEM UI in LIGHT mode non si vede
 
-IMPORTANTE se click della categoria nel grafico a torta allora filtro lista per categoria
+icona categoria su menu categorie new operation 
+
+sistemare exchange come categoria a sè 
 
 
 
