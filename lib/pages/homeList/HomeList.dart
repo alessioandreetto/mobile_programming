@@ -162,6 +162,7 @@ class _HomeListState extends State<HomeList> {
           .where((transaction) => transaction.categoryId ==
              selectedCategoryIndex)
           .toList();
+           transactions.sort((a, b) => b.date!.compareTo(a.date!));
     }
 
       loadedTransactions.sort((a, b) => b.date!.compareTo(a.date!));
