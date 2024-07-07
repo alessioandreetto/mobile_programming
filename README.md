@@ -33,7 +33,6 @@ No items found aggiungere icona e sistemare messaggio
 
 SYSTEM UI in LIGHT mode non si vede
 
-icona categoria su menu categorie new operation 
 
 sistemare exchange come categoria a sè 
 
