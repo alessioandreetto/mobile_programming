@@ -92,6 +92,31 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
     Category(id: 5, name: 'Viaggio'),
     Category(id: 6, name: 'Varie'),
   ];
+
+  Map<int, Color> categoryColors = {
+    0: Colors.red, // Categoria Auto
+    1: Colors.blue, // Categoria Banca
+    2: Colors.green, // Categoria Casa
+    3: Colors.orange, // Categoria Intrattenimento
+    4: Colors.purple, // Categoria Shopping
+    5: Colors.yellow, // Categoria Viaggio
+    6: Colors.brown, // Categoria Varie
+  };
+
+  Map<int, IconData> categoryIcons = {
+    0: Icons.directions_car, // Categoria Auto
+    1: Icons.account_balance, // Categoria Banca
+    2: Icons.home, // Categoria Casa
+    3: Icons.movie, // Categoria Intrattenimento
+    4: Icons.shopping_cart, // Categoria Shopping
+    5: Icons.airplanemode_active, // Categoria Viaggio
+    6: Icons.category, // Categoria Varie
+  };
+
+
+
+
+
   List<String> actionTypes = ['Entrata', 'Uscita', 'Exchange'];
 
   @override
@@ -398,26 +423,45 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
               ),
  ],
 
+DropdownButtonFormField<Category>(
+  value: categories.firstWhere((category) => category.id == _selectedCategoryId),
+  onChanged: (newValue) {
+    setState(() {
+      _selectedCategoryId = newValue!.id;
+    });
+  },
+  items: categories.map((category) {
+    return DropdownMenuItem(
+      value: category,
+      child: Row(
+        children: [
+          Container(
+            margin: EdgeInsets.only(right: 10.0),
+            width: 40,
+            height: 40,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: categoryColors[category.id] ?? Colors.grey,
+            ),
+            child: Center(
+              child: Icon(
+                categoryIcons[category.id] ?? Icons.category,
+                color: Colors.white,
+                size: 16, // Dimensione dell'icona
+              ),
+            ),
+          ),
+          Text(category.name),
+        ],
+      ),
+    );
+  }).toList(),
+  decoration: InputDecoration(
+    labelText: 'Categoria',
+  ),
+),
 
-                SizedBox(height: 16.0),
-                DropdownButtonFormField<Category>(
-                  value: categories.firstWhere(
-                      (category) => category.id == _selectedCategoryId),
-                  onChanged: (newValue) {
-                    setState(() {
-                      _selectedCategoryId = newValue!.id;
-                    });
-                  },
-                  items: categories.map((category) {
-                    return DropdownMenuItem(
-                      value: category,
-                      child: Text(category.name),
-                    );
-                  }).toList(),
-                  decoration: InputDecoration(
-                    labelText: 'Categoria',
-                  ),
-                ),
+
                 SizedBox(height: 16.0),
                 ToggleButtons(
                   children: _buildToggleButtons(),
