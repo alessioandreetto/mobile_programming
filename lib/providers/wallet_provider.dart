@@ -8,12 +8,14 @@ class WalletProvider with ChangeNotifier {
   String _valuta = '€';
   int _selectedWalletIndex = 0; // Indice del wallet selezionato
   bool _tipologiaMovimento = true;
+  int categorySelected = -1;
 
   // Getter per i dati
   List<Wallet> get wallets => _wallets;
   String get name => _name;
   String get valuta => _valuta;
   int get selectedWalletIndex => _selectedWalletIndex;
+  int get categorySelectedIndex => categorySelected;
 
   // Metodo per caricare i wallet dal database
   Future<List<Wallet>> loadWallets() async {
@@ -114,6 +116,18 @@ int getWalletCount() {
     print (_selectedWalletIndex);
     return _selectedWalletIndex;
   }
+
+  void updateSelectedCategoryIndex(int index) {
+    categorySelected = index;
+   
+    notifyListeners();
+  }
+
+  // Getter per l'indice del wallet selezionato
+  int getSelectedCategoryIndex() {
+    return categorySelected;
+  }
+
 
     void updateTipologia(bool value) {
     _tipologiaMovimento= value;

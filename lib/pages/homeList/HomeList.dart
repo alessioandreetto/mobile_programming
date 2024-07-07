@@ -9,7 +9,21 @@ import '../new_operation.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 
+void main() {
+  runApp(MyApp());
+}
 
+class MyApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: ChangeNotifierProvider(
+        create: (_) => WalletProvider(),
+        child: HomeList(),
+      ),
+    );
+  }
+}
 
 class HomeList extends StatefulWidget {
   @override
@@ -138,10 +152,24 @@ class _HomeListState extends State<HomeList> {
             .toList();
       }
 
+      WalletProvider walletProvider = Provider.of<WalletProvider>(context, listen: false);
+    int selectedCategoryIndex = walletProvider.getSelectedCategoryIndex();
+
+    if (selectedCategoryIndex != -1) {
+
+      print (selectedCategoryIndex);
+      transactions = loadedTransactions
+          .where((transaction) => transaction.categoryId ==
+             selectedCategoryIndex)
+          .toList();
+    }
+
       loadedTransactions.sort((a, b) => b.date!.compareTo(a.date!));
 
       setState(() {
+        if(selectedCategoryIndex == -1){
         transactions = loadedTransactions;
+        }
       });
 
       return loadedTransactions;
@@ -208,6 +236,10 @@ class _HomeListState extends State<HomeList> {
         valoreCategoria = categoryAmounts[tappedCategory]!;
       }
     });
+
+    WalletProvider walletProvider = Provider.of<WalletProvider>(context, listen: false);
+walletProvider.updateSelectedCategoryIndex(_selectedCategory != null ? int.parse(_selectedCategory!) : -1);
+
   }
 
   double _getAngle(Offset position) {
