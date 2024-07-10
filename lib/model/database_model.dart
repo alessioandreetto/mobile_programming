@@ -17,6 +17,7 @@ class DatabaseHelper {
   static const String colCategoryId = 'category_id';
   static const String colDate = 'date';
   static const String colValue = 'value';
+  static const String colRelatedTransactionId = 'related_transaction_id';
 
   // Metodo per ottenere l'istanza del database
   Future<Database> get database async {
@@ -31,7 +32,7 @@ class DatabaseHelper {
     print(path);
     _database = await openDatabase(
       path,
-      version: 1,
+      version: 2, // Incrementa la versione del database
       onCreate: (Database db, int version) async {
         // Creazione della tabella portafoglio
         await db.execute('''
@@ -51,9 +52,17 @@ class DatabaseHelper {
             $colDate TEXT,
             $colValue REAL,
             $colWalletid INTEGER,
+            $colRelatedTransactionId INTEGER,
             FOREIGN KEY ($colWalletid) REFERENCES $walletTable($colId)
           )
         ''');
+      },
+      onUpgrade: (Database db, int oldVersion, int newVersion) async {
+        if (oldVersion < 2) {
+          await db.execute('''
+            ALTER TABLE $transactionsTable ADD COLUMN $colRelatedTransactionId INTEGER
+          ''');
+        }
       },
     );
     return _database!;
@@ -98,20 +107,14 @@ class DatabaseHelper {
   }
 
   // Eliminazione di un portafoglio
-/*   Future<int> deleteWallet(int id) async {
+  Future<int> deleteWallet(int id) async {
     Database db = await this.database;
+    // Elimina prima tutte le transazioni associate al wallet
+    await db
+        .delete(transactionsTable, where: '$colWalletid = ?', whereArgs: [id]);
+    // Poi elimina il wallet stesso
     return await db.delete(walletTable, where: '$colId = ?', whereArgs: [id]);
   }
- */
-
-  Future<int> deleteWallet(int id) async {
-  Database db = await this.database;
-  // Elimina prima tutte le transazioni associate al wallet
-  await db.delete(transactionsTable, where: '$colWalletid = ?', whereArgs: [id]);
-  // Poi elimina il wallet stesso
-  return await db.delete(walletTable, where: '$colId = ?', whereArgs: [id]);
-}
-
 
   // Operazioni per la tabella transazioni
 
@@ -135,11 +138,31 @@ class DatabaseHelper {
   // Eliminazione di una transazione
   Future<int> deleteTransaction(int id) async {
     Database db = await this.database;
-    int result = await db
-        .delete(transactionsTable, where: '$colId = ?', whereArgs: [id]);
-    // Dopo l'eliminazione della transazione, aggiorna il saldo del wallet
-    await WalletProvider().reloadWalletBalance();
-    return result;
+    // Ottieni la transazione da eliminare
+    List<Map<String, dynamic>> transactionData = await db.query(
+      transactionsTable,
+      where: '$colId = ?',
+      whereArgs: [id],
+    );
+
+    if (transactionData.isNotEmpty) {
+      Transaction transaction = Transaction.fromMap(transactionData.first);
+
+      // Elimina la transazione collegata se esiste
+      if (transaction.relatedTransactionId != null) {
+        await db.delete(transactionsTable,
+            where: '$colId = ?', whereArgs: [transaction.relatedTransactionId]);
+      }
+
+      // Elimina la transazione corrente
+      int result = await db
+          .delete(transactionsTable, where: '$colId = ?', whereArgs: [id]);
+      // Dopo l'eliminazione della transazione, aggiorna il saldo del wallet
+      await WalletProvider().reloadWalletBalance();
+      return result;
+    } else {
+      throw Exception('Transaction not found');
+    }
   }
 
   // Aggiorna una transazione esistente nel database
@@ -151,6 +174,25 @@ class DatabaseHelper {
       where: '$colId = ?',
       whereArgs: [transaction.id],
     );
+
+    // Aggiorna la transazione collegata se esiste
+    if (transaction.relatedTransactionId != null) {
+      Transaction relatedTransaction = Transaction(
+        id: transaction.relatedTransactionId,
+        name: transaction.name,
+        categoryId: transaction.categoryId,
+        date: transaction.date,
+        value: -transaction.value!,
+        transactionId: transaction.transactionId,
+      );
+      await db.update(
+        transactionsTable,
+        relatedTransaction.toMap(),
+        where: '$colId = ?',
+        whereArgs: [relatedTransaction.id],
+      );
+    }
+
     // Dopo l'aggiornamento della transazione, aggiorna il saldo del wallet
     await WalletProvider().reloadWalletBalance();
     return result;
@@ -188,6 +230,7 @@ class Transaction {
   String? date;
   double? value;
   int? transactionId;
+  int? relatedTransactionId;
 
   Transaction({
     this.id,
@@ -196,6 +239,7 @@ class Transaction {
     this.date,
     this.value,
     this.transactionId,
+    this.relatedTransactionId,
   });
 
   Map<String, dynamic> toMap() {
@@ -206,6 +250,7 @@ class Transaction {
       DatabaseHelper.colDate: date,
       DatabaseHelper.colValue: value,
       DatabaseHelper.colWalletid: transactionId,
+      DatabaseHelper.colRelatedTransactionId: relatedTransactionId,
     };
   }
 
@@ -217,6 +262,7 @@ class Transaction {
       date: map[DatabaseHelper.colDate],
       value: map[DatabaseHelper.colValue],
       transactionId: map[DatabaseHelper.colWalletid],
+      relatedTransactionId: map[DatabaseHelper.colRelatedTransactionId],
     );
   }
 }
