@@ -278,8 +278,18 @@ class _ChartsListState extends State<ChartsList> {
 
                             if (transactions.isEmpty) {
                               return Center(
-                                child: Text('No transactions available.'),
-                              );
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                          
+                            Icon(Icons.search_off, size: 48.0),
+                            Text(
+                              'Nessuna transazione',
+                              style: TextStyle(fontSize: 14.0),
+                            ),
+                          ],
+                        ),
+                      );
                             }
 
                             return ListView.builder(

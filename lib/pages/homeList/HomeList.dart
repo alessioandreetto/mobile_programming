@@ -682,9 +682,16 @@ walletProvider.updateSelectedCategoryIndex(_selectedCategory != null ? int.parse
                     return SizedBox(
                       height: MediaQuery.of(context).size.height / 2,
                       child: Center(
-                        child: Text(
-                          'Nessuna transazione',
-                          style: TextStyle(fontSize: 18.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                          
+                            Icon(Icons.search_off, size: 48.0),
+                            Text(
+                              'Nessuna transazione',
+                              style: TextStyle(fontSize: 14.0),
+                            ),
+                          ],
                         ),
                       ),
                     );
