@@ -12,6 +12,7 @@ class ChangeNamePage extends StatefulWidget {
 class _ChangeNamePageState extends State<ChangeNamePage> {
   TextEditingController _nameController = TextEditingController();
   bool _isDirty = false;
+  String? _errorText;
 
   @override
   void initState() {
@@ -53,13 +54,17 @@ class _ChangeNamePageState extends State<ChangeNamePage> {
                     child: TextField(
                       controller: _nameController,
                       style: TextStyle(),
-                      onChanged: (_) {
+                      maxLength: 15,
+                      onChanged: (text) {
                         setState(() {
                           _isDirty = true;
+                          _errorText = text.length > 15 ? 'Nome troppo lungo' : null;
                         });
                       },
                       decoration: InputDecoration(
                         labelText: 'Nome account',
+                        errorText: _errorText,
+                        counterText: '', // Rimuove il contatore caratteri predefinito
                       ),
                     ),
                   ),
@@ -112,7 +117,7 @@ class _ChangeNamePageState extends State<ChangeNamePage> {
   }
 
   void _saveName(BuildContext context) {
-    if (_isDirty && _nameController.text.isNotEmpty) {
+    if (_isDirty && _nameController.text.isNotEmpty && _nameController.text.length <= 15) {
       String newName = _nameController.text.trim(); // Pulisce gli spazi
       Provider.of<WalletProvider>(context, listen: false)
           .updateAccountName(newName);
@@ -122,6 +127,10 @@ class _ChangeNamePageState extends State<ChangeNamePage> {
       });
       Navigator.of(context).pop();
       _showSnackbar(context, 'Nome account modificato con successo');
+    } else if (_nameController.text.length > 15) {
+      setState(() {
+        _errorText = 'Nome troppo lungo';
+      });
     }
   }
 
