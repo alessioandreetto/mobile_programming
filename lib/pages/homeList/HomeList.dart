@@ -349,11 +349,12 @@ walletProvider.updateSelectedCategoryIndex(_selectedCategory != null ? int.parse
                           : Colors.white)),
                   children: <TextSpan>[
                     TextSpan(
-                      text: '${walletProvider.name}',
+                      text: '${walletProvider.name.length > 10 ? walletProvider.name.substring(0, 10) + '...' : walletProvider.name}',
                       style: TextStyle(
                         fontWeight:
                             FontWeight.bold, // Imposta il testo in grassetto
                       ),
+                      
                     ),
                     TextSpan(
                       text: '!',

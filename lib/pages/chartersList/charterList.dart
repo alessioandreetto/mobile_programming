@@ -153,7 +153,7 @@ class _ChartsListState extends State<ChartsList> {
                                   walletProvider.selectedWalletIndex == index;
                               return Padding(
                                 padding: const EdgeInsets.symmetric(
-                                    vertical: 8.0, horizontal: 16.0),
+                                    vertical: 8.0, horizontal: 8.0),
                                 child: ElevatedButton(
                                   onPressed: () {
                                     _handleButtonPress(index);
