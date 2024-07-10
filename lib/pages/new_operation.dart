@@ -485,28 +485,7 @@ DropdownButtonFormField<Category>(
                   },
                 ),
                 SizedBox(height: 16.0),
-              /*   ElevatedButton(
-                  onPressed: () async {
-                    if (_validateFields()) {
-                      await _performRegularTransaction();
 
-                      Provider.of<WalletProvider>(context, listen: false)
-                          .loadWallets();
-
-                      _showSnackbar(
-                          context,
-                          widget.transaction == null
-                              ? 'Transazione aggiunta con successo!'
-                              : 'Transazione modificata con successo!');
-                      _navigateToHome(context);
-                    } else {
-                      _showSnackbar(context, 'Inserisci tutti i campi');
-                    }
-                  },
-                  child: Text(widget.transaction == null
-                      ? 'Aggiungi Transazione'
-                      : 'Modifica Transazione'),
-                ), */
               ],
             ),
           ),
@@ -651,13 +630,14 @@ bottomNavigationBar: Padding(
       await dbHelper.updateTransaction(widget.transaction!);
     } else {
       Transaction newTransaction = Transaction(
-        name: widget.nameController.text,
+        name: widget.nameController.text.trim(),
         categoryId: _selectedCategoryId,
         date: _selectedDate?.toIso8601String() ??
             DateTime.now().toIso8601String(),
         value: transactionValue,
         transactionId: selectedWallet.id,
       );
+
 
       await dbHelper.insertTransaction(newTransaction);
 
