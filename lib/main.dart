@@ -73,28 +73,39 @@ class MyApp extends StatelessWidget {
           ],
           child: AdaptiveTheme(
             light: ThemeData(
-              useMaterial3: true,
-              colorSchemeSeed: Colors.blue,
               brightness: Brightness.light,
+              colorSchemeSeed: Colors.blue,
               scaffoldBackgroundColor: Colors.white,
-              cardColor: Colors.white,
-              fontFamily: 'Poppins', // Imposta il font qui
-          appBarTheme: AppBarTheme(
+              cardColor: Colors.grey[200],
+              fontFamily: 'Poppins',
+              appBarTheme: AppBarTheme(
                 backgroundColor: Colors.transparent,
                 elevation: 0,
                 surfaceTintColor: Colors.transparent,
-              ), 
+                systemOverlayStyle: SystemUiOverlayStyle(
+                  statusBarColor: Colors.transparent,
+                  statusBarIconBrightness:
+                      Brightness.dark, // Icone scure per sfondo chiaro
+                  statusBarBrightness: Brightness.light,
+                ),
+              ),
             ),
             dark: ThemeData(
               brightness: Brightness.dark,
               colorSchemeSeed: Colors.blue,
               scaffoldBackgroundColor: Colors.black,
               cardColor: Colors.grey[900],
-              fontFamily: 'Poppins', // Imposta il font qui
+              fontFamily: 'Poppins',
               appBarTheme: AppBarTheme(
                 backgroundColor: Colors.transparent,
                 elevation: 0,
                 surfaceTintColor: Colors.transparent,
+                systemOverlayStyle: SystemUiOverlayStyle(
+                  statusBarColor: Colors.transparent,
+                  statusBarIconBrightness:
+                      Brightness.light, // Icone chiare per sfondo scuro
+                  statusBarBrightness: Brightness.dark,
+                ),
               ),
             ),
             initial: AdaptiveThemeMode.light,
