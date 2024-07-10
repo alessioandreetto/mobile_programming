@@ -117,7 +117,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
 
 
 
-  List<String> actionTypes = ['Entrata', 'Uscita', 'Exchange'];
+  List<String> actionTypes = ['Entrata', 'Uscita', ];
 
   @override
   void initState() {
@@ -384,7 +384,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                   decoration: InputDecoration(
                     labelText: 'Portafoglio',
                   ),
-                ),
+                ),/* 
  if (_selectedActionIndex == 2 && _wallets.length > 1) ...[
               SizedBox(height: 16.0),
               DropdownButtonFormField<String>(
@@ -421,7 +421,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                   labelText: 'Portafoglio Entrata',
                 ),
               ),
- ],
+ ], */
 
 DropdownButtonFormField<Category>(
   value: categories.firstWhere((category) => category.id == _selectedCategoryId),
@@ -527,12 +527,12 @@ bottomNavigationBar: Padding(
               ),
               onPressed:  () async {
                     if (_validateFields()) {
-                        if (_selectedActionIndex == 2) {
+                    /*     if (_selectedActionIndex == 2) {
                     await _performExchangeTransaction(
                         double.parse(widget.valueController.text));
-                  } else {
+                  } else { */
                       await _performRegularTransaction();
-                  }
+                  /* } */
 
                       Provider.of<WalletProvider>(context, listen: false)
                           .loadWallets();
@@ -578,7 +578,7 @@ bottomNavigationBar: Padding(
 
 
 
-Future<void> _performExchangeTransaction(double value) async {
+/* Future<void> _performExchangeTransaction(double value) async {
     Wallet selectedWalletForExchangeOut = _wallets
         .firstWhere((wallet) => wallet.name == _selectedWalletForExchangeOut);
     Wallet selectedWalletForExchangeIn = _wallets
@@ -624,7 +624,7 @@ Future<void> _performExchangeTransaction(double value) async {
       balance: newIncomingBalance,
     );
     await dbHelper.updateWallet(updatedIncomingWallet);
-  }
+  } */
 
   Future<void> _performRegularTransaction() async {
     double transactionValue = double.parse(widget.valueController.text);
