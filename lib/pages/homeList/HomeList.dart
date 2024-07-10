@@ -340,7 +340,7 @@ walletProvider.updateSelectedCategoryIndex(_selectedCategory != null ? int.parse
               snap: true,
               title: RichText(
                 text: TextSpan(
-                  text: 'Ti do il benvenuto, ',
+                  text: 'Ciao, ',
                   style: TextStyle(
                       fontFamily: 'Poppins',
                       fontSize: 25.0, // Dimensione del testo
