@@ -252,7 +252,7 @@ class _ChartsListState extends State<ChartsList> {
                       },
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(left: 16, top: 8.0),
+                      padding: const EdgeInsets.only(left: 16, top: 8.0 , bottom: 10),
                       child: Text(
                         "Transazioni per ${selectedWallet.name}:",
                         style: TextStyle(fontSize: 16),

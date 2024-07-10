@@ -427,8 +427,8 @@ walletProvider.updateSelectedCategoryIndex(_selectedCategory != null ? int.parse
             SliverPersistentHeader(
               pinned: true,
               delegate: _SliverPersistentHeaderDelegate(
-                minHeight: 250.0, // Increased to accommodate additional texts
-                maxHeight: 250.0, // Increased to accommodate additional texts
+                minHeight: 230.0, // Increased to accommodate additional texts
+                maxHeight: 230.0, // Increased to accommodate additional texts
                 child: Container(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
