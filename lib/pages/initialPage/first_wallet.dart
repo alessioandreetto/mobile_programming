@@ -57,9 +57,7 @@ class _FirstWalletState extends State<FirstWallet> {
         },
         child: Scaffold(
           appBar: AppBar(
-            
             backgroundColor: Colors.transparent,
-
             elevation: 0,
           ),
           body: SingleChildScrollView(

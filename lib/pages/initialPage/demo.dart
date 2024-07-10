@@ -35,7 +35,6 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
     super.initState();
     nameController = TextEditingController();
     balanceController = TextEditingController();
-
   }
 
   @override
@@ -127,6 +126,11 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
     }
   }
 
+  bool _validateCurrentForm() {
+    _showErrorMessages();
+    return _isNameValid && _isBalanceValid;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -146,9 +150,21 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
                 child: PageView(
                   controller: _pageController,
                   onPageChanged: (index) {
-                    setState(() {
-                      _currentPageIndex = index;
-                    });
+                    // Validate the form when user tries to swipe to the next page
+                    if (index == 2 &&
+                        _currentPageIndex == 1 &&
+                        !_validateCurrentForm()) {
+                      // Block the swipe if form is not valid
+                      _pageController.animateToPage(
+                        1,
+                        duration: Duration(milliseconds: 300),
+                        curve: Curves.ease,
+                      );
+                    } else {
+                      setState(() {
+                        _currentPageIndex = index;
+                      });
+                    }
                     // Chiudi la tastiera quando cambia la pagina
                     _focusScopeNode.unfocus();
                   },
