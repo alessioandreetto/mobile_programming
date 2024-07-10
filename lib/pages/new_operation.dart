@@ -117,7 +117,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
 
 
 
-  List<String> actionTypes = ['Entrata', 'Uscita', ];
+  List<String> actionTypes = ['Entrata', 'Uscita'];
 
   @override
   void initState() {
@@ -384,7 +384,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                   decoration: InputDecoration(
                     labelText: 'Portafoglio',
                   ),
-                ),/* 
+                ),
  if (_selectedActionIndex == 2 && _wallets.length > 1) ...[
               SizedBox(height: 16.0),
               DropdownButtonFormField<String>(
@@ -421,7 +421,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                   labelText: 'Portafoglio Entrata',
                 ),
               ),
- ], */
+ ], 
 
 DropdownButtonFormField<Category>(
   value: categories.firstWhere((category) => category.id == _selectedCategoryId),
@@ -466,9 +466,7 @@ DropdownButtonFormField<Category>(
                 ToggleButtons(
                   children: _buildToggleButtons(),
                   isSelected: List.generate(
-                    (  _wallets.length >= 2 && widget.transaction == null)
-                          ? actionTypes.length
-                          : actionTypes.length - 1,
+                 actionTypes.length ,
                       (index) => _selectedActionIndex == index),
                   onPressed: (index) {
                     setState(() {
@@ -570,9 +568,7 @@ bottomNavigationBar: Padding(
         child: Text(type),
       );
     }).toList();
-    if (_wallets.length < 2 || widget.transaction != null) {
-      buttons.removeLast();
-    }
+
     return buttons;
   }
 
