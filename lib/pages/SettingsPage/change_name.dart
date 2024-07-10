@@ -25,8 +25,7 @@ class _ChangeNamePageState extends State<ChangeNamePage> {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String name = prefs.getString('account_name') ?? '';
     setState(() {
-      _nameController.text =
-          name; // Imposta il valore iniziale del campo di testo
+      _nameController.text = name.trim(); // Pulisce gli spazi
     });
   }
 
@@ -49,25 +48,21 @@ class _ChangeNamePageState extends State<ChangeNamePage> {
               children: [
                 Padding(
                   padding: const EdgeInsets.all(16.0),
-                
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: TextField(
-                        controller: _nameController,
-                        style: TextStyle(
-                        ),
-                        onChanged: (_) {
-                          setState(() {
-                            _isDirty = true;
-                          });
-                        },
-                        decoration: InputDecoration(
-                          labelText: 'Nome account',
-
-                        ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: TextField(
+                      controller: _nameController,
+                      style: TextStyle(),
+                      onChanged: (_) {
+                        setState(() {
+                          _isDirty = true;
+                        });
+                      },
+                      decoration: InputDecoration(
+                        labelText: 'Nome account',
                       ),
                     ),
-                  
+                  ),
                 ),
               ],
             ),
@@ -118,7 +113,7 @@ class _ChangeNamePageState extends State<ChangeNamePage> {
 
   void _saveName(BuildContext context) {
     if (_isDirty && _nameController.text.isNotEmpty) {
-      String newName = _nameController.text;
+      String newName = _nameController.text.trim(); // Pulisce gli spazi
       Provider.of<WalletProvider>(context, listen: false)
           .updateAccountName(newName);
       _saveNameToSharedPreferences(newName);

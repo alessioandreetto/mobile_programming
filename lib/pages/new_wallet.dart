@@ -130,10 +130,9 @@ class _AddNotePageState extends State<AddNotePage> {
         child: Scaffold(
           appBar: AppBar(
             title: widget.initialTitle == null && widget.initialBody == null
-                  ? Text("Nuovo Portafoglio", style: TextStyle(fontSize: 25))
-                  : Text("Modifica Portafiglio", style: TextStyle(fontSize: 25)),
+                ? Text("Nuovo Portafoglio", style: TextStyle(fontSize: 25))
+                : Text("Modifica Portafiglio", style: TextStyle(fontSize: 25)),
             backgroundColor: Colors.transparent,
-            
             elevation: 0,
             leading: IconButton(
               icon: Icon(Icons.arrow_back),
@@ -176,7 +175,6 @@ class _AddNotePageState extends State<AddNotePage> {
                   padding: const EdgeInsets.all(16.0),
                   child: Container(
                     decoration: BoxDecoration(
-                      
                       color: _hasTransactions
                           ? (isDarkMode
                               ? Colors.grey.shade800
@@ -206,8 +204,6 @@ class _AddNotePageState extends State<AddNotePage> {
                         ],
                         decoration: InputDecoration(
                           labelText: 'Bilancio iniziale ',
-                        
-                         
                         ),
                         enabled:
                             !_hasTransactions, // Disabilita se ci sono transazioni
@@ -243,16 +239,19 @@ class _AddNotePageState extends State<AddNotePage> {
   }
 
   void _saveNote() {
-    if (widget.titleController.text.isNotEmpty &&
-        widget.bodyController.text.isNotEmpty) {
+    // Trimming the input text
+    String trimmedTitle = widget.titleController.text.trim();
+    String trimmedBody = widget.bodyController.text.trim();
+
+    if (trimmedTitle.isNotEmpty && trimmedBody.isNotEmpty) {
       double title;
       if (!_hasTransactions) {
-        title = double.parse(widget.titleController.text);
+        title = double.parse(trimmedTitle);
       } else {
         title = widget.initialTitle!;
       }
 
-      widget.onSave(title, widget.bodyController.text);
+      widget.onSave(title, trimmedBody);
       setState(() {
         _isDirty = false;
       });

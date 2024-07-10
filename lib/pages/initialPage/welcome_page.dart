@@ -28,13 +28,13 @@ class _WelcomePageState extends State<WelcomePage> {
       final provider = Provider.of<WalletProvider>(context, listen: false);
       if (provider.name != 'User') {
         _nameController.text = provider.name;
-        _isButtonDisabled = _nameController.text.isEmpty;
+        _isButtonDisabled = _nameController.text.trim().isEmpty;
       }
     });
 
     _nameController.addListener(() {
       setState(() {
-        _isButtonDisabled = _nameController.text.isEmpty;
+        _isButtonDisabled = _nameController.text.trim().isEmpty;
       });
     });
   }
@@ -59,58 +59,56 @@ class _WelcomePageState extends State<WelcomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-       resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: false,
       body: Padding(
         padding: EdgeInsets.all(20.0),
-        child: 
-            Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Benvenuto! Inizia il tuo viaggio finanziario.',
-                    style: TextStyle(
-                      fontSize: 24.0,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black,
-                    ),
-                  ),
-                  SizedBox(height: 20.0),
-                  TextFormField(
-                    controller: _nameController,
-                    decoration: InputDecoration(
-                      labelText: 'Inserisci il tuo nome per iniziare',
-                      
-                    ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Inserire il nome';
-                      }
-                      return null;
-                    },
-                    onChanged: (value) {
-                      // Aggiorna il nome nel provider quando cambia
-                      Provider.of<WalletProvider>(context, listen: false)
-                          .updateAccountName(value);
-                    },
-                  ),
-                  SizedBox(height: 20.0),
-                  Text(
-                    'Con questa app semplice e intuitiva, '
-                    'potrai tenere traccia delle tue spese quotidiane '
-                    'e pianificare un futuro finanziario migliore. '
-                    'Inizia ad esplorare il mondo delle tue finanze oggi stesso!',
-                    style: TextStyle(
-                      fontSize: 16.0,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Text(
+                'Benvenuto! Inizia il tuo viaggio finanziario.',
+                style: TextStyle(
+                  fontSize: 24.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black,
+                ),
               ),
-            ),
-            // Aggiungi altre pagine qui
+              SizedBox(height: 20.0),
+              TextFormField(
+                controller: _nameController,
+                decoration: InputDecoration(
+                  labelText: 'Inserisci il tuo nome per iniziare',
+                ),
+                validator: (value) {
+                  if (value == null || value.trim().isEmpty) {
+                    return 'Inserire il nome';
+                  }
+                  return null;
+                },
+                onChanged: (value) {
+                  // Aggiorna il nome nel provider quando cambia
+                  Provider.of<WalletProvider>(context, listen: false)
+                      .updateAccountName(value.trim());
+                },
+              ),
+              SizedBox(height: 20.0),
+              Text(
+                'Con questa app semplice e intuitiva, '
+                'potrai tenere traccia delle tue spese quotidiane '
+                'e pianificare un futuro finanziario migliore. '
+                'Inizia ad esplorare il mondo delle tue finanze oggi stesso!',
+                style: TextStyle(
+                  fontSize: 16.0,
+                ),
+                textAlign: TextAlign.center,
+              ),
+            ],
+          ),
+        ),
+        // Aggiungi altre pagine qui
       ),
     );
   }

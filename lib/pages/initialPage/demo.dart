@@ -48,7 +48,7 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
 
   void _updateWalletData(String name, double balance, {int? id}) {
     setState(() {
-      walletName = name; // Aggiorna il nome del wallet
+      walletName = name.trim(); // Aggiorna il nome del wallet
       walletBalance = balance;
       walletId = id;
     });
@@ -174,7 +174,7 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
                         child: WelcomePage(
                           onNameEntered: (name) {
                             setState(() {
-                              walletName = name;
+                              walletName = name.trim();
                             });
                           },
                         ),
@@ -186,7 +186,7 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
                           nameController: nameController,
                           balanceController: balanceController,
                           onWalletDataChanged: (name, balance) {
-                            _updateWalletData(name, balance);
+                            _updateWalletData(name.trim(), balance);
                           },
                           isNameValid: _isNameValid,
                           isBalanceValid: _isBalanceValid,
