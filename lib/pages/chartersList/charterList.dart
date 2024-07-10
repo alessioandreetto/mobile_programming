@@ -92,7 +92,7 @@ class _ChartsListState extends State<ChartsList> {
                   backgroundColor: MaterialStateProperty.resolveWith<Color>(
                     (states) {
                       return _selectedButton == period
-                          ? Color(0xffE63C3A)
+                          ? Colors.blue
                           : Colors.transparent;
                     },
                   ),
