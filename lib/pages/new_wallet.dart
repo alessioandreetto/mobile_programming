@@ -272,15 +272,15 @@ class _AddNotePageState extends State<AddNotePage> {
         actions: <Widget>[
           TextButton(
             onPressed: () {
-              Navigator.of(context).pop(false);
-            },
-            child: Text('No'),
-          ),
-          TextButton(
-            onPressed: () {
               Navigator.of(context).pop(true);
             },
             child: Text('Sì'),
+          ),
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(false);
+            },
+            child: Text('No'),
           ),
         ],
       ),
