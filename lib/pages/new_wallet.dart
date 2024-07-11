@@ -28,40 +28,6 @@ class AddNotePage extends StatefulWidget {
   _AddNotePageState createState() => _AddNotePageState();
 }
 
-class DecimalTextInputFormatter extends TextInputFormatter {
-  final int decimalRange;
-  final int maxDigits;
-
-  DecimalTextInputFormatter(
-      {required this.decimalRange, required this.maxDigits})
-      : assert(decimalRange > 0),
-        assert(maxDigits > 0);
-
-  @override
-  TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue, TextEditingValue newValue) {
-    if (newValue.text == '') {
-      return newValue;
-    }
-
-    final newValueText = newValue.text;
-    if (double.tryParse(newValueText) == null) {
-      return oldValue;
-    }
-
-    final List<String> parts = newValueText.split('.');
-    if (parts.length > 1 && parts[1].length > decimalRange) {
-      return oldValue;
-    }
-
-    if (newValueText.replaceAll('.', '').length > maxDigits) {
-      return oldValue;
-    }
-
-    return newValue;
-  }
-}
-
 class _AddNotePageState extends State<AddNotePage> {
   bool _isDirty = false;
   bool _hasTransactions = false;
@@ -165,7 +131,7 @@ class _AddNotePageState extends State<AddNotePage> {
           appBar: AppBar(
             title: widget.initialTitle == null && widget.initialBody == null
                 ? Text("Nuovo Portafoglio", style: TextStyle(fontSize: 25))
-                : Text("Modifica Portafoglio", style: TextStyle(fontSize: 25)),
+                : Text("Modifica Portafiglio", style: TextStyle(fontSize: 25)),
             backgroundColor: Colors.transparent,
             elevation: 0,
             leading: IconButton(
@@ -190,7 +156,6 @@ class _AddNotePageState extends State<AddNotePage> {
                       padding: const EdgeInsets.symmetric(horizontal: 8.0),
                       child: TextField(
                         controller: widget.bodyController,
-                        maxLength: 9,
                         style: TextStyle(
                           color: isDarkMode ? Colors.white : Colors.black,
                         ),
@@ -201,7 +166,6 @@ class _AddNotePageState extends State<AddNotePage> {
                         },
                         decoration: InputDecoration(
                           labelText: 'Nome portafoglio',
-                          counterText: '',
                         ),
                       ),
                     ),
@@ -236,9 +200,7 @@ class _AddNotePageState extends State<AddNotePage> {
                         keyboardType: TextInputType.number,
                         inputFormatters: [
                           FilteringTextInputFormatter.allow(
-                              RegExp(r'^\d*\.?\d{0,2}')),
-                          DecimalTextInputFormatter(
-                              decimalRange: 2, maxDigits: 6),
+                              RegExp(r'^\d+\.?\d{0,2}')),
                         ],
                         decoration: InputDecoration(
                           labelText: 'Bilancio iniziale ',

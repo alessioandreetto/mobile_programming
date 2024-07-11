@@ -20,40 +20,6 @@ class FirstWallet extends StatefulWidget {
   _FirstWalletState createState() => _FirstWalletState();
 }
 
-class DecimalTextInputFormatter extends TextInputFormatter {
-  final int decimalRange;
-  final int maxDigits;
-
-  DecimalTextInputFormatter(
-      {required this.decimalRange, required this.maxDigits})
-      : assert(decimalRange > 0),
-        assert(maxDigits > 0);
-
-  @override
-  TextEditingValue formatEditUpdate(
-      TextEditingValue oldValue, TextEditingValue newValue) {
-    if (newValue.text == '') {
-      return newValue;
-    }
-
-    final newValueText = newValue.text;
-    if (double.tryParse(newValueText) == null) {
-      return oldValue;
-    }
-
-    final List<String> parts = newValueText.split('.');
-    if (parts.length > 1 && parts[1].length > decimalRange) {
-      return oldValue;
-    }
-
-    if (newValueText.replaceAll('.', '').length > maxDigits) {
-      return oldValue;
-    }
-
-    return newValue;
-  }
-}
-
 class _FirstWalletState extends State<FirstWallet> {
   bool _isDirty = false;
 
@@ -160,9 +126,7 @@ class _FirstWalletState extends State<FirstWallet> {
                             keyboardType: TextInputType.number,
                             inputFormatters: [
                               FilteringTextInputFormatter.allow(
-                                  RegExp(r'^\d*\.?\d{0,2}')),
-                              DecimalTextInputFormatter(
-                                  decimalRange: 2, maxDigits: 6),
+                                  RegExp(r'^\d+\.?\d{0,2}')),
                             ],
                             onChanged: (_) {
                               setState(() {
