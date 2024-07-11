@@ -36,11 +36,13 @@ class _BottomBarDemoState extends State<BottomBarDemo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+resizeToAvoidBottomInset: false ,// fluter 2.x
       body: IndexedStack(
         index: _selectedIndex,
         children: _widgetOptions,
       ),
       bottomNavigationBar: BottomAppBar(
+
         shape: CircularNotchedRectangle(),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -55,9 +57,11 @@ class _BottomBarDemoState extends State<BottomBarDemo> {
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: Consumer<WalletProvider>(
+        
         builder: (context, walletProvider, child) {
           bool hasWallets = walletProvider.wallets.isNotEmpty;
           return FloatingActionButton(
+            enableFeedback: true,
             onPressed: hasWallets
                 ? () {
                     Navigator.push(
@@ -80,7 +84,9 @@ class _BottomBarDemoState extends State<BottomBarDemo> {
           );
         },
       ),
+         
     );
+       
   }
 
  Widget _buildNavBarItem(IconData icon, int index, String label) {
