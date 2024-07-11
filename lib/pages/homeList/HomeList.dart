@@ -330,9 +330,12 @@ class _HomeListState extends State<HomeList> {
     number = number.abs();
 
     if (number >= 1000000) {
-      return sign + (number / 1000000).toStringAsFixed(1) + 'M';
+      double value = (number / 1000000);
+      return sign + value.toStringAsFixed(1) + 'M';
     } else if (number >= 1000) {
-      return sign + (number / 1000).toStringAsFixed(1) + 'k';
+      int intPart = (number / 1000).floor();
+      int decimalPart = ((number % 1000) / 100).floor();
+      return sign + intPart.toString() + '.' + decimalPart.toString() + 'k';
     } else {
       return sign + number.toStringAsFixed(2);
     }
