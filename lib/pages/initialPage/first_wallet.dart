@@ -60,96 +60,111 @@ class _FirstWalletState extends State<FirstWallet> {
             backgroundColor: Colors.transparent,
             elevation: 0,
           ),
-          body: SingleChildScrollView(
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text('Crea qui il tuo primo portafoglio!',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          )),
-                      SizedBox(height: 20),
-                      Text(
-                        'Inserisci qui sotto un nome significativo per il portafoglio che andrai a creare:',
-                        style: TextStyle(
-                          fontSize: 18,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Container(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: TextField(
-                            controller: widget.nameController,
-                            onChanged: (_) {
-                              setState(() {
-                                _isDirty = true;
-                              });
-                            },
-                            decoration: InputDecoration(
-                              labelText: 'Nome del portafoglio',
-                              errorText: widget.isNameValid
-                                  ? null
-                                  : 'Questo campo è obbligatorio',
-                              suffixIcon: widget.isNameValid
-                                  ? null
-                                  : Icon(Icons.error, color: Colors.red),
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
+          body: LayoutBuilder(
+            builder: (context, constraints) {
+              return SingleChildScrollView(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(
+                    minHeight: constraints.maxHeight,
                   ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Imposta un saldo iniziale da cui parti e da dove inizierai a tener traccia delle tue spese e delle tue entrate.',
-                        style: TextStyle(
-                          fontSize: 18,
-                        ),
-                      ),
-                      SizedBox(height: 8),
-                      Container(
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                          child: TextField(
-                            controller: widget.balanceController,
-                            keyboardType: TextInputType.number,
-                            inputFormatters: [
-                              FilteringTextInputFormatter.allow(
-                                  RegExp(r'^\d+\.?\d{0,2}')),
+                  child: IntrinsicHeight(
+                    child: Column(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text('Crea qui il tuo primo portafoglio!',
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                  )),
+                              SizedBox(height: 20),
+                              Text(
+                                'Inserisci qui sotto un nome significativo per il portafoglio che andrai a creare:',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                ),
+                              ),
+                              SizedBox(height: 8),
+                              Container(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8.0),
+                                  child: TextField(
+                                    controller: widget.nameController,
+                                    onChanged: (_) {
+                                      setState(() {
+                                        _isDirty = true;
+                                      });
+                                    },
+                                    decoration: InputDecoration(
+                                      labelText: 'Nome del portafoglio',
+                                      errorText: widget.isNameValid
+                                          ? null
+                                          : 'Questo campo è obbligatorio',
+                                      suffixIcon: widget.isNameValid
+                                          ? null
+                                          : Icon(Icons.error,
+                                              color: Colors.red),
+                                    ),
+                                  ),
+                                ),
+                              ),
                             ],
-                            onChanged: (_) {
-                              setState(() {
-                                _isDirty = true;
-                              });
-                            },
-                            decoration: InputDecoration(
-                              labelText: 'Bilancio iniziale',
-                              errorText: widget.isBalanceValid
-                                  ? null
-                                  : 'Questo campo è obbligatorio',
-                              suffixIcon: widget.isBalanceValid
-                                  ? null
-                                  : Icon(Icons.error, color: Colors.red),
-                            ),
                           ),
                         ),
-                      ),
-                    ],
+                        Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Imposta un saldo iniziale da cui parti e da dove inizierai a tener traccia delle tue spese e delle tue entrate.',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                ),
+                              ),
+                              SizedBox(height: 8),
+                              Container(
+                                child: Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8.0),
+                                  child: TextField(
+                                    controller: widget.balanceController,
+                                    keyboardType: TextInputType.number,
+                                    inputFormatters: [
+                                      FilteringTextInputFormatter.allow(
+                                          RegExp(r'^\d+\.?\d{0,2}')),
+                                    ],
+                                    onChanged: (_) {
+                                      setState(() {
+                                        _isDirty = true;
+                                      });
+                                    },
+                                    decoration: InputDecoration(
+                                      labelText: 'Bilancio iniziale',
+                                      errorText: widget.isBalanceValid
+                                          ? null
+                                          : 'Questo campo è obbligatorio',
+                                      suffixIcon: widget.isBalanceValid
+                                          ? null
+                                          : Icon(Icons.error,
+                                              color: Colors.red),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ],
-            ),
+              );
+            },
           ),
         ),
       ),
