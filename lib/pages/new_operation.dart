@@ -338,6 +338,10 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                 TextField(
                   controller: widget.nameController,
                   decoration: InputDecoration(labelText: 'Nome'),
+                  inputFormatters: [
+                    LengthLimitingTextInputFormatter(
+                        25), // Limita a 25 caratteri
+                  ],
                 ),
                 TextField(
                   controller: widget.valueController,
