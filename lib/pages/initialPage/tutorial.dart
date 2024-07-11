@@ -45,25 +45,29 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          Container(
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: AssetImage('assets/images/sfondo_tutorial.jpg'),
-                fit: BoxFit.cover,
+      body: LayoutBuilder(
+        builder: (context, constraints) {
+          return Stack(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  image: DecorationImage(
+                    image: AssetImage('assets/images/sfondo_tutorial.jpg'),
+                    fit: BoxFit.cover,
+                  ),
+                ),
               ),
-            ),
-          ),
-          if (_isBlurVisible && (_currentStep >= 0 && _currentStep <= 5))
-            _buildBlurBackground(),
-          if (_isInfoVisible && _currentStep == 0) _buildStep1(),
-          if (_isInfoVisible && _currentStep == 1) _buildStep2(),
-          if (_isInfoVisible && _currentStep == 2) _buildStep3(),
-          if (_isInfoVisible && _currentStep == 3) _buildStep4(),
-          if (_currentStep == 4) _buildAddTransactionButton(),
-          if (_isInfoVisible && _currentStep == 5) _buildStep5(),
-        ],
+              if (_isBlurVisible && (_currentStep >= 0 && _currentStep <= 5))
+                _buildBlurBackground(),
+              if (_isInfoVisible && _currentStep == 0) _buildStep1(constraints),
+              if (_isInfoVisible && _currentStep == 1) _buildStep2(constraints),
+              if (_isInfoVisible && _currentStep == 2) _buildStep3(constraints),
+              if (_isInfoVisible && _currentStep == 3) _buildStep4(constraints),
+              if (_currentStep == 4) _buildAddTransactionButton(),
+              if (_isInfoVisible && _currentStep == 5) _buildStep5(constraints),
+            ],
+          );
+        },
       ),
     );
   }
@@ -81,12 +85,12 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
     );
   }
 
-  Widget _buildStep1() {
+  Widget _buildStep1(BoxConstraints constraints) {
     return Positioned(
       left: 20,
-      top: 65,
+      top: constraints.maxHeight * 0.1,
       child: Container(
-        width: MediaQuery.of(context).size.width - 40,
+        width: constraints.maxWidth - 40,
         color: Colors.black.withOpacity(0.1),
         padding: EdgeInsets.all(16),
         child: Column(
@@ -115,12 +119,12 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
     );
   }
 
-  Widget _buildStep2() {
+  Widget _buildStep2(BoxConstraints constraints) {
     return Positioned(
       left: 20,
-      top: 270,
+      top: constraints.maxHeight * 0.3,
       child: Container(
-        width: MediaQuery.of(context).size.width - 40,
+        width: constraints.maxWidth - 40,
         color: Colors.black.withOpacity(0.1),
         padding: EdgeInsets.all(16),
         child: Column(
@@ -149,12 +153,12 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
     );
   }
 
-  Widget _buildStep3() {
+  Widget _buildStep3(BoxConstraints constraints) {
     return Positioned(
       left: 20,
-      top: 490,
+      top: constraints.maxHeight * 0.6,
       child: Container(
-        width: MediaQuery.of(context).size.width - 40,
+        width: constraints.maxWidth - 40,
         color: Colors.black.withOpacity(0.1),
         padding: EdgeInsets.all(16),
         child: Column(
@@ -183,12 +187,12 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
     );
   }
 
-  Widget _buildStep4() {
+  Widget _buildStep4(BoxConstraints constraints) {
     return Positioned(
       left: 20,
-      top: 500,
+      top: constraints.maxHeight * 0.7,
       child: Container(
-        width: MediaQuery.of(context).size.width - 40,
+        width: constraints.maxWidth - 40,
         color: Colors.black.withOpacity(0.1),
         padding: EdgeInsets.all(16),
         child: Column(
@@ -232,12 +236,12 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
     );
   }
 
-  Widget _buildStep5() {
+  Widget _buildStep5(BoxConstraints constraints) {
     return Positioned(
       left: 20,
-      top: 480,
+      top: constraints.maxHeight * 0.6,
       child: Container(
-        width: MediaQuery.of(context).size.width - 40,
+        width: constraints.maxWidth - 40,
         color: Colors.black.withOpacity(0.1),
         padding: EdgeInsets.all(16),
         child: Column(
