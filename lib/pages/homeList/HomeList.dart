@@ -245,11 +245,12 @@ class _HomeListState extends State<HomeList> {
   }
 
   double _getAngle(Offset position) {
-    final centerX = 150.0; // Updated to match the size of the PieChart
-    final centerY = 150.0; // Updated to match the size of the PieChart
+    final centerX = 100.0; // Metà della larghezza del contenitore
+    final centerY = 100.0; // Metà dell'altezza del contenitore
     final dx = position.dx - centerX;
     final dy = position.dy - centerY;
-    final angle = (Math.atan2(dy, dx) * 150 / Math.pi + 360) % 360;
+    final angle = (Math.atan2(dy, dx) * 180 / Math.pi + 360) %
+        360; // Converti radian in gradi
     return angle;
   }
 
@@ -324,19 +325,18 @@ class _HomeListState extends State<HomeList> {
     );
   }
 
-String formatNumber(double number) {
-  String sign = number < 0 ? '-' : '';
-  number = number.abs();
+  String formatNumber(double number) {
+    String sign = number < 0 ? '-' : '';
+    number = number.abs();
 
-  if (number >= 1000000) {
-    return sign + (number / 1000000).toStringAsFixed(1) + 'M';
-  } else if (number >= 1000) {
-    return sign + (number / 1000).toStringAsFixed(1) + 'k';
-  } else {
-    return sign + number.toStringAsFixed(2);
+    if (number >= 1000000) {
+      return sign + (number / 1000000).toStringAsFixed(1) + 'M';
+    } else if (number >= 1000) {
+      return sign + (number / 1000).toStringAsFixed(1) + 'k';
+    } else {
+      return sign + number.toStringAsFixed(2);
+    }
   }
-}
-
 
   @override
   Widget build(BuildContext context) {
@@ -411,18 +411,19 @@ String formatNumber(double number) {
                               onTapUp: (details) {
                                 _handlePieChartTap(details, categoryAmounts);
                               },
-                              child: Container(
-                                width:
-                                    180, // Increased size to match the center position
-                                height:
-                                    180, // Increased size to match the center position
-                                color: Colors.green,
-                                child: PieChart(
-                                  PieChartData(
-                                    sections: _createPieChartSections(
-                                        categoryAmounts),
-                                    sectionsSpace: 2,
-                                    centerSpaceRadius: 0,
+                              child: ClipOval(
+                                child: Container(
+                                  width: 200,
+                                  height: 200,
+                                  color: Colors
+                                      .transparent, // Rimuovi il colore di sfondo per evitare interferenze
+                                  child: PieChart(
+                                    PieChartData(
+                                      sections: _createPieChartSections(
+                                          categoryAmounts),
+                                      sectionsSpace: 2,
+                                      centerSpaceRadius: 0,
+                                    ),
                                   ),
                                 ),
                               ),
