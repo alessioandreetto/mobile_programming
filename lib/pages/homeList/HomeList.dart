@@ -90,13 +90,13 @@ class _HomeListState extends State<HomeList> {
     var walletProvider = Provider.of<WalletProvider>(context, listen: false);
 
     _showExpenses = walletProvider.getTipologiaMovimento();
-    if (walletProvider.wallets.isNotEmpty) {
+     if (walletProvider.wallets.isNotEmpty) {
       final selectedWallet =
           walletProvider.wallets[walletProvider.getSelectedWalletIndex()];
       setState(() {
         _selectedWalletId = selectedWallet.id!;
         _selectedValuta = walletProvider.valuta;
-      });
+      }); 
    //   _loadTransactions(_selectedWalletId);
     } else {
       setState(() {
@@ -122,14 +122,16 @@ class _HomeListState extends State<HomeList> {
   }
 
   void _handleSwipe(int index) {
-
+   print('prova' + index!.toString());
     var walletProvider = Provider.of<WalletProvider>(context, listen: false);
     final walletId = walletProvider.wallets[index].id!;
-   //_loadTransactions(index);
+     walletProvider.updateSelectedWalletIndex(index);
+   //_loadTransactions();
    
   }
 
   Future<List<Transaction>> _loadTransactions(int walletId) async {
+    print('prova load' + walletId.toString());
     try {
       List<Transaction> loadedTransactions =
           await DatabaseHelper().getTransactionsForWallet(walletId);

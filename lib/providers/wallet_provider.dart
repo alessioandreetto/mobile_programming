@@ -93,12 +93,12 @@ class WalletProvider with ChangeNotifier {
 
   void updateSelectedWalletIndex(int index) {
     _selectedWalletIndex = index;
-    print(_selectedWalletIndex);
+    //print(_selectedWalletIndex);
     notifyListeners();
   }
 
   int getSelectedWalletIndex() {
-    print(_selectedWalletIndex);
+    //print(_selectedWalletIndex);
     return _selectedWalletIndex;
   }
 
