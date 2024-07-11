@@ -199,58 +199,45 @@ class _ChartsListState extends State<ChartsList> {
                                     foregroundColor: MaterialStateProperty
                                         .resolveWith<Color>(
                                       (Set<MaterialState> states) {
-                                        if (Theme.of(context).brightness ==
-                                            Brightness.light) {
-                                          return walletProvider
-                                                          .selectedWalletIndex +
-                                                      1 ==
-                                                  walletProvider
-                                                      .wallets[index].id!
-                                              ? Colors.white
-                                              : Colors.black;
-                                        } else {
-                                          return walletProvider
-                                                          .selectedWalletIndex +
-                                                      1 ==
-                                                  walletProvider
-                                                      .wallets[index].id!
-                                              ? Colors.black
-                                              : Colors.white;
-                                        }
+                                        bool isSelected = walletProvider
+                                                .selectedWalletIndex ==
+                                            index;
+                                        return isSelected
+                                            ? (Theme.of(context).brightness ==
+                                                    Brightness.light
+                                                ? Colors.white
+                                                : Colors.black)
+                                            : (Theme.of(context).brightness ==
+                                                    Brightness.light
+                                                ? Colors.black
+                                                : Colors.white);
                                       },
                                     ),
                                     backgroundColor: MaterialStateProperty
                                         .resolveWith<Color>(
                                       (Set<MaterialState> states) {
-                                        if (Theme.of(context).brightness ==
-                                            Brightness.light) {
-                                          return walletProvider
-                                                          .selectedWalletIndex +
-                                                      1 ==
-                                                  walletProvider
-                                                      .wallets[index].id!
-                                              ? Colors.black
-                                              : Colors.white;
-                                        } else {
-                                          return walletProvider
-                                                          .selectedWalletIndex +
-                                                      1 ==
-                                                  walletProvider
-                                                      .wallets[index].id!
-                                              ? Colors.white
-                                              : Colors.black;
-                                        }
+                                        bool isSelected = walletProvider
+                                                .selectedWalletIndex ==
+                                            index;
+                                        return isSelected
+                                            ? (Theme.of(context).brightness ==
+                                                    Brightness.light
+                                                ? Colors.black
+                                                : Colors.white)
+                                            : (Theme.of(context).brightness ==
+                                                    Brightness.light
+                                                ? Colors.white
+                                                : Colors.black);
                                       },
                                     ),
                                     textStyle: MaterialStateProperty
                                         .resolveWith<TextStyle>(
                                       (Set<MaterialState> states) {
+                                        bool isSelected = walletProvider
+                                                .selectedWalletIndex ==
+                                            index;
                                         return TextStyle(
-                                          color: walletProvider
-                                                          .selectedWalletIndex +
-                                                      1 ==
-                                                  walletProvider
-                                                      .wallets[index].id!
+                                          color: isSelected
                                               ? (Theme.of(context).brightness ==
                                                       Brightness.light
                                                   ? Colors.white
