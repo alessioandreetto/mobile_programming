@@ -60,7 +60,7 @@ class _FirstWalletState extends State<FirstWallet> {
             title:  Text(
                         'Crea qui il tuo primo portafoglio!',
                         style: TextStyle(
-                          fontSize: 24,
+                          fontSize: 20,
                           fontWeight: FontWeight.bold,
                         ),
                       ),

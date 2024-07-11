@@ -53,7 +53,7 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
                 decoration: BoxDecoration(
                   image: DecorationImage(
                     image: AssetImage('assets/images/sfondo_tutorial.jpg'),
-                    fit: BoxFit.cover,
+                    fit: BoxFit.fill,
                   ),
                 ),
               ),
@@ -190,7 +190,7 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
   Widget _buildStep4(BoxConstraints constraints) {
     return Positioned(
       left: 20,
-      top: constraints.maxHeight * 0.7,
+      top: constraints.maxHeight * 0.5,
       child: Container(
         width: constraints.maxWidth - 40,
         color: Colors.black.withOpacity(0.1),
