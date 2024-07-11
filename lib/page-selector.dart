@@ -70,9 +70,7 @@ class _BottomBarDemoState extends State<BottomBarDemo> {
                   },
             child: Icon(
               Icons.add,
-              //color: Colors.white,
             ),
-            //backgroundColor: Colors.grey, // Cambiato da blue a grey
             elevation: 5.0,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(30.0),
