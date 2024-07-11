@@ -626,8 +626,17 @@ class _ChartsListState extends State<ChartsList> {
   void _deleteTransaction(
       Transaction transaction, WalletProvider walletProvider) async {
     double deletedTransactionValue = transaction.value ?? 0.0;
+
     await DatabaseHelper().deleteTransaction(transaction.id!);
+
+    Wallet selectedWallet =
+        walletProvider.wallets[walletProvider.selectedWalletIndex];
+    selectedWallet.balance = selectedWallet.balance! - deletedTransactionValue;
+
+    await DatabaseHelper().updateWallet(selectedWallet);
+
     walletProvider.refreshWallets();
+    walletProvider.notifyListeners();
   }
 
   String _twoDigits(int n) {
