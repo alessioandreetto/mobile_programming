@@ -120,9 +120,7 @@ class _FirstWalletState extends State<FirstWallet> {
                         controller: widget.balanceController,
                         keyboardType: TextInputType.number,
                         inputFormatters: [
-                          FilteringTextInputFormatter.allow(
-                            RegExp(r'^\d+\.?\d{0,2}'),
-                          ),
+                       CustomNumberInputFormatter(),
                         ],
                         onChanged: (_) {
                           setState(() {
@@ -178,5 +176,40 @@ class _FirstWalletState extends State<FirstWallet> {
           ),
         )) ??
         false;
+  }
+}
+
+
+class CustomNumberInputFormatter extends TextInputFormatter {
+  @override
+  TextEditingValue formatEditUpdate(
+    TextEditingValue oldValue,
+    TextEditingValue newValue,
+  ) {
+    // Handle empty input
+    if (newValue.text.isEmpty) {
+      return newValue;
+    }
+
+    // Split the input into integer and decimal parts
+    final parts = newValue.text.split('.');
+
+    // Check the integer part length
+    if (parts[0].length > 9) {
+      return oldValue;
+    }
+
+    // Check the decimal part length if it exists
+    if (parts.length > 1 && parts[1].length > 2) {
+      return oldValue;
+    }
+
+    // Check the total length
+    if (newValue.text.length > 12) {
+      return oldValue;
+    }
+
+    // Return the new value if it passes all checks
+    return newValue;
   }
 }
