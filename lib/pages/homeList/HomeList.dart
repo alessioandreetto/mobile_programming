@@ -90,14 +90,14 @@ class _HomeListState extends State<HomeList> {
     var walletProvider = Provider.of<WalletProvider>(context, listen: false);
 
     _showExpenses = walletProvider.getTipologiaMovimento();
-     if (walletProvider.wallets.isNotEmpty) {
+    if (walletProvider.wallets.isNotEmpty) {
       final selectedWallet =
           walletProvider.wallets[walletProvider.getSelectedWalletIndex()];
       setState(() {
         _selectedWalletId = selectedWallet.id!;
         _selectedValuta = walletProvider.valuta;
-      }); 
-   //   _loadTransactions(_selectedWalletId);
+      });
+      //   _loadTransactions(_selectedWalletId);
     } else {
       setState(() {
         _selectedWalletId = 0;
@@ -117,21 +117,18 @@ class _HomeListState extends State<HomeList> {
           _selectedWalletId = 0;
         }
       });
-    //  _loadTransactions(_selectedWalletId);
+      //  _loadTransactions(_selectedWalletId);
     }
   }
 
   void _handleSwipe(int index) {
-   print('prova' + index!.toString());
     var walletProvider = Provider.of<WalletProvider>(context, listen: false);
     final walletId = walletProvider.wallets[index].id!;
-     walletProvider.updateSelectedWalletIndex(index);
-   //_loadTransactions();
-   
+    walletProvider.updateSelectedWalletIndex(index);
+    //_loadTransactions();
   }
 
   Future<List<Transaction>> _loadTransactions(int walletId) async {
-    print('prova load' + walletId.toString());
     try {
       List<Transaction> loadedTransactions =
           await DatabaseHelper().getTransactionsForWallet(walletId);
@@ -152,7 +149,6 @@ class _HomeListState extends State<HomeList> {
       int selectedCategoryIndex = walletProvider.getSelectedCategoryIndex();
 
       if (selectedCategoryIndex != -1) {
-        print(selectedCategoryIndex);
         transactions = loadedTransactions
             .where((transaction) =>
                 transaction.categoryId == selectedCategoryIndex)
@@ -279,8 +275,8 @@ class _HomeListState extends State<HomeList> {
 
     await DatabaseHelper().deleteTransaction(transaction.id!);
 
-    Wallet selectedWallet = walletProvider.wallets
-        .firstWhere((wallet) => wallet.id == _selectedWalletId);
+    Wallet selectedWallet =
+        walletProvider.wallets[walletProvider.selectedWalletIndex];
     selectedWallet.balance = selectedWallet.balance! - deletedTransactionValue;
 
     await DatabaseHelper().updateWallet(selectedWallet);
@@ -307,7 +303,7 @@ class _HomeListState extends State<HomeList> {
   }
 
   void _handleButtonPress(int index) {
-     setState(() {
+    setState(() {
       _selectedWalletId = index;
     });
     _pageController.animateToPage(
@@ -340,11 +336,9 @@ class _HomeListState extends State<HomeList> {
 
   @override
   Widget build(BuildContext context) {
-
-   
     var walletProvider = Provider.of<WalletProvider>(context);
- Wallet selectedWallet =
-            walletProvider.wallets[walletProvider.selectedWalletIndex];
+    Wallet selectedWallet =
+        walletProvider.wallets[walletProvider.selectedWalletIndex];
     return Scaffold(
         body: NestedScrollView(
       headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
@@ -393,8 +387,7 @@ class _HomeListState extends State<HomeList> {
                     padding: const EdgeInsets.only(top: 80.0),
                     child: Center(
                       child: FutureBuilder<List<Transaction>>(
-                        future: _loadTransactions(
-                            selectedWallet.id!),
+                        future: _loadTransactions(selectedWallet.id!),
                         builder: (context, snapshot) {
                           if (snapshot.hasError) {
                             return Center(
@@ -558,7 +551,7 @@ class _HomeListState extends State<HomeList> {
                             scrollDirection: Axis.horizontal,
                             itemCount: walletProvider.wallets.length,
                             itemBuilder: (context, index) {
-                               bool isSelected =
+                              bool isSelected =
                                   walletProvider.selectedWalletIndex == index;
                               return Padding(
                                 padding: const EdgeInsets.symmetric(
@@ -567,9 +560,9 @@ class _HomeListState extends State<HomeList> {
                                   onPressed: () {
                                     _handleButtonPress(index);
 
-                                 
-                                  walletProvider.updateSelectedWalletIndex(index);
-                                   /*  _loadTransactions(
+                                    walletProvider
+                                        .updateSelectedWalletIndex(index);
+                                    /*  _loadTransactions(
                                   selectedWallet.id!); */
                                   },
                                   style: ButtonStyle(
@@ -668,9 +661,9 @@ class _HomeListState extends State<HomeList> {
                                 setState(() {
                                   _showExpenses = value!;
                                   walletProvider.updateTipologia(_showExpenses);
-                                 /*  _loadTransactions(
+                                  /*  _loadTransactions(
                                      walletProvider.wallets[walletProvider.selectedWalletIndex].id!);*/
-                                }); 
+                                });
                               },
                               items: [
                                 DropdownMenuItem<bool>(
