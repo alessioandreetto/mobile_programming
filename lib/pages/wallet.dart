@@ -38,6 +38,19 @@ class Note {
   }
 }
 
+String formatNumber(double number) {
+  String sign = number < 0 ? '-' : '';
+  number = number.abs();
+
+  if (number >= 1000000) {
+    return sign + (number / 1000000).toStringAsFixed(1) + 'M';
+  } else if (number >= 1000) {
+    return sign + (number / 1000).toStringAsFixed(1) + 'k';
+  } else {
+    return sign + number.toStringAsFixed(2);
+  }
+}
+
 class _WalletPageState extends State<WalletPage> {
   List<Note> data = [];
   Set<int> selectedIndices = Set();
@@ -345,7 +358,7 @@ class _WalletPageState extends State<WalletPage> {
                         ),
                       ),
                       Text(
-                        "$title $valuta",
+                        "${formatNumber(title)} $valuta",
                         style: TextStyle(
                           fontSize: 20,
                         ),

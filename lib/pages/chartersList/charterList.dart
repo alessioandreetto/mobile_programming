@@ -47,6 +47,19 @@ class _ChartsListState extends State<ChartsList> {
     6: Icons.category, // Categoria Varie
   };
 
+String formatNumber(double number) {
+  String sign = number < 0 ? '-' : '';
+  number = number.abs();
+
+  if (number >= 1000000) {
+    return sign + (number / 1000000).toStringAsFixed(1) + 'M';
+  } else if (number >= 1000) {
+    return sign + (number / 1000).toStringAsFixed(1) + 'k';
+  } else {
+    return sign + number.toStringAsFixed(2);
+  }
+}
+
   @override
   void initState() {
     super.initState();
@@ -460,7 +473,7 @@ class _ChartsListState extends State<ChartsList> {
                                               padding:
                                                   const EdgeInsets.all(8.0),
                                               child: Text(
-                                                "${transaction.value} ${walletProvider.valuta}",
+                                                "${formatNumber(transaction.value ?? 0)} ${walletProvider.valuta}",
                                                 style: TextStyle(
                                                   color: transaction.value! >= 0
                                                       ? Colors.green
@@ -520,7 +533,9 @@ class _ChartsListState extends State<ChartsList> {
                 padding: const EdgeInsets.all(16.0),
                 child: SfCartesianChart(
                   primaryXAxis: NumericAxis(interval: 1),
-                  primaryYAxis: NumericAxis(),
+                 primaryYAxis: NumericAxis(
+                  isVisible: false,
+                 ),
                   series: <LineSeries<ChartSampleData, num>>[
                     LineSeries<ChartSampleData, num>(
                       dataSource: chartData,
@@ -533,10 +548,10 @@ class _ChartsListState extends State<ChartsList> {
                         double transactionValue = data.transactionValue;
                         // Controlla se il valore della transazione è double.nan
                         if (transactionValue.isNaN) {
-                          return '${partialBalance.toStringAsFixed(2)} ${walletProvider.valuta}';
+                          return '${formatNumber(partialBalance)} ${walletProvider.valuta}';
                         } else {
                           // Formatta il testo dell'etichetta per includere sia il bilancio parziale che il valore della transazione
-                          return '${partialBalance.toStringAsFixed(2)} ${walletProvider.valuta}\n${transactionValue.toStringAsFixed(2)} ${walletProvider.valuta}';
+                          return '${formatNumber(partialBalance)} ${walletProvider.valuta}\n${formatNumber(transactionValue)} ${walletProvider.valuta}';
                         }
                       },
                       dataLabelSettings: DataLabelSettings(isVisible: true),

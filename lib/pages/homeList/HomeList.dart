@@ -152,24 +152,24 @@ class _HomeListState extends State<HomeList> {
             .toList();
       }
 
-      WalletProvider walletProvider = Provider.of<WalletProvider>(context, listen: false);
-    int selectedCategoryIndex = walletProvider.getSelectedCategoryIndex();
+      WalletProvider walletProvider =
+          Provider.of<WalletProvider>(context, listen: false);
+      int selectedCategoryIndex = walletProvider.getSelectedCategoryIndex();
 
-    if (selectedCategoryIndex != -1) {
-
-      print (selectedCategoryIndex);
-      transactions = loadedTransactions
-          .where((transaction) => transaction.categoryId ==
-             selectedCategoryIndex)
-          .toList();
-           transactions.sort((a, b) => b.date!.compareTo(a.date!));
-    }
+      if (selectedCategoryIndex != -1) {
+        print(selectedCategoryIndex);
+        transactions = loadedTransactions
+            .where((transaction) =>
+                transaction.categoryId == selectedCategoryIndex)
+            .toList();
+        transactions.sort((a, b) => b.date!.compareTo(a.date!));
+      }
 
       loadedTransactions.sort((a, b) => b.date!.compareTo(a.date!));
 
       setState(() {
-        if(selectedCategoryIndex == -1){
-        transactions = loadedTransactions;
+        if (selectedCategoryIndex == -1) {
+          transactions = loadedTransactions;
         }
       });
 
@@ -238,9 +238,10 @@ class _HomeListState extends State<HomeList> {
       }
     });
 
-    WalletProvider walletProvider = Provider.of<WalletProvider>(context, listen: false);
-walletProvider.updateSelectedCategoryIndex(_selectedCategory != null ? int.parse(_selectedCategory!) : -1);
-
+    WalletProvider walletProvider =
+        Provider.of<WalletProvider>(context, listen: false);
+    walletProvider.updateSelectedCategoryIndex(
+        _selectedCategory != null ? int.parse(_selectedCategory!) : -1);
   }
 
   double _getAngle(Offset position) {
@@ -323,13 +324,16 @@ walletProvider.updateSelectedCategoryIndex(_selectedCategory != null ? int.parse
     );
   }
 
-  String formatNumber(double number) {
+String formatNumber(double number) {
+  String sign = number < 0 ? '-' : '';
+  number = number.abs();
+
   if (number >= 1000000) {
-    return (number / 1000000).toStringAsFixed(1) + 'M';
+    return sign + (number / 1000000).toStringAsFixed(1) + 'M';
   } else if (number >= 1000) {
-    return (number / 1000).toStringAsFixed(1) + 'k';
+    return sign + (number / 1000).toStringAsFixed(1) + 'k';
   } else {
-    return number.toStringAsFixed(2);
+    return sign + number.toStringAsFixed(2);
   }
 }
 
@@ -360,12 +364,12 @@ walletProvider.updateSelectedCategoryIndex(_selectedCategory != null ? int.parse
                           : Colors.white)),
                   children: <TextSpan>[
                     TextSpan(
-                      text: '${walletProvider.name.length > 15 ? walletProvider.name.substring(0, 15) + '...' : walletProvider.name}',
+                      text:
+                          '${walletProvider.name.length > 15 ? walletProvider.name.substring(0, 15) + '...' : walletProvider.name}',
                       style: TextStyle(
                         fontWeight:
                             FontWeight.bold, // Imposta il testo in grassetto
                       ),
-                      
                     ),
                     TextSpan(
                       text: '!',
@@ -466,7 +470,7 @@ walletProvider.updateSelectedCategoryIndex(_selectedCategory != null ? int.parse
                                   children: <TextSpan>[
                                     TextSpan(
                                       text:
-                                          '${walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).name!.length > 12 ? walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).name!.substring(0, 12) + '...' : walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).name  }',
+                                          '${walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).name!.length > 12 ? walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).name!.substring(0, 12) + '...' : walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).name}',
                                       style: TextStyle(
                                           fontWeight: FontWeight
                                               .bold, // Imposta il testo in grassetto
@@ -487,13 +491,15 @@ walletProvider.updateSelectedCategoryIndex(_selectedCategory != null ? int.parse
                                           ? Colors.black
                                           : Colors.white)),
                                   children: <TextSpan>[
-                                  TextSpan(
-  text: '${formatNumber(walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).balance ?? 0.0)} ${walletProvider.valuta}',
-  style: TextStyle(
-    fontWeight: FontWeight.bold, // Imposta il testo in grassetto
-    fontSize: 20.0,
-  ),
-),
+                                    TextSpan(
+                                      text:
+                                          '${formatNumber(walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).balance ?? 0.0)} ${walletProvider.valuta}',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight
+                                            .bold, // Imposta il testo in grassetto
+                                        fontSize: 20.0,
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -640,8 +646,11 @@ walletProvider.updateSelectedCategoryIndex(_selectedCategory != null ? int.parse
                                       },
                                     ),
                                   ),
-                                  child:
-                                      Text(walletProvider.wallets[index].name!.length >9 ? '${walletProvider.wallets[index].name!.substring(0, 9)}...' : walletProvider.wallets[index].name!),
+                                  child: Text(walletProvider
+                                              .wallets[index].name!.length >
+                                          9
+                                      ? '${walletProvider.wallets[index].name!.substring(0, 9)}...'
+                                      : walletProvider.wallets[index].name!),
                                 ),
                               );
                             },
@@ -655,7 +664,7 @@ walletProvider.updateSelectedCategoryIndex(_selectedCategory != null ? int.parse
                           children: [
                             if (walletProvider.wallets.isNotEmpty)
                               Text(
-                                "Transazioni per ${walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).name!.length > 9 ? '${walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).name!.substring(0, 9)}...' : walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).name }:",
+                                "Transazioni per ${walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).name!.length > 9 ? '${walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).name!.substring(0, 9)}...' : walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).name}:",
                                 style: TextStyle(fontSize: 14),
                               ),
                             DropdownButton<bool>(
@@ -671,11 +680,17 @@ walletProvider.updateSelectedCategoryIndex(_selectedCategory != null ? int.parse
                               items: [
                                 DropdownMenuItem<bool>(
                                   value: true,
-                                  child: Text('Mostra Uscite', style: TextStyle(fontSize: 14),),
+                                  child: Text(
+                                    'Mostra Uscite',
+                                    style: TextStyle(fontSize: 14),
+                                  ),
                                 ),
                                 DropdownMenuItem<bool>(
                                   value: false,
-                                  child: Text('Mostra Entrate', style: TextStyle(fontSize: 14),),
+                                  child: Text(
+                                    'Mostra Entrate',
+                                    style: TextStyle(fontSize: 14),
+                                  ),
                                 ),
                               ],
                             ),
@@ -697,7 +712,6 @@ walletProvider.updateSelectedCategoryIndex(_selectedCategory != null ? int.parse
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                          
                             Icon(Icons.search_off, size: 48.0),
                             Text(
                               'Nessuna transazione',
@@ -717,7 +731,7 @@ walletProvider.updateSelectedCategoryIndex(_selectedCategory != null ? int.parse
                         extentRatio: 0.25,
                         motion: ScrollMotion(),
                         children: [
-                           SlidableAction(
+                          SlidableAction(
                             borderRadius: BorderRadius.circular(10),
                             padding: EdgeInsets.all(
                                 5), // Riduce il padding del pulsante
@@ -727,17 +741,16 @@ walletProvider.updateSelectedCategoryIndex(_selectedCategory != null ? int.parse
                                 transactions.removeAt(index);
                               });
                             },
-                            backgroundColor: Theme.of(context).brightness ==
-                                    Brightness.light
-                                ? Colors.white: Colors.black,
+                            backgroundColor:
+                                Theme.of(context).brightness == Brightness.light
+                                    ? Colors.white
+                                    : Colors.black,
                             foregroundColor: Colors.red,
                             icon: Icons.delete,
                             label: 'Elimina',
                             // Nota: iconSize non è un parametro direttamente supportato.
                             // Dovrai accettare che l'icona sarà della dimensione predefinita.
-                          ), 
-
-                         
+                          ),
                         ],
                       ),
                       child: GestureDetector(
@@ -803,7 +816,11 @@ walletProvider.updateSelectedCategoryIndex(_selectedCategory != null ? int.parse
                                       ), */
                                       RichText(
                                         text: TextSpan(
-                                          text: transaction.name!.length> 15? transaction.name!.substring(0, 15) + '...' : transaction.name,
+                                          text: transaction.name!.length > 15
+                                              ? transaction.name!
+                                                      .substring(0, 15) +
+                                                  '...'
+                                              : transaction.name,
                                           style: TextStyle(
                                             fontFamily: 'Poppins',
                                             color:
