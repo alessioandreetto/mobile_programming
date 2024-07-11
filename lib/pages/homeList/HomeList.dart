@@ -97,7 +97,7 @@ class _HomeListState extends State<HomeList> {
         _selectedWalletId = selectedWallet.id!;
         _selectedValuta = walletProvider.valuta;
       });
-      _loadTransactions(_selectedWalletId);
+   //   _loadTransactions(_selectedWalletId);
     } else {
       setState(() {
         _selectedWalletId = 0;
@@ -117,16 +117,16 @@ class _HomeListState extends State<HomeList> {
           _selectedWalletId = 0;
         }
       });
-      _loadTransactions(_selectedWalletId);
+    //  _loadTransactions(_selectedWalletId);
     }
   }
 
   void _handleSwipe(int index) {
+
     var walletProvider = Provider.of<WalletProvider>(context, listen: false);
     final walletId = walletProvider.wallets[index].id!;
-
-    _loadTransactions(walletId);
-    walletProvider.updateSelectedWalletIndex(index);
+   //_loadTransactions(index);
+   
   }
 
   Future<List<Transaction>> _loadTransactions(int walletId) async {
@@ -305,6 +305,9 @@ class _HomeListState extends State<HomeList> {
   }
 
   void _handleButtonPress(int index) {
+     setState(() {
+      _selectedWalletId = index;
+    });
     _pageController.animateToPage(
       index,
       duration: Duration(milliseconds: 500),
@@ -335,8 +338,11 @@ class _HomeListState extends State<HomeList> {
 
   @override
   Widget build(BuildContext context) {
-    var walletProvider = Provider.of<WalletProvider>(context);
 
+   
+    var walletProvider = Provider.of<WalletProvider>(context);
+ Wallet selectedWallet =
+            walletProvider.wallets[walletProvider.selectedWalletIndex];
     return Scaffold(
         body: NestedScrollView(
       headerSliverBuilder: (BuildContext context, bool innerBoxIsScrolled) {
@@ -386,7 +392,7 @@ class _HomeListState extends State<HomeList> {
                     child: Center(
                       child: FutureBuilder<List<Transaction>>(
                         future: _loadTransactions(
-                            walletProvider.selectedWalletIndex + 1),
+                            selectedWallet.id!),
                         builder: (context, snapshot) {
                           if (snapshot.hasError) {
                             return Center(
@@ -550,6 +556,8 @@ class _HomeListState extends State<HomeList> {
                             scrollDirection: Axis.horizontal,
                             itemCount: walletProvider.wallets.length,
                             itemBuilder: (context, index) {
+                               bool isSelected =
+                                  walletProvider.selectedWalletIndex == index;
                               return Padding(
                                 padding: const EdgeInsets.symmetric(
                                     vertical: 8.0, horizontal: 8.0),
@@ -557,10 +565,10 @@ class _HomeListState extends State<HomeList> {
                                   onPressed: () {
                                     _handleButtonPress(index);
 
-                                    walletProvider
-                                        .updateSelectedWalletIndex(index);
-                                    _loadTransactions(
-                                        walletProvider.selectedWalletIndex + 1);
+                                 
+                                  walletProvider.updateSelectedWalletIndex(index);
+                                   /*  _loadTransactions(
+                                  selectedWallet.id!); */
                                   },
                                   style: ButtonStyle(
                                     elevation: MaterialStateProperty.all(0),
@@ -658,9 +666,9 @@ class _HomeListState extends State<HomeList> {
                                 setState(() {
                                   _showExpenses = value!;
                                   walletProvider.updateTipologia(_showExpenses);
-                                  _loadTransactions(
-                                      walletProvider.selectedWalletIndex + 1);
-                                });
+                                 /*  _loadTransactions(
+                                     walletProvider.wallets[walletProvider.selectedWalletIndex].id!);*/
+                                }); 
                               },
                               items: [
                                 DropdownMenuItem<bool>(
