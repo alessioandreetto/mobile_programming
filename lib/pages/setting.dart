@@ -120,7 +120,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ),
           ),
-           /*  Card(
+ Card(
             child: ListTile(
               title: Text('tutorial demo'),
               onTap: () {
@@ -130,7 +130,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 ); 
               },
             ),
-          ),*/
+          ),
         ],
       ),
     );

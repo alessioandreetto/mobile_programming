@@ -105,7 +105,7 @@ class _WelcomePageState extends State<WelcomePage> {
                 'e pianificare un futuro finanziario migliore. '
                 'Inizia ad esplorare il mondo delle tue finanze oggi stesso!',
                 style: TextStyle(
-                  fontSize: 16.0,
+                  fontSize: 14.0,
                 ),
                 textAlign: TextAlign.center,
               ),
