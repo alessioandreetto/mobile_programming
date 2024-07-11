@@ -49,11 +49,14 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
         builder: (context, constraints) {
           return Stack(
             children: [
-              Container(
-                decoration: BoxDecoration(
-                  image: DecorationImage(
-                    image: AssetImage('assets/images/sfondo_tutorial.jpg'),
-                    fit: BoxFit.fill,
+              Padding(
+                padding: const EdgeInsets.only(top: 15.0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: AssetImage('assets/images/sfondo_tutorial.jpg'),
+                      
+                    ),
                   ),
                 ),
               ),
