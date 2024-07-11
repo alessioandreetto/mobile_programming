@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
-
 class Category {
   final int id;
   final String name;
@@ -73,7 +72,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
   int _selectedActionIndex = 0;
   DateTime? _selectedDate;
   bool _deleteButtonVisible = false;
-    String _selectedWalletForExchangeOut = '';
+  String _selectedWalletForExchangeOut = '';
   String _selectedWalletForExchangeIn = '';
 
   String? _initialName;
@@ -94,28 +93,24 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
   ];
 
   Map<int, Color> categoryColors = {
-    0: Colors.red, // Categoria Auto
-    1: Colors.blue, // Categoria Banca
-    2: Colors.green, // Categoria Casa
-    3: Colors.orange, // Categoria Intrattenimento
-    4: Colors.purple, // Categoria Shopping
-    5: Colors.yellow, // Categoria Viaggio
-    6: Colors.brown, // Categoria Varie
+    0: Colors.red,
+    1: Colors.blue,
+    2: Colors.green,
+    3: Colors.orange,
+    4: Colors.purple,
+    5: Colors.yellow,
+    6: Colors.brown,
   };
 
   Map<int, IconData> categoryIcons = {
-    0: Icons.directions_car, // Categoria Auto
-    1: Icons.account_balance, // Categoria Banca
-    2: Icons.home, // Categoria Casa
-    3: Icons.movie, // Categoria Intrattenimento
-    4: Icons.shopping_cart, // Categoria Shopping
-    5: Icons.airplanemode_active, // Categoria Viaggio
-    6: Icons.category, // Categoria Varie
+    0: Icons.directions_car,
+    1: Icons.account_balance,
+    2: Icons.home,
+    3: Icons.movie,
+    4: Icons.shopping_cart,
+    5: Icons.airplanemode_active,
+    6: Icons.category,
   };
-
-
-
-
 
   List<String> actionTypes = ['Entrata', 'Uscita'];
 
@@ -148,7 +143,6 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
         });
       });
     } else {
-      
       _selectedDate = DateTime.now();
       widget.dateController.text =
           NewTransactionPage.formatDate(_selectedDate!);
@@ -191,17 +185,16 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
         if (_initialWallet == null) {
           _initialWallet = _selectedWallet;
         }
-                _selectedWalletForExchangeOut = _selectedWallet;
+        _selectedWalletForExchangeOut = _selectedWallet;
         _selectedWalletForExchangeIn = _selectedWallet;
       }
     });
   }
 
   Future<void> _selectDate(BuildContext context) async {
-    
     DateTime selectedDate = _selectedDate ?? DateTime.now();
     final DateTime? picked = await showDatePicker(
-      locale:  Locale('it', "IT"),
+      locale: Locale('it', "IT"),
       context: context,
       initialDate: selectedDate,
       firstDate: DateTime(2000),
@@ -281,7 +274,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
       },
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor:  Colors.transparent,
+          backgroundColor: Colors.transparent,
           title: widget.transaction == null
               ? Text('Nuova Transazione')
               : Text('Modifica Transazione'),
@@ -338,8 +331,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                   controller: widget.nameController,
                   decoration: InputDecoration(labelText: 'Nome'),
                   inputFormatters: [
-                    LengthLimitingTextInputFormatter(
-                        25), // Limita a 25 caratteri
+                    LengthLimitingTextInputFormatter(25),
                   ],
                 ),
                 TextField(
@@ -361,114 +353,109 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                     _selectDate(context);
                   },
                 ),
-                 if (_selectedActionIndex != 2 && _wallets.isNotEmpty)
-                DropdownButtonFormField<Wallet>(
-                  value: _wallets.isNotEmpty
-                      ? _wallets.firstWhere(
-                          (wallet) => wallet.name == _selectedWallet)
-                      : null,
+                if (_selectedActionIndex != 2 && _wallets.isNotEmpty)
+                  DropdownButtonFormField<Wallet>(
+                    value: _wallets.isNotEmpty
+                        ? _wallets.firstWhere(
+                            (wallet) => wallet.name == _selectedWallet)
+                        : null,
+                    onChanged: (newValue) {
+                      setState(() {
+                        _selectedWallet = newValue!.name!;
+                      });
+                      int selectedWalletIndex = _wallets.indexOf(newValue!);
+                      Provider.of<WalletProvider>(context, listen: false)
+                          .updateSelectedWalletIndex(selectedWalletIndex);
+                    },
+                    items: _wallets.map((wallet) {
+                      return DropdownMenuItem(
+                        value: wallet,
+                        child: Text(wallet.name!),
+                      );
+                    }).toList(),
+                    decoration: InputDecoration(
+                      labelText: 'Portafoglio',
+                    ),
+                  ),
+                if (_selectedActionIndex == 2 && _wallets.length > 1) ...[
+                  SizedBox(height: 16.0),
+                  DropdownButtonFormField<String>(
+                    value: _selectedWalletForExchangeOut,
+                    onChanged: (newValue) {
+                      setState(() {
+                        _selectedWalletForExchangeOut = newValue!;
+                      });
+                    },
+                    items: _wallets.map((wallet) {
+                      return DropdownMenuItem(
+                        value: wallet.name!,
+                        child: Text(wallet.name!),
+                      );
+                    }).toList(),
+                    decoration: InputDecoration(
+                      labelText: 'Portafoglio Uscita',
+                    ),
+                  ),
+                  DropdownButtonFormField<String>(
+                    value: _selectedWalletForExchangeIn,
+                    onChanged: (newValue) {
+                      setState(() {
+                        _selectedWalletForExchangeIn = newValue!;
+                      });
+                    },
+                    items: _wallets.map((wallet) {
+                      return DropdownMenuItem(
+                        value: wallet.name!,
+                        child: Text(wallet.name!),
+                      );
+                    }).toList(),
+                    decoration: InputDecoration(
+                      labelText: 'Portafoglio Entrata',
+                    ),
+                  ),
+                ],
+                DropdownButtonFormField<Category>(
+                  value: categories.firstWhere(
+                      (category) => category.id == _selectedCategoryId),
                   onChanged: (newValue) {
                     setState(() {
-                      _selectedWallet = newValue!.name!;
+                      _selectedCategoryId = newValue!.id;
                     });
-                    int selectedWalletIndex = _wallets.indexOf(
-                        newValue!); // Ottieni l'indice del wallet selezionato
-                    Provider.of<WalletProvider>(context, listen: false)
-                        .updateSelectedWalletIndex(
-                            selectedWalletIndex); // Passa l'indice del wallet
                   },
-                  items: _wallets.map((wallet) {
+                  items: categories.map((category) {
                     return DropdownMenuItem(
-                      value: wallet,
-                      child: Text(wallet.name!),
+                      value: category,
+                      child: Row(
+                        children: [
+                          Container(
+                            margin: EdgeInsets.only(right: 10.0),
+                            width: 40,
+                            height: 40,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: categoryColors[category.id] ?? Colors.grey,
+                            ),
+                            child: Center(
+                              child: Icon(
+                                categoryIcons[category.id] ?? Icons.category,
+                                color: Colors.white,
+                                size: 16,
+                              ),
+                            ),
+                          ),
+                          Text(category.name),
+                        ],
+                      ),
                     );
-                  }).toList(), // Converte la lista in una lista di DropdownMenuItem
+                  }).toList(),
                   decoration: InputDecoration(
-                    labelText: 'Portafoglio',
+                    labelText: 'Categoria',
                   ),
                 ),
- if (_selectedActionIndex == 2 && _wallets.length > 1) ...[
-              SizedBox(height: 16.0),
-              DropdownButtonFormField<String>(
-                value: _selectedWalletForExchangeOut,
-                onChanged: (newValue) {
-                  setState(() {
-                    _selectedWalletForExchangeOut = newValue!;
-                  });
-                },
-                items: _wallets.map((wallet) {
-                  return DropdownMenuItem(
-                    value: wallet.name!,
-                    child: Text(wallet.name!),
-                  );
-                }).toList(),
-                decoration: InputDecoration(
-                  labelText: 'Portafoglio Uscita',
-                ),
-              ),
-              DropdownButtonFormField<String>(
-                value: _selectedWalletForExchangeIn,
-                onChanged: (newValue) {
-                  setState(() {
-                    _selectedWalletForExchangeIn = newValue!;
-                  });
-                },
-                items: _wallets.map((wallet) {
-                  return DropdownMenuItem(
-                    value: wallet.name!,
-                    child: Text(wallet.name!),
-                  );
-                }).toList(),
-                decoration: InputDecoration(
-                  labelText: 'Portafoglio Entrata',
-                ),
-              ),
- ], 
-
-DropdownButtonFormField<Category>(
-  value: categories.firstWhere((category) => category.id == _selectedCategoryId),
-  onChanged: (newValue) {
-    setState(() {
-      _selectedCategoryId = newValue!.id;
-    });
-  },
-  items: categories.map((category) {
-    return DropdownMenuItem(
-      value: category,
-      child: Row(
-        children: [
-          Container(
-            margin: EdgeInsets.only(right: 10.0),
-            width: 40,
-            height: 40,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: categoryColors[category.id] ?? Colors.grey,
-            ),
-            child: Center(
-              child: Icon(
-                categoryIcons[category.id] ?? Icons.category,
-                color: Colors.white,
-                size: 16, // Dimensione dell'icona
-              ),
-            ),
-          ),
-          Text(category.name),
-        ],
-      ),
-    );
-  }).toList(),
-  decoration: InputDecoration(
-    labelText: 'Categoria',
-  ),
-),
-
-
                 SizedBox(height: 16.0),
                 ToggleButtons(
                   children: _buildToggleButtons(),
-                  isSelected: List.generate(
-                 actionTypes.length ,
+                  isSelected: List.generate(actionTypes.length,
                       (index) => _selectedActionIndex == index),
                   onPressed: (index) {
                     setState(() {
@@ -487,51 +474,45 @@ DropdownButtonFormField<Category>(
                   },
                 ),
                 SizedBox(height: 16.0),
-
               ],
             ),
           ),
         ),
-bottomNavigationBar: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                elevation: 0,
-                shape: RoundedRectangleBorder(
-                  side: BorderSide(
-                      color: Theme.of(context).brightness == Brightness.dark ? Colors.white70 : Color(0xffb3b3b3),
-                      width: 1),
-                  borderRadius: BorderRadius.circular(10),
-                ),
+        bottomNavigationBar: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              elevation: 0,
+              shape: RoundedRectangleBorder(
+                side: BorderSide(
+                    color: Theme.of(context).brightness == Brightness.dark
+                        ? Colors.white70
+                        : Color(0xffb3b3b3),
+                    width: 1),
+                borderRadius: BorderRadius.circular(10),
               ),
-              onPressed:  () async {
-                    if (_validateFields()) {
-                    /*     if (_selectedActionIndex == 2) {
-                    await _performExchangeTransaction(
-                        double.parse(widget.valueController.text));
-                  } else { */
-                      await _performRegularTransaction();
-                  /* } */
-
-                      Provider.of<WalletProvider>(context, listen: false)
-                          .loadWallets();
-
-                      _showSnackbar(
-                          context,
-                          widget.transaction == null
-                              ? 'Transazione aggiunta con successo!'
-                              : 'Transazione modificata con successo!');
-                      _navigateToHome(context);
-                    } else {
-                      _showSnackbar(context, 'Inserisci tutti i campi');
-                    }
-                  },
-              child: Text(widget.transaction == null
-                      ? 'Aggiungi Transazione'
-                      : 'Modifica Transazione'),
             ),
+            onPressed: () async {
+              if (_validateFields()) {
+                await _performRegularTransaction();
+                Provider.of<WalletProvider>(context, listen: false)
+                    .loadWallets();
+
+                _showSnackbar(
+                    context,
+                    widget.transaction == null
+                        ? 'Transazione aggiunta con successo!'
+                        : 'Transazione modificata con successo!');
+                _navigateToHome(context);
+              } else {
+                _showSnackbar(context, 'Inserisci tutti i campi');
+              }
+            },
+            child: Text(widget.transaction == null
+                ? 'Aggiungi Transazione'
+                : 'Modifica Transazione'),
           ),
-        
+        ),
       ),
     );
   }
@@ -552,56 +533,6 @@ bottomNavigationBar: Padding(
 
     return buttons;
   }
-
-
-
-/* Future<void> _performExchangeTransaction(double value) async {
-    Wallet selectedWalletForExchangeOut = _wallets
-        .firstWhere((wallet) => wallet.name == _selectedWalletForExchangeOut);
-    Wallet selectedWalletForExchangeIn = _wallets
-        .firstWhere((wallet) => wallet.name == _selectedWalletForExchangeIn);
-
-    // Transazione di uscita
-    double outValue = -value;
-    Transaction outgoingTransaction = Transaction(
-      name: widget.nameController.text,
-      categoryId: _selectedCategoryId,
-      date:
-          _selectedDate?.toIso8601String() ?? DateTime.now().toIso8601String(),
-      value: outValue,
-      transactionId: selectedWalletForExchangeOut.id,
-    );
-
-    await dbHelper.insertTransaction(outgoingTransaction);
-    double newOutgoingBalance =
-        selectedWalletForExchangeOut.balance! + outgoingTransaction.value!;
-    Wallet updatedOutgoingWallet = Wallet(
-      id: selectedWalletForExchangeOut.id,
-      name: selectedWalletForExchangeOut.name,
-      balance: newOutgoingBalance,
-    );
-    await dbHelper.updateWallet(updatedOutgoingWallet);
-
-    // Transazione di ingresso
-    Transaction incomingTransaction = Transaction(
-      name: widget.nameController.text,
-      categoryId: _selectedCategoryId,
-      date:
-          _selectedDate?.toIso8601String() ?? DateTime.now().toIso8601String(),
-      value: value,
-      transactionId: selectedWalletForExchangeIn.id,
-    );
-
-    await dbHelper.insertTransaction(incomingTransaction);
-    double newIncomingBalance =
-        selectedWalletForExchangeIn.balance! + incomingTransaction.value!;
-    Wallet updatedIncomingWallet = Wallet(
-      id: selectedWalletForExchangeIn.id,
-      name: selectedWalletForExchangeIn.name,
-      balance: newIncomingBalance,
-    );
-    await dbHelper.updateWallet(updatedIncomingWallet);
-  } */
 
   Future<void> _performRegularTransaction() async {
     double transactionValue = double.parse(widget.valueController.text);
@@ -639,7 +570,6 @@ bottomNavigationBar: Padding(
         value: transactionValue,
         transactionId: selectedWallet.id,
       );
-
 
       await dbHelper.insertTransaction(newTransaction);
 
@@ -695,37 +625,30 @@ bottomNavigationBar: Padding(
   }
 }
 
-
 class CustomNumberInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
     TextEditingValue oldValue,
     TextEditingValue newValue,
   ) {
-    // Handle empty input
     if (newValue.text.isEmpty) {
       return newValue;
     }
 
-    // Split the input into integer and decimal parts
     final parts = newValue.text.split('.');
 
-    // Check the integer part length
     if (parts[0].length > 9) {
       return oldValue;
     }
 
-    // Check the decimal part length if it exists
     if (parts.length > 1 && parts[1].length > 2) {
       return oldValue;
     }
 
-    // Check the total length
     if (newValue.text.length > 12) {
       return oldValue;
     }
 
-    // Return the new value if it passes all checks
     return newValue;
   }
 }

@@ -17,16 +17,14 @@ class _ChangeNamePageState extends State<ChangeNamePage> {
   @override
   void initState() {
     super.initState();
-    // Carica il nome quando il widget viene creato
     _loadNameFromSharedPreferences();
   }
 
-  // Metodo per caricare il nome dalle SharedPreferences
   Future<void> _loadNameFromSharedPreferences() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String name = prefs.getString('account_name') ?? '';
     setState(() {
-      _nameController.text = name.trim(); // Pulisce gli spazi
+      _nameController.text = name.trim();
     });
   }
 
@@ -58,13 +56,14 @@ class _ChangeNamePageState extends State<ChangeNamePage> {
                       onChanged: (text) {
                         setState(() {
                           _isDirty = true;
-                          _errorText = text.length > 15 ? 'Nome troppo lungo' : null;
+                          _errorText =
+                              text.length > 15 ? 'Nome troppo lungo' : null;
                         });
                       },
                       decoration: InputDecoration(
                         labelText: 'Nome account',
                         errorText: _errorText,
-                        counterText: '', // Rimuove il contatore caratteri predefinito
+                        counterText: '',
                       ),
                     ),
                   ),
@@ -117,8 +116,10 @@ class _ChangeNamePageState extends State<ChangeNamePage> {
   }
 
   void _saveName(BuildContext context) {
-    if (_isDirty && _nameController.text.isNotEmpty && _nameController.text.length <= 15) {
-      String newName = _nameController.text.trim(); // Pulisce gli spazi
+    if (_isDirty &&
+        _nameController.text.isNotEmpty &&
+        _nameController.text.length <= 15) {
+      String newName = _nameController.text.trim();
       Provider.of<WalletProvider>(context, listen: false)
           .updateAccountName(newName);
       _saveNameToSharedPreferences(newName);
@@ -134,7 +135,6 @@ class _ChangeNamePageState extends State<ChangeNamePage> {
     }
   }
 
-  // Metodo per salvare il nome nelle SharedPreferences
   Future<void> _saveNameToSharedPreferences(String newName) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('account_name', newName);

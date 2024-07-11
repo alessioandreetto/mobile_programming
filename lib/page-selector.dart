@@ -3,7 +3,6 @@ import 'package:flutter_application_1/pages/chartersList/charterList.dart';
 import 'package:flutter_application_1/pages/homeList/HomeList.dart';
 import 'package:provider/provider.dart';
 
-
 import 'pages/wallet.dart';
 import 'pages/setting.dart';
 import 'providers/wallet_provider.dart';
@@ -36,20 +35,19 @@ class _BottomBarDemoState extends State<BottomBarDemo> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-resizeToAvoidBottomInset: false ,// fluter 2.x
+      resizeToAvoidBottomInset: false,
       body: IndexedStack(
         index: _selectedIndex,
         children: _widgetOptions,
       ),
       bottomNavigationBar: BottomAppBar(
-
         shape: CircularNotchedRectangle(),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: <Widget>[
             _buildNavBarItem(Icons.home, 0, 'Home'),
             _buildNavBarItem(Icons.show_chart, 1, 'Grafico'),
-            SizedBox(width: 40), // Spazio vuoto per il notch centrale
+            SizedBox(width: 40),
             _buildNavBarItem(Icons.wallet, 2, 'Portafogli'),
             _buildNavBarItem(Icons.settings, 3, 'Impostazioni'),
           ],
@@ -57,7 +55,6 @@ resizeToAvoidBottomInset: false ,// fluter 2.x
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       floatingActionButton: Consumer<WalletProvider>(
-        
         builder: (context, walletProvider, child) {
           bool hasWallets = walletProvider.wallets.isNotEmpty;
           return FloatingActionButton(
@@ -84,48 +81,45 @@ resizeToAvoidBottomInset: false ,// fluter 2.x
           );
         },
       ),
-         
     );
-       
   }
 
- Widget _buildNavBarItem(IconData icon, int index, String label) {
-  return MouseRegion(
-    cursor: SystemMouseCursors.click,
-    child: GestureDetector(
-      onTap: () => _onItemTapped(index),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(
-            icon,
-            color: _selectedIndex == index ? Colors.blue : Colors.grey,
-          ),
-          Text(
-            label.length > 7 ? '${label.substring(0, 6)}...' : label,
-            style: TextStyle(
-              fontSize: 10,
+  Widget _buildNavBarItem(IconData icon, int index, String label) {
+    return MouseRegion(
+      cursor: SystemMouseCursors.click,
+      child: GestureDetector(
+        onTap: () => _onItemTapped(index),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
               color: _selectedIndex == index ? Colors.blue : Colors.grey,
-              fontWeight: _selectedIndex == index
-                  ? FontWeight.bold
-                  : FontWeight.normal,
             ),
-            overflow: TextOverflow.ellipsis,
-            maxLines: 1,
-            softWrap: false,
-          ),
-        ],
+            Text(
+              label.length > 7 ? '${label.substring(0, 6)}...' : label,
+              style: TextStyle(
+                fontSize: 10,
+                color: _selectedIndex == index ? Colors.blue : Colors.grey,
+                fontWeight: _selectedIndex == index
+                    ? FontWeight.bold
+                    : FontWeight.normal,
+              ),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+              softWrap: false,
+            ),
+          ],
+        ),
       ),
-    ),
-  );
-}
-
+    );
+  }
 
   void _showSnackbar(BuildContext context, String message) {
     final overlay = Overlay.of(context);
     final overlayEntry = OverlayEntry(
       builder: (context) => Positioned(
-        top: 50.0, // Posiziona il messaggio a 50 pixel dall'alto
+        top: 50.0,
         left: MediaQuery.of(context).size.width * 0.1,
         width: MediaQuery.of(context).size.width * 0.8,
         child: Material(
@@ -148,7 +142,6 @@ resizeToAvoidBottomInset: false ,// fluter 2.x
 
     overlay.insert(overlayEntry);
 
-    // Rimuove il messaggio dopo 2 secondi
     Future.delayed(Duration(seconds: 2), () {
       overlayEntry.remove();
     });
