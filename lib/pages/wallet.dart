@@ -37,19 +37,26 @@ class Note {
     );
   }
 }
-
 String formatNumber(double number) {
-  String sign = number < 0 ? '-' : '';
-  number = number.abs();
+    String sign = number < 0 ? '-' : '';
+    number = number.abs();
 
-  if (number >= 1000000) {
-    return sign + (number / 1000000).toStringAsFixed(1) + 'M';
-  } else if (number >= 1000) {
-    return sign + (number / 1000).toStringAsFixed(1) + 'k';
-  } else {
-    return sign + number.toStringAsFixed(2);
+    if (number >= 1000000000) {
+      int intPart = (number / 1000000000).floor();
+      int decimalPart = ((number % 1000000000) / 100000000).floor();
+      return sign + intPart.toString() + '.' + decimalPart.toString() + 'B';
+    } else if (number >= 1000000) {
+      int intPart = (number / 1000000).floor();
+      int decimalPart = ((number % 1000000) / 100000).floor();
+      return sign + intPart.toString() + '.' + decimalPart.toString() + 'M';
+    } else if (number >= 1000) {
+      int intPart = (number / 1000).floor();
+      int decimalPart = ((number % 1000) / 100).floor();
+      return sign + intPart.toString() + '.' + decimalPart.toString() + 'k';
+    } else {
+      return sign + number.toStringAsFixed(2);
+    }
   }
-}
 
 class _WalletPageState extends State<WalletPage> {
   List<Note> data = [];

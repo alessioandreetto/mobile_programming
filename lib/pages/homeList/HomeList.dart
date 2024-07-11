@@ -325,13 +325,18 @@ class _HomeListState extends State<HomeList> {
     );
   }
 
-  String formatNumber(double number) {
+String formatNumber(double number) {
     String sign = number < 0 ? '-' : '';
     number = number.abs();
 
-    if (number >= 1000000) {
-      double value = (number / 1000000);
-      return sign + value.toStringAsFixed(1) + 'M';
+    if (number >= 1000000000) {
+      int intPart = (number / 1000000000).floor();
+      int decimalPart = ((number % 1000000000) / 100000000).floor();
+      return sign + intPart.toString() + '.' + decimalPart.toString() + 'B';
+    } else if (number >= 1000000) {
+      int intPart = (number / 1000000).floor();
+      int decimalPart = ((number % 1000000) / 100000).floor();
+      return sign + intPart.toString() + '.' + decimalPart.toString() + 'M';
     } else if (number >= 1000) {
       int intPart = (number / 1000).floor();
       int decimalPart = ((number % 1000) / 100).floor();
@@ -451,6 +456,7 @@ class _HomeListState extends State<HomeList> {
                 minHeight: 230.0, // Increased to accommodate additional texts
                 maxHeight: 230.0, // Increased to accommodate additional texts
                 child: Container(
+                  color: Theme.of(context).scaffoldBackgroundColor,
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
