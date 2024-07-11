@@ -511,7 +511,7 @@ walletProvider.updateSelectedCategoryIndex(_selectedCategory != null ? int.parse
                                   children: <TextSpan>[
                                     TextSpan(
                                       text:
-                                          '$valoreCategoria ${walletProvider.valuta}',
+                                          '${formatNumber(valoreCategoria)} ${walletProvider.valuta}',
                                       style: TextStyle(
                                           fontWeight: FontWeight
                                               .bold, // Imposta il testo in grassetto
@@ -850,7 +850,7 @@ walletProvider.updateSelectedCategoryIndex(_selectedCategory != null ? int.parse
                                 Padding(
                                   padding: const EdgeInsets.all(8.0),
                                   child: Text(
-                                    "${transaction.value} ${walletProvider.valuta}",
+                                    "${formatNumber(transaction.value ?? 0)} ${walletProvider.valuta}",
                                     style: TextStyle(
                                       color: transaction.value! >= 0
                                           ? Colors.green
