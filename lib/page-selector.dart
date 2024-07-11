@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_application_1/pages/chartersList/charterList.dart';
+import 'package:flutter_application_1/pages/homeList/HomeList.dart';
 import 'package:provider/provider.dart';
-import 'pages/home.dart';
-import 'pages/charts.dart';
+
+
 import 'pages/wallet.dart';
 import 'pages/setting.dart';
 import 'providers/wallet_provider.dart';
@@ -19,8 +21,8 @@ class _BottomBarDemoState extends State<BottomBarDemo> {
   bool _isMenuOpen = false;
 
   final List<Widget> _widgetOptions = <Widget>[
-    MyHomePage(),
-    ChartsPage(),
+    HomeList(),
+    ChartsList(),
     WalletPage(),
     SettingsPage(),
   ];
