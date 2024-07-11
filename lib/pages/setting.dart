@@ -45,42 +45,21 @@ class _SettingsPageState extends State<SettingsPage> {
         backgroundColor: Colors.transparent,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
-       /*  actions: <Widget>[
-          // Italy Flag Icon
-          IconButton(
-            icon: Image.asset(
-                'assets/images/it_flag.jpg'), // Replace with your asset path
-            onPressed: () {
-              // Add functionality if needed
-            },
-          ),
-          // England Flag Icon
-          IconButton(
-            icon: Image.asset(
-                'assets/images/uk_flag.jpg'), // Replace with your asset path
-            onPressed: () {
-              // Add functionality if needed
-            },
-          ),
-        ], */
       ),
       body: ListView(
         children: <Widget>[
- 
           Card(
-              child: ListTile(
-                title: Text('Modifica nome account'),
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => ChangeNamePage()),
-                  );
-                },
-              ),
+            child: ListTile(
+              title: Text('Modifica nome account'),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => ChangeNamePage()),
+                );
+              },
             ),
-          
+          ),
           Card(
-           
             child: ListTile(
               title: Text('Cambia valuta'),
               onTap: () {},
@@ -120,7 +99,6 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ),
           ),
- 
         ],
       ),
     );
@@ -129,8 +107,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Future<void> _saveValutaToSharedPreferences(String newValuta) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('valuta', newValuta);
-    _selectedValuta = newValuta; // Aggiornamento locale del valore selezionato
-    Provider.of<WalletProvider>(context, listen: false)
-        .updateValuta(newValuta); // Avviso del cambio di valuta al provider
+    _selectedValuta = newValuta;
+    Provider.of<WalletProvider>(context, listen: false).updateValuta(newValuta);
   }
 }

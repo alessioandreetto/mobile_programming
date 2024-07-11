@@ -37,26 +37,27 @@ class Note {
     );
   }
 }
-String formatNumber(double number) {
-    String sign = number < 0 ? '-' : '';
-    number = number.abs();
 
-    if (number >= 1000000000) {
-      int intPart = (number / 1000000000).floor();
-      int decimalPart = ((number % 1000000000) / 100000000).floor();
-      return sign + intPart.toString() + '.' + decimalPart.toString() + 'B';
-    } else if (number >= 1000000) {
-      int intPart = (number / 1000000).floor();
-      int decimalPart = ((number % 1000000) / 100000).floor();
-      return sign + intPart.toString() + '.' + decimalPart.toString() + 'M';
-    } else if (number >= 1000) {
-      int intPart = (number / 1000).floor();
-      int decimalPart = ((number % 1000) / 100).floor();
-      return sign + intPart.toString() + '.' + decimalPart.toString() + 'k';
-    } else {
-      return sign + number.toStringAsFixed(2);
-    }
+String formatNumber(double number) {
+  String sign = number < 0 ? '-' : '';
+  number = number.abs();
+
+  if (number >= 1000000000) {
+    int intPart = (number / 1000000000).floor();
+    int decimalPart = ((number % 1000000000) / 100000000).floor();
+    return sign + intPart.toString() + '.' + decimalPart.toString() + 'B';
+  } else if (number >= 1000000) {
+    int intPart = (number / 1000000).floor();
+    int decimalPart = ((number % 1000000) / 100000).floor();
+    return sign + intPart.toString() + '.' + decimalPart.toString() + 'M';
+  } else if (number >= 1000) {
+    int intPart = (number / 1000).floor();
+    int decimalPart = ((number % 1000) / 100).floor();
+    return sign + intPart.toString() + '.' + decimalPart.toString() + 'k';
+  } else {
+    return sign + number.toStringAsFixed(2);
   }
+}
 
 class _WalletPageState extends State<WalletPage> {
   List<Note> data = [];
@@ -66,13 +67,11 @@ class _WalletPageState extends State<WalletPage> {
   void initState() {
     super.initState();
     Provider.of<WalletProvider>(context, listen: false).loadValuta();
-    // Non è necessario chiamare _loadNotes() qui, lo chiameremo in didChangeDependencies().
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    // Chiamiamo _loadNotes() qui per essere sicuri che venga chiamato quando il Provider notifica i cambiamenti.
     _loadNotes();
   }
 
@@ -115,7 +114,6 @@ class _WalletPageState extends State<WalletPage> {
     required String body,
   }) async {
     if (index >= 0 && index < data.length) {
-      // Update existing wallet
       Wallet existingWallet =
           await DatabaseHelper().getWalletById(data[index].id!);
       Wallet updatedWallet = Wallet(
@@ -133,7 +131,6 @@ class _WalletPageState extends State<WalletPage> {
       });
       Provider.of<WalletProvider>(context, listen: false).loadWallets();
     } else {
-      // Insert new wallet
       Wallet newWallet = Wallet(
         name: body,
         balance: title,
@@ -179,9 +176,7 @@ class _WalletPageState extends State<WalletPage> {
           if (selectedIndices.isNotEmpty)
             IconButton(
               icon: Icon(Icons.delete),
-              onPressed: () {
-                // Implement delete functionality
-              },
+              onPressed: () {},
             ),
         ],
       ),
@@ -202,9 +197,7 @@ class _WalletPageState extends State<WalletPage> {
                     return buildItem(
                         context, index, wallet.balance!, wallet.name!, valuta);
                   }).toList(),
-                  onReorder: (oldIndex, newIndex) {
-                    // Implement reorder functionality
-                  },
+                  onReorder: (oldIndex, newIndex) {},
                   footer: [
                     GestureDetector(
                       onTap: () {
@@ -221,8 +214,7 @@ class _WalletPageState extends State<WalletPage> {
                                 );
                                 Navigator.pop(context);
                               },
-                              walletId:
-                                  -1, // Passa un ID fittizio per un nuovo wallet
+                              walletId: -1,
                             ),
                           ),
                         );
@@ -277,16 +269,7 @@ class _WalletPageState extends State<WalletPage> {
     final walletId = data[index].id;
 
     return GestureDetector(
-      //per eliminazione multipla di wallet, manca la funzione del db
-      onLongPress: () {
-/*         setState(() {
-          if (isSelected) {
-            selectedIndices.remove(index);
-          } else {
-            selectedIndices.add(index);
-          }
-        }); */
-      },
+      onLongPress: () {},
       onTap: () {
         if (selectedIndices.isNotEmpty) {
           setState(() {
@@ -308,18 +291,15 @@ class _WalletPageState extends State<WalletPage> {
                     title: newTitle,
                     body: newBody,
                   );
-                  Navigator.pop(
-                      context); // Chiudi AddNotePage dopo il salvataggio
+                  Navigator.pop(context);
                 },
                 initialTitle: title,
                 initialBody: body,
                 onDelete: () {
-                  deleteNote(
-                      index); // Chiama deleteNote quando viene attivato onDelete
-                  Navigator.pop(
-                      context); // Chiudi AddNotePage dopo la cancellazione
+                  deleteNote(index);
+                  Navigator.pop(context);
                 },
-                walletId: walletId!, // Passa l'ID del wallet corrente
+                walletId: walletId!,
               ),
             ),
           );

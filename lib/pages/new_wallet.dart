@@ -20,7 +20,8 @@ class AddNotePage extends StatefulWidget {
     this.initialBody,
     required this.walletId,
   })  : titleController = TextEditingController(
-            text: initialTitle != null ? initialTitle.toStringAsFixed(2) : null),
+            text:
+                initialTitle != null ? initialTitle.toStringAsFixed(2) : null),
         bodyController = TextEditingController(text: initialBody);
 
   @override
@@ -41,7 +42,8 @@ class _AddNotePageState extends State<AddNotePage> {
   Future<void> _checkTransactions() async {
     final walletProvider = Provider.of<WalletProvider>(context, listen: false);
     int walletCount = await walletProvider.getWalletCount();
-    bool hasTransactions = await walletProvider.hasTransactionsForWallet(widget.walletId);
+    bool hasTransactions =
+        await walletProvider.hasTransactionsForWallet(widget.walletId);
     setState(() {
       _hasTransactions = hasTransactions;
       _hideDeleteButton = walletCount <= 1;
@@ -86,7 +88,8 @@ class _AddNotePageState extends State<AddNotePage> {
         context: context,
         builder: (context) => AlertDialog(
           title: Text('Conferma uscita'),
-          content: Text('Hai delle modifiche non salvate. Sei sicuro di voler tornare indietro senza salvare?'),
+          content: Text(
+              'Hai delle modifiche non salvate. Sei sicuro di voler tornare indietro senza salvare?'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
@@ -173,7 +176,9 @@ class _AddNotePageState extends State<AddNotePage> {
                   child: Container(
                     decoration: BoxDecoration(
                       color: _hasTransactions
-                          ? (isDarkMode ? Colors.grey.shade800 : Colors.grey.shade200)
+                          ? (isDarkMode
+                              ? Colors.grey.shade800
+                              : Colors.grey.shade200)
                           : null,
                     ),
                     child: Padding(
@@ -182,7 +187,9 @@ class _AddNotePageState extends State<AddNotePage> {
                         controller: widget.titleController,
                         style: TextStyle(
                           color: _hasTransactions
-                              ? (isDarkMode ? Colors.grey.shade400 : Colors.grey)
+                              ? (isDarkMode
+                                  ? Colors.grey.shade400
+                                  : Colors.grey)
                               : (isDarkMode ? Colors.white : Colors.black),
                         ),
                         onChanged: (_) {
@@ -197,7 +204,7 @@ class _AddNotePageState extends State<AddNotePage> {
                         decoration: InputDecoration(
                           labelText: 'Bilancio iniziale ',
                         ),
-                        enabled: !_hasTransactions, // Disabilita se ci sono transazioni
+                        enabled: !_hasTransactions,
                       ),
                     ),
                   ),
@@ -212,12 +219,16 @@ class _AddNotePageState extends State<AddNotePage> {
               style: ElevatedButton.styleFrom(
                 elevation: 0,
                 shape: RoundedRectangleBorder(
-                  side: BorderSide(color: isDarkMode ? Colors.white70 : Color(0xffb3b3b3), width: 1),
+                  side: BorderSide(
+                      color: isDarkMode ? Colors.white70 : Color(0xffb3b3b3),
+                      width: 1),
                   borderRadius: BorderRadius.circular(10),
                 ),
               ),
               onPressed: _saveNote,
-              child: widget.initialTitle == null && widget.initialBody == null ? Text("Aggiungi") : Text("Modifica"),
+              child: widget.initialTitle == null && widget.initialBody == null
+                  ? Text("Aggiungi")
+                  : Text("Modifica"),
             ),
           ),
         ),
@@ -226,7 +237,6 @@ class _AddNotePageState extends State<AddNotePage> {
   }
 
   void _saveNote() {
-    // Trimming the input text
     String trimmedTitle = widget.titleController.text.trim();
     String trimmedBody = widget.bodyController.text.trim();
 
@@ -242,9 +252,11 @@ class _AddNotePageState extends State<AddNotePage> {
       setState(() {
         _isDirty = false;
       });
-      _showSnackbar(context, widget.initialTitle == null && widget.initialBody == null
-          ? 'Portafoglio creato con successo'
-          : 'Portafoglio modificato con successo');
+      _showSnackbar(
+          context,
+          widget.initialTitle == null && widget.initialBody == null
+              ? 'Portafoglio creato con successo'
+              : 'Portafoglio modificato con successo');
     } else {
       _showSnackbar(context, 'Inserire tutti i campi');
     }
@@ -255,7 +267,8 @@ class _AddNotePageState extends State<AddNotePage> {
       context: context,
       builder: (context) => AlertDialog(
         title: Text('Conferma Eliminazione'),
-        content: Text('Sei sicuro di voler eliminare questo portafoglio? Questa azione non può essere annullata.'),
+        content: Text(
+            'Sei sicuro di voler eliminare questo portafoglio? Questa azione non può essere annullata.'),
         actions: <Widget>[
           TextButton(
             onPressed: () {
@@ -294,30 +307,24 @@ class CustomNumberInputFormatter extends TextInputFormatter {
     TextEditingValue oldValue,
     TextEditingValue newValue,
   ) {
-    // Handle empty input
     if (newValue.text.isEmpty) {
       return newValue;
     }
 
-    // Split the input into integer and decimal parts
     final parts = newValue.text.split('.');
 
-    // Check the integer part length
     if (parts[0].length > 9) {
       return oldValue;
     }
 
-    // Check the decimal part length if it exists
     if (parts.length > 1 && parts[1].length > 2) {
       return oldValue;
     }
 
-    // Check the total length
     if (newValue.text.length > 12) {
       return oldValue;
     }
 
-    // Return the new value if it passes all checks
     return newValue;
   }
 }

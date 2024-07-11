@@ -9,8 +9,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter/services.dart';
 
 void main() {
-  WidgetsFlutterBinding
-      .ensureInitialized(); // Assicurati che i binding siano inizializzati
+  WidgetsFlutterBinding.ensureInitialized();
   SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
@@ -28,7 +27,7 @@ class MyApp extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return MaterialApp(
             locale: Locale('it', "IT"),
-                 supportedLocales: [
+            supportedLocales: [
               Locale('it', "IT"),
             ],
             localizationsDelegates: [
@@ -39,12 +38,12 @@ class MyApp extends StatelessWidget {
             theme: ThemeData(
               useMaterial3: true,
               colorSchemeSeed: Colors.blue,
-              fontFamily: 'Poppins', // Imposta il font qui
+              fontFamily: 'Poppins',
             ),
             home: Scaffold(
               backgroundColor: Colors.white,
               body: Center(
-                child: CircularProgressIndicator(), // Indicatore di caricamento
+                child: CircularProgressIndicator(),
               ),
             ),
           );
@@ -63,12 +62,11 @@ class MyApp extends StatelessWidget {
             theme: ThemeData(
               useMaterial3: true,
               colorSchemeSeed: Colors.blue,
-              fontFamily: 'Poppins', // Imposta il font qui
+              fontFamily: 'Poppins',
             ),
             home: Scaffold(
               body: Center(
-                child: Text(
-                    'Error: ${snapshot.error}'), // Mostra un messaggio di errore se si verifica un errore durante il controllo
+                child: Text('Error: ${snapshot.error}'),
               ),
             ),
           );
@@ -92,8 +90,7 @@ class MyApp extends StatelessWidget {
                 surfaceTintColor: Colors.transparent,
                 systemOverlayStyle: SystemUiOverlayStyle(
                   statusBarColor: Colors.transparent,
-                  statusBarIconBrightness:
-                      Brightness.dark, // Icone scure per sfondo chiaro
+                  statusBarIconBrightness: Brightness.dark,
                   statusBarBrightness: Brightness.light,
                 ),
               ),
@@ -110,8 +107,7 @@ class MyApp extends StatelessWidget {
                 surfaceTintColor: Colors.transparent,
                 systemOverlayStyle: SystemUiOverlayStyle(
                   statusBarColor: Colors.transparent,
-                  statusBarIconBrightness:
-                      Brightness.light, // Icone chiare per sfondo scuro
+                  statusBarIconBrightness: Brightness.light,
                   statusBarBrightness: Brightness.dark,
                 ),
               ),
@@ -119,9 +115,9 @@ class MyApp extends StatelessWidget {
             initial: AdaptiveThemeMode.light,
             builder: (theme, darkTheme) => MaterialApp(
               locale: Locale('it', "IT"),
-                   supportedLocales: [
-              Locale('it', "IT"),
-            ],
+              supportedLocales: [
+                Locale('it', "IT"),
+              ],
               localizationsDelegates: [
                 GlobalMaterialLocalizations.delegate,
                 GlobalWidgetsLocalizations.delegate,
