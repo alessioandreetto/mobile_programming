@@ -27,6 +27,10 @@ class MyApp extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return MaterialApp(
+            locale: Locale('it', "IT"),
+                 supportedLocales: [
+              Locale('it', "IT"),
+            ],
             localizationsDelegates: [
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
@@ -47,6 +51,10 @@ class MyApp extends StatelessWidget {
         }
         if (snapshot.hasError) {
           return MaterialApp(
+            locale: Locale('it', "IT"),
+            supportedLocales: [
+              Locale('it', "IT"),
+            ],
             localizationsDelegates: [
               GlobalMaterialLocalizations.delegate,
               GlobalWidgetsLocalizations.delegate,
@@ -110,6 +118,10 @@ class MyApp extends StatelessWidget {
             ),
             initial: AdaptiveThemeMode.light,
             builder: (theme, darkTheme) => MaterialApp(
+              locale: Locale('it', "IT"),
+                   supportedLocales: [
+              Locale('it', "IT"),
+            ],
               localizationsDelegates: [
                 GlobalMaterialLocalizations.delegate,
                 GlobalWidgetsLocalizations.delegate,
