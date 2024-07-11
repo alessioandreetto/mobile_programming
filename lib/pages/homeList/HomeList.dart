@@ -122,10 +122,18 @@ class _HomeListState extends State<HomeList> {
   }
 
   void _handleSwipe(int index) {
+    print('prova' + index.toString());
     var walletProvider = Provider.of<WalletProvider>(context, listen: false);
     final walletId = walletProvider.wallets[index].id!;
     walletProvider.updateSelectedWalletIndex(index);
-    //_loadTransactions();
+
+    setState(() {
+      _selectedCategory = null; // Resetta la categoria selezionata
+      nomeCategoria = '';
+      valoreCategoria = 0;
+    });
+
+    // _loadTransactions(walletId);
   }
 
   Future<List<Transaction>> _loadTransactions(int walletId) async {
