@@ -154,6 +154,7 @@ class _WalletPageState extends State<WalletPage> {
       data.removeAt(index);
     });
     Provider.of<WalletProvider>(context, listen: false).loadWallets();
+    Provider.of<WalletProvider>(context, listen: false).updateSelectedWalletIndex(0);
   }
 
   @override
