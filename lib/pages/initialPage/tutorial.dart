@@ -84,7 +84,7 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
   Widget _buildStep1() {
     return Positioned(
       left: 20,
-      top: 70,
+      top: 65,
       child: Container(
         width: MediaQuery.of(context).size.width - 40,
         color: Colors.black.withOpacity(0.1),
@@ -118,7 +118,7 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
   Widget _buildStep2() {
     return Positioned(
       left: 20,
-      top: 275,
+      top: 270,
       child: Container(
         width: MediaQuery.of(context).size.width - 40,
         color: Colors.black.withOpacity(0.1),
@@ -152,7 +152,7 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
   Widget _buildStep3() {
     return Positioned(
       left: 20,
-      top: 500,
+      top: 490,
       child: Container(
         width: MediaQuery.of(context).size.width - 40,
         color: Colors.black.withOpacity(0.1),
@@ -223,6 +223,8 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
       child: Padding(
         padding: const EdgeInsets.only(bottom: 20.0),
         child: FloatingActionButton(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
           onPressed: _addTransaction,
           child: Icon(Icons.add),
         ),
