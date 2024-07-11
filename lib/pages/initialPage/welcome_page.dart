@@ -81,10 +81,14 @@ class _WelcomePageState extends State<WelcomePage> {
                 controller: _nameController,
                 decoration: InputDecoration(
                   labelText: 'Inserisci il tuo nome per iniziare',
+                  counterText: '', // Nasconde il contatore del TextFormField
                 ),
+                maxLength: 15,
                 validator: (value) {
                   if (value == null || value.trim().isEmpty) {
                     return 'Inserire il nome';
+                  } else if (value.length > 15) {
+                    return 'Il nome non può superare i 15 caratteri';
                   }
                   return null;
                 },
