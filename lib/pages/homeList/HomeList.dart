@@ -248,7 +248,7 @@ walletProvider.updateSelectedCategoryIndex(_selectedCategory != null ? int.parse
     final centerY = 150.0; // Updated to match the size of the PieChart
     final dx = position.dx - centerX;
     final dy = position.dy - centerY;
-    final angle = (Math.atan2(dy, dx) * 180 / Math.pi + 360) % 360;
+    final angle = (Math.atan2(dy, dx) * 150 / Math.pi + 360) % 360;
     return angle;
   }
 
@@ -322,6 +322,17 @@ walletProvider.updateSelectedCategoryIndex(_selectedCategory != null ? int.parse
       curve: Curves.easeInOut,
     );
   }
+
+  String formatNumber(double number) {
+  if (number >= 1000000) {
+    return (number / 1000000).toStringAsFixed(1) + 'M';
+  } else if (number >= 1000) {
+    return (number / 1000).toStringAsFixed(1) + 'k';
+  } else {
+    return number.toStringAsFixed(2);
+  }
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -398,9 +409,10 @@ walletProvider.updateSelectedCategoryIndex(_selectedCategory != null ? int.parse
                               },
                               child: Container(
                                 width:
-                                    300, // Increased size to match the center position
+                                    180, // Increased size to match the center position
                                 height:
-                                    300, // Increased size to match the center position
+                                    180, // Increased size to match the center position
+                                color: Colors.green,
                                 child: PieChart(
                                   PieChartData(
                                     sections: _createPieChartSections(
@@ -475,14 +487,13 @@ walletProvider.updateSelectedCategoryIndex(_selectedCategory != null ? int.parse
                                           ? Colors.black
                                           : Colors.white)),
                                   children: <TextSpan>[
-                                    TextSpan(
-                                      text:
-                                          '${walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).balance} ${walletProvider.valuta}',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight
-                                              .bold, // Imposta il testo in grassetto
-                                          fontSize: 20.0),
-                                    ),
+                                  TextSpan(
+  text: '${formatNumber(walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).balance ?? 0.0)} ${walletProvider.valuta}',
+  style: TextStyle(
+    fontWeight: FontWeight.bold, // Imposta il testo in grassetto
+    fontSize: 20.0,
+  ),
+),
                                   ],
                                 ),
                               ),
