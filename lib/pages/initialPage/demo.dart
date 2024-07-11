@@ -18,13 +18,12 @@ class PageIndicatorDemo extends StatefulWidget {
 class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
   final PageController _pageController = PageController();
   int _currentPageIndex = 0;
-  String walletName = ''; // Nome del wallet
+  String walletName = '';
   double walletBalance = 0.0;
   int? walletId;
   bool _isNameValid = true;
   bool _isBalanceValid = true;
 
-  // Creazione dei controller
   late TextEditingController nameController;
   late TextEditingController balanceController;
 
@@ -39,16 +38,15 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
 
   @override
   void dispose() {
-    // Rilascia le risorse dei controller
     nameController.dispose();
     balanceController.dispose();
-    _focusScopeNode.dispose(); // Disponi del nodo FocusScope
+    _focusScopeNode.dispose();
     super.dispose();
   }
 
   void _updateWalletData(String name, double balance, {int? id}) {
     setState(() {
-      walletName = name.trim(); // Aggiorna il nome del wallet
+      walletName = name.trim();
       walletBalance = balance;
       walletId = id;
     });
@@ -63,12 +61,10 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
       );
 
       if (walletId != null) {
-        // Update existing wallet
         DatabaseHelper().updateWallet(newWallet).then((id) {
           Provider.of<WalletProvider>(context, listen: false).loadWallets();
         });
       } else {
-        // Insert new wallet
         DatabaseHelper().insertWallet(newWallet).then((id) {
           Provider.of<WalletProvider>(context, listen: false).loadWallets();
         });
@@ -83,7 +79,6 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
     });
 
     if (!_isNameValid || !_isBalanceValid) {
-      // Show an error message using an overlay
       final overlay = Overlay.of(context);
       final overlayEntry = OverlayEntry(
         builder: (context) => Positioned(
@@ -137,7 +132,6 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
       resizeToAvoidBottomInset: false,
       body: GestureDetector(
         onTap: () {
-          // Chiudi la tastiera se è aperta
           if (!_focusScopeNode.hasPrimaryFocus) {
             _focusScopeNode.unfocus();
           }
@@ -150,11 +144,9 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
                 child: PageView(
                   controller: _pageController,
                   onPageChanged: (index) {
-                    // Validate the form when user tries to swipe to the next page
                     if (index == 2 &&
                         _currentPageIndex == 1 &&
                         !_validateCurrentForm()) {
-                      // Block the swipe if form is not valid
                       _pageController.animateToPage(
                         1,
                         duration: Duration(milliseconds: 300),
@@ -165,7 +157,7 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
                         _currentPageIndex = index;
                       });
                     }
-                    // Chiudi la tastiera quando cambia la pagina
+
                     _focusScopeNode.unfocus();
                   },
                   children: [

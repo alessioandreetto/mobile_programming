@@ -51,39 +51,36 @@ class _HomeListState extends State<HomeList> {
   ];
 
   Map<int, Color> categoryColors = {
-    0: Colors.red, // Categoria Auto
-    1: Colors.blue, // Categoria Banca
-    2: Colors.green, // Categoria Casa
-    3: Colors.orange, // Categoria Intrattenimento
-    4: Colors.purple, // Categoria Shopping
-    5: Colors.yellow, // Categoria Viaggio
-    6: Colors.brown, // Categoria Varie
+    0: Colors.red,
+    1: Colors.blue,
+    2: Colors.green,
+    3: Colors.orange,
+    4: Colors.purple,
+    5: Colors.yellow,
+    6: Colors.brown,
   };
 
   Map<int, IconData> categoryIcons = {
-    0: Icons.directions_car, // Categoria Auto
-    1: Icons.account_balance, // Categoria Banca
-    2: Icons.home, // Categoria Casa
-    3: Icons.movie, // Categoria Intrattenimento
-    4: Icons.shopping_cart, // Categoria Shopping
-    5: Icons.airplanemode_active, // Categoria Viaggio
-    6: Icons.category, // Categoria Varie
+    0: Icons.directions_car,
+    1: Icons.account_balance,
+    2: Icons.home,
+    3: Icons.movie,
+    4: Icons.shopping_cart,
+    5: Icons.airplanemode_active,
+    6: Icons.category,
   };
 
   @override
   void initState() {
     super.initState();
     _selectedWalletId = 0;
-    // Inizializza lo stato selezionando il primo wallet se presente
     _initSelectedWallet();
-    // Ascolta i cambiamenti nel provider dei wallet
     Provider.of<WalletProvider>(context, listen: false)
         .addListener(_onWalletsChanged);
   }
 
   @override
   void dispose() {
-    // Rimuovi il listener quando il widget viene eliminato
     Provider.of<WalletProvider>(context, listen: false)
         .removeListener(_onWalletsChanged);
     super.dispose();
@@ -97,7 +94,6 @@ class _HomeListState extends State<HomeList> {
       final selectedWalletIndex = walletProvider.getSelectedWalletIndex();
       final selectedWallet = walletProvider.wallets[selectedWalletIndex];
       setState(() {
-        //_selectedWalletId = selectedWallet.id!;
         _selectedValuta = walletProvider.valuta;
       });
       _loadTransactions(selectedWalletIndex + 1);
@@ -111,10 +107,8 @@ class _HomeListState extends State<HomeList> {
 
   void _onWalletsChanged() {
     var walletProvider = Provider.of<WalletProvider>(context, listen: false);
-    // Controlla se il wallet attualmente selezionato è stato eliminato
     if (!walletProvider.wallets
         .any((wallet) => wallet.id == _selectedWalletId)) {
-      // Se il wallet attualmente selezionato è stato eliminato, seleziona automaticamente il wallet con l'indice più basso
       setState(() {
         _selectedWalletId = walletProvider.wallets.isNotEmpty
             ? walletProvider.wallets.first.id!
@@ -127,10 +121,7 @@ class _HomeListState extends State<HomeList> {
   void _handleSwipe(int index) {
     final walletId =
         Provider.of<WalletProvider>(context, listen: false).wallets[index].id!;
-    /*    setState(() {
-      _selectedWalletId = walletId;
-      _selectedCategory = null;
-    }); */
+
     _loadTransactions(walletId);
     Provider.of<WalletProvider>(context, listen: false)
         .updateSelectedWalletIndex(index);
@@ -192,13 +183,13 @@ class _HomeListState extends State<HomeList> {
   List<PieChartSectionData> _createPieChartSections(
       Map<String, double> categoryAmounts) {
     Map<int, Color> categoryColors = {
-      0: Colors.red, // Auto
-      1: Colors.blue, // Banca
-      2: Colors.green, // Casa
-      3: Colors.orange, // Intrattenimento
-      4: Colors.purple, // Shopping
-      5: Colors.yellow, // Viaggio
-      6: Colors.brown, // Varie
+      0: Colors.red,
+      1: Colors.blue,
+      2: Colors.green,
+      3: Colors.orange,
+      4: Colors.purple,
+      5: Colors.yellow,
+      6: Colors.brown,
     };
 
     List<PieChartSectionData> sections = [];
@@ -245,12 +236,11 @@ class _HomeListState extends State<HomeList> {
   }
 
   double _getAngle(Offset position) {
-    final centerX = 100.0; // Metà della larghezza del contenitore
-    final centerY = 100.0; // Metà dell'altezza del contenitore
+    final centerX = 100.0;
+    final centerY = 100.0;
     final dx = position.dx - centerX;
     final dy = position.dy - centerY;
-    final angle = (Math.atan2(dy, dx) * 180 / Math.pi + 360) %
-        360; // Converti radian in gradi
+    final angle = (Math.atan2(dy, dx) * 180 / Math.pi + 360) % 360;
     return angle;
   }
 
@@ -281,21 +271,16 @@ class _HomeListState extends State<HomeList> {
 
   void _deleteTransaction(
       Transaction transaction, WalletProvider walletProvider) async {
-    // Recupera il valore della transazione eliminata
     double deletedTransactionValue = transaction.value ?? 0.0;
 
-    // Elimina la transazione dal database
     await DatabaseHelper().deleteTransaction(transaction.id!);
 
-    // Aggiorna il bilancio del wallet corrispondente
     Wallet selectedWallet = walletProvider.wallets
         .firstWhere((wallet) => wallet.id == _selectedWalletId);
     selectedWallet.balance = selectedWallet.balance! - deletedTransactionValue;
 
-    // Aggiorna il bilancio del wallet nel database
     await DatabaseHelper().updateWallet(selectedWallet);
 
-    // Aggiorna i wallet nel WalletProvider e notifica i cambiamenti
     walletProvider.refreshWallets();
     walletProvider.notifyListeners();
   }
@@ -325,7 +310,7 @@ class _HomeListState extends State<HomeList> {
     );
   }
 
-String formatNumber(double number) {
+  String formatNumber(double number) {
     String sign = number < 0 ? '-' : '';
     number = number.abs();
 
@@ -366,7 +351,7 @@ String formatNumber(double number) {
                   text: 'Ciao, ',
                   style: TextStyle(
                       fontFamily: 'Poppins',
-                      fontSize: 25.0, // Dimensione del testo
+                      fontSize: 25.0,
                       color: (Theme.of(context).brightness == Brightness.light
                           ? Colors.black
                           : Colors.white)),
@@ -375,15 +360,13 @@ String formatNumber(double number) {
                       text:
                           '${walletProvider.name.length > 15 ? walletProvider.name.substring(0, 15) + '...' : walletProvider.name}',
                       style: TextStyle(
-                        fontWeight:
-                            FontWeight.bold, // Imposta il testo in grassetto
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                     TextSpan(
                       text: '!',
                       style: TextStyle(
-                        fontWeight:
-                            FontWeight.normal, // Imposta il testo come regular
+                        fontWeight: FontWeight.normal,
                       ),
                     ),
                   ],
@@ -399,7 +382,6 @@ String formatNumber(double number) {
                   return Padding(
                     padding: const EdgeInsets.only(top: 80.0),
                     child: Center(
-                      // Centrato il grafico a torta
                       child: FutureBuilder<List<Transaction>>(
                         future: _loadTransactions(
                             walletProvider.selectedWalletIndex + 1),
@@ -423,8 +405,7 @@ String formatNumber(double number) {
                                 child: Container(
                                   width: 200,
                                   height: 200,
-                                  color: Colors
-                                      .transparent, // Rimuovi il colore di sfondo per evitare interferenze
+                                  color: Colors.transparent,
                                   child: PieChart(
                                     PieChartData(
                                       sections: _createPieChartSections(
@@ -453,8 +434,8 @@ String formatNumber(double number) {
             SliverPersistentHeader(
               pinned: true,
               delegate: _SliverPersistentHeaderDelegate(
-                minHeight: 230.0, // Increased to accommodate additional texts
-                maxHeight: 230.0, // Increased to accommodate additional texts
+                minHeight: 230.0,
+                maxHeight: 230.0,
                 child: Container(
                   color: Theme.of(context).scaffoldBackgroundColor,
                   child: Column(
@@ -472,7 +453,7 @@ String formatNumber(double number) {
                                   text: 'Nome Portafoglio: ',
                                   style: TextStyle(
                                       fontFamily: 'Poppins',
-                                      fontSize: 12.0, // Dimensione del testo
+                                      fontSize: 12.0,
                                       color: (Theme.of(context).brightness ==
                                               Brightness.light
                                           ? Colors.black
@@ -482,8 +463,7 @@ String formatNumber(double number) {
                                       text:
                                           '${walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).name!.length > 12 ? walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).name!.substring(0, 12) + '...' : walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).name}',
                                       style: TextStyle(
-                                          fontWeight: FontWeight
-                                              .bold, // Imposta il testo in grassetto
+                                          fontWeight: FontWeight.bold,
                                           fontSize: 20.0),
                                     ),
                                   ],
@@ -495,7 +475,7 @@ String formatNumber(double number) {
                                   text: 'Bilancio: ',
                                   style: TextStyle(
                                       fontFamily: 'Poppins',
-                                      fontSize: 12.0, // Dimensione del testo
+                                      fontSize: 12.0,
                                       color: (Theme.of(context).brightness ==
                                               Brightness.light
                                           ? Colors.black
@@ -505,8 +485,7 @@ String formatNumber(double number) {
                                       text:
                                           '${formatNumber(walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).balance ?? 0.0)} ${walletProvider.valuta}',
                                       style: TextStyle(
-                                        fontWeight: FontWeight
-                                            .bold, // Imposta il testo in grassetto
+                                        fontWeight: FontWeight.bold,
                                         fontSize: 20.0,
                                       ),
                                     ),
@@ -519,7 +498,7 @@ String formatNumber(double number) {
                                   text: '$nomeCategoria: ',
                                   style: TextStyle(
                                       fontFamily: 'Poppins',
-                                      fontSize: 12.0, // Dimensione del testo
+                                      fontSize: 12.0,
                                       color: (Theme.of(context).brightness ==
                                               Brightness.light
                                           ? Colors.black
@@ -529,8 +508,7 @@ String formatNumber(double number) {
                                       text:
                                           '${formatNumber(valoreCategoria)} ${walletProvider.valuta}',
                                       style: TextStyle(
-                                          fontWeight: FontWeight
-                                              .bold, // Imposta il testo in grassetto
+                                          fontWeight: FontWeight.bold,
                                           fontSize: 20.0,
                                           color: valoreCategoria < 0
                                               ? Colors.red
@@ -564,10 +542,6 @@ String formatNumber(double number) {
                                 child: ElevatedButton(
                                   onPressed: () {
                                     _handleButtonPress(index);
-                                    /* setState(() {
-                                      _selectedWalletId =
-                                          walletProvider.wallets[index].id!;
-                                    }); */
 
                                     walletProvider
                                         .updateSelectedWalletIndex(index);
@@ -743,8 +717,7 @@ String formatNumber(double number) {
                         children: [
                           SlidableAction(
                             borderRadius: BorderRadius.circular(10),
-                            padding: EdgeInsets.all(
-                                5), // Riduce il padding del pulsante
+                            padding: EdgeInsets.all(5),
                             onPressed: (context) {
                               _deleteTransaction(transaction, walletProvider);
                               setState(() {
@@ -758,8 +731,6 @@ String formatNumber(double number) {
                             foregroundColor: Colors.red,
                             icon: Icons.delete,
                             label: 'Elimina',
-                            // Nota: iconSize non è un parametro direttamente supportato.
-                            // Dovrai accettare che l'icona sarà della dimensione predefinita.
                           ),
                         ],
                       ),
@@ -771,29 +742,10 @@ String formatNumber(double number) {
                           padding: const EdgeInsets.only(
                               left: 3.0, right: 5.0, bottom: 3.0),
                           child: Card(
-                            /* decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(10.0),
-                              color: Theme.of(context).brightness ==
-                                      Brightness.light
-                                  ? Colors.white
-                                  : Colors
-                                      .black, // Imposta il colore di sfondo in base alla modalità
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.5),
-                                  spreadRadius: 3,
-                                  blurRadius: 5,
-                                  offset: Offset(
-                                      0, 1), // changes position of shadow
-                                ),
-                              ],
-                            ), */
                             child: Row(
                               children: [
                                 Container(
-                                  margin:
-                                      EdgeInsets.all(8), // Aggiunto margin qui
-                                  // padding: EdgeInsets.all(2),
+                                  margin: EdgeInsets.all(8),
                                   width: 60,
                                   height: 60,
                                   decoration: BoxDecoration(
@@ -817,13 +769,6 @@ String formatNumber(double number) {
                                         CrossAxisAlignment.start,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      /*  Text(
-                                        transaction.name! + ' - ' + categories[int.parse(transaction.categoryId.toString())].name  ?? '',
-                                        style: TextStyle(
-                                          fontSize: 18.0,
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ), */
                                       RichText(
                                         text: TextSpan(
                                           text: transaction.name!.length > 15
@@ -863,13 +808,11 @@ String formatNumber(double number) {
                                       SizedBox(height: 4),
                                       Text(formattedDate,
                                           style: TextStyle(
-                                            color: Theme.of(context)
-                                                        .brightness ==
-                                                    Brightness.light
-                                                ? Colors
-                                                    .black // Colore del testo per la modalità chiara
-                                                : Colors
-                                                    .white, // Colore del testo per la modalità scura
+                                            color:
+                                                Theme.of(context).brightness ==
+                                                        Brightness.light
+                                                    ? Colors.black
+                                                    : Colors.white,
                                           )),
                                     ],
                                   ),
@@ -895,7 +838,6 @@ String formatNumber(double number) {
                     );
                   }
                 },
-                // Assicura che almeno un elemento venga visualizzato, anche se transactions è vuoto
                 childCount: transactions.length == 0 ? 1 : transactions.length,
               ),
             )

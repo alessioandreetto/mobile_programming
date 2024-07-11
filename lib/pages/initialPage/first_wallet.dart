@@ -57,13 +57,13 @@ class _FirstWalletState extends State<FirstWallet> {
         },
         child: Scaffold(
           appBar: AppBar(
-            title:  Text(
-                        'Crea qui il tuo primo portafoglio!',
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
+            title: Text(
+              'Crea qui il tuo primo portafoglio!',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             backgroundColor: Colors.transparent,
             elevation: 0,
           ),
@@ -76,7 +76,6 @@ class _FirstWalletState extends State<FirstWallet> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                     
                       SizedBox(height: 10),
                       Text(
                         'Inserisci qui sotto un nome significativo per il portafoglio che andrai a creare:',
@@ -120,7 +119,7 @@ class _FirstWalletState extends State<FirstWallet> {
                         controller: widget.balanceController,
                         keyboardType: TextInputType.number,
                         inputFormatters: [
-                       CustomNumberInputFormatter(),
+                          CustomNumberInputFormatter(),
                         ],
                         onChanged: (_) {
                           setState(() {
@@ -179,37 +178,30 @@ class _FirstWalletState extends State<FirstWallet> {
   }
 }
 
-
 class CustomNumberInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
     TextEditingValue oldValue,
     TextEditingValue newValue,
   ) {
-    // Handle empty input
     if (newValue.text.isEmpty) {
       return newValue;
     }
 
-    // Split the input into integer and decimal parts
     final parts = newValue.text.split('.');
 
-    // Check the integer part length
     if (parts[0].length > 9) {
       return oldValue;
     }
 
-    // Check the decimal part length if it exists
     if (parts.length > 1 && parts[1].length > 2) {
       return oldValue;
     }
 
-    // Check the total length
     if (newValue.text.length > 12) {
       return oldValue;
     }
 
-    // Return the new value if it passes all checks
     return newValue;
   }
 }

@@ -18,13 +18,11 @@ class DatabaseHelper {
   static const String colDate = 'date';
   static const String colValue = 'value';
 
-  // Metodo per ottenere l'istanza del database
   Future<Database> get database async {
     _database ??= await initializeDatabase();
     return _database!;
   }
 
-  // Inizializza il database
   Future<Database> initializeDatabase() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String path = '${documentsDirectory.path}/flutter.db';
@@ -33,7 +31,6 @@ class DatabaseHelper {
       path,
       version: 1,
       onCreate: (Database db, int version) async {
-        // Creazione della tabella portafoglio
         await db.execute('''
           CREATE TABLE $walletTable (
             $colId INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -42,7 +39,6 @@ class DatabaseHelper {
           )
         ''');
 
-        // Creazione della tabella transazioni
         await db.execute('''
           CREATE TABLE $transactionsTable (
             $colId INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -59,23 +55,18 @@ class DatabaseHelper {
     return _database!;
   }
 
-  // Operazioni per la tabella portafoglio
-
-  // Inserimento di un nuovo portafoglio
   Future<int> insertWallet(Wallet wallet) async {
     print('wallet db');
     Database db = await this.database;
     return await db.insert(walletTable, wallet.toMap());
   }
 
-  // Ottenimento di tutti i portafogli
   Future<List<Wallet>> getWallets() async {
     Database db = await this.database;
     List<Map<String, dynamic>> result = await db.query(walletTable);
     return result.map((item) => Wallet.fromMap(item)).toList();
   }
 
-  // Ottenimento di un portafoglio tramite ID
   Future<Wallet> getWalletById(int id) async {
     Database db = await this.database;
     List<Map<String, dynamic>> result = await db.query(
@@ -90,41 +81,28 @@ class DatabaseHelper {
     }
   }
 
-  // Aggiornamento di un portafoglio
   Future<int> updateWallet(Wallet wallet) async {
     Database db = await this.database;
     return await db.update(walletTable, wallet.toMap(),
         where: '$colId = ?', whereArgs: [wallet.id]);
   }
 
-  // Eliminazione di un portafoglio
-/*   Future<int> deleteWallet(int id) async {
+  Future<int> deleteWallet(int id) async {
     Database db = await this.database;
+    // Elimina prima tutte le transazioni associate al wallet
+    await db
+        .delete(transactionsTable, where: '$colWalletid = ?', whereArgs: [id]);
+    // Poi elimina il wallet stesso
     return await db.delete(walletTable, where: '$colId = ?', whereArgs: [id]);
   }
- */
 
-  Future<int> deleteWallet(int id) async {
-  Database db = await this.database;
-  // Elimina prima tutte le transazioni associate al wallet
-  await db.delete(transactionsTable, where: '$colWalletid = ?', whereArgs: [id]);
-  // Poi elimina il wallet stesso
-  return await db.delete(walletTable, where: '$colId = ?', whereArgs: [id]);
-}
-
-
-  // Operazioni per la tabella transazioni
-
-  // Inserimento di una nuova transazione
   Future<int> insertTransaction(Transaction transaction) async {
     Database db = await this.database;
     int result = await db.insert(transactionsTable, transaction.toMap());
-    // Dopo l'inserimento della transazione, aggiorna il saldo del wallet
     await WalletProvider().reloadWalletBalance();
     return result;
   }
 
-  // Ottenimento di tutte le transazioni di un certo portafoglio
   Future<List<Transaction>> getTransactionsForWallet(int walletId) async {
     Database db = await this.database;
     List<Map<String, dynamic>> result = await db.query(transactionsTable,
@@ -132,17 +110,15 @@ class DatabaseHelper {
     return result.map((item) => Transaction.fromMap(item)).toList();
   }
 
-  // Eliminazione di una transazione
   Future<int> deleteTransaction(int id) async {
     Database db = await this.database;
     int result = await db
         .delete(transactionsTable, where: '$colId = ?', whereArgs: [id]);
-    // Dopo l'eliminazione della transazione, aggiorna il saldo del wallet
+
     await WalletProvider().reloadWalletBalance();
     return result;
   }
 
-  // Aggiorna una transazione esistente nel database
   Future<int> updateTransaction(Transaction transaction) async {
     Database db = await this.database;
     int result = await db.update(
@@ -151,7 +127,7 @@ class DatabaseHelper {
       where: '$colId = ?',
       whereArgs: [transaction.id],
     );
-    // Dopo l'aggiornamento della transazione, aggiorna il saldo del wallet
+
     await WalletProvider().reloadWalletBalance();
     return result;
   }

@@ -18,13 +18,13 @@ class _ChartsListState extends State<ChartsList> {
   late PageController _pageController;
 
   Map<int, Color> categoryColors = {
-    0: Colors.red, // Categoria Auto
-    1: Colors.blue, // Categoria Banca
-    2: Colors.green, // Categoria Casa
-    3: Colors.orange, // Categoria Intrattenimento
-    4: Colors.purple, // Categoria Shopping
-    5: Colors.yellow, // Categoria Viaggio
-    6: Colors.brown, // Categoria Varie
+    0: Colors.red,
+    1: Colors.blue,
+    2: Colors.green,
+    3: Colors.orange,
+    4: Colors.purple,
+    5: Colors.yellow,
+    6: Colors.brown,
   };
 
   List<Category> categories = [
@@ -38,16 +38,16 @@ class _ChartsListState extends State<ChartsList> {
   ];
 
   Map<int, IconData> categoryIcons = {
-    0: Icons.directions_car, // Categoria Auto
-    1: Icons.account_balance, // Categoria Banca
-    2: Icons.home, // Categoria Casa
-    3: Icons.movie, // Categoria Intrattenimento
-    4: Icons.shopping_cart, // Categoria Shopping
-    5: Icons.airplanemode_active, // Categoria Viaggio
-    6: Icons.category, // Categoria Varie
+    0: Icons.directions_car,
+    1: Icons.account_balance,
+    2: Icons.home,
+    3: Icons.movie,
+    4: Icons.shopping_cart,
+    5: Icons.airplanemode_active,
+    6: Icons.category,
   };
 
-String formatNumber(double number) {
+  String formatNumber(double number) {
     String sign = number < 0 ? '-' : '';
     number = number.abs();
 
@@ -263,8 +263,13 @@ String formatNumber(double number) {
                                       },
                                     ),
                                   ),
-                                  child:
-                                      Text(walletProvider.wallets[index].name!.length > 9 ? walletProvider.wallets[index].name!.substring(0, 9) + '...' : walletProvider.wallets[index].name!),
+                                  child: Text(walletProvider
+                                              .wallets[index].name!.length >
+                                          9
+                                      ? walletProvider.wallets[index].name!
+                                              .substring(0, 9) +
+                                          '...'
+                                      : walletProvider.wallets[index].name!),
                                 ),
                               );
                             },
@@ -276,7 +281,7 @@ String formatNumber(double number) {
                       padding:
                           const EdgeInsets.only(left: 16, top: 8.0, bottom: 10),
                       child: Text(
-                        "Transazioni per ${selectedWallet.name!.length > 9 ? selectedWallet.name!.substring(0, 9) + '...' : selectedWallet.name }:",
+                        "Transazioni per ${selectedWallet.name!.length > 9 ? selectedWallet.name!.substring(0, 9) + '...' : selectedWallet.name}:",
                         style: TextStyle(fontSize: 14),
                       ),
                     ),
@@ -356,30 +361,10 @@ String formatNumber(double number) {
                                       padding: const EdgeInsets.only(
                                           left: 5.0, right: 5.0, bottom: 5.0),
                                       child: Card(
-                                        /*    decoration: BoxDecoration(
-                                          borderRadius:
-                                              BorderRadius.circular(10.0),
-                                          color: Theme.of(context).brightness ==
-                                                  Brightness.light
-                                              ? Colors.white
-                                              : Colors
-                                                  .black, // Imposta il colore di sfondo in base alla modalità
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color:
-                                                  Colors.grey.withOpacity(0.5),
-                                              spreadRadius: 3,
-                                              blurRadius: 5,
-                                              offset: Offset(0,
-                                                  1), // changes position of shadow
-                                            ),
-                                          ],
-                                        ), */
                                         child: Row(
                                           children: [
                                             Container(
-                                              margin: EdgeInsets.all(
-                                                  8), // Aggiunto margin qui
+                                              margin: EdgeInsets.all(8),
                                               padding: EdgeInsets.all(12),
                                               width: 60,
                                               height: 60,
@@ -407,15 +392,6 @@ String formatNumber(double number) {
                                                 mainAxisAlignment:
                                                     MainAxisAlignment.center,
                                                 children: [
-                                                  /* Text(
-                                                    transaction.name ?? '',
-                                                    style: TextStyle(
-                                                      fontSize: 18.0,
-                                                      fontWeight:
-                                                          FontWeight.bold,
-                                                    ),
-                                                  ), */
-
                                                   RichText(
                                                     text: TextSpan(
                                                       text: transaction
@@ -469,10 +445,8 @@ String formatNumber(double number) {
                                                         color: Theme.of(context)
                                                                     .brightness ==
                                                                 Brightness.light
-                                                            ? Colors
-                                                                .black // Colore del testo per la modalità chiara
-                                                            : Colors
-                                                                .white, // Colore del testo per la modalità scura
+                                                            ? Colors.black
+                                                            : Colors.white,
                                                       )),
                                                 ],
                                               ),
@@ -541,24 +515,22 @@ String formatNumber(double number) {
                 padding: const EdgeInsets.all(16.0),
                 child: SfCartesianChart(
                   primaryXAxis: NumericAxis(interval: 1),
-                 primaryYAxis: NumericAxis(
-                  isVisible: false,
-                 ),
+                  primaryYAxis: NumericAxis(
+                    isVisible: false,
+                  ),
                   series: <LineSeries<ChartSampleData, num>>[
                     LineSeries<ChartSampleData, num>(
                       dataSource: chartData,
                       xValueMapper: (ChartSampleData data, _) => data.x,
                       yValueMapper: (ChartSampleData data, _) => data.y,
                       dataLabelMapper: (ChartSampleData data, _) {
-                        // Calcola il bilancio parziale
                         double partialBalance = data.y;
-                        // Ottieni il valore della transazione
+
                         double transactionValue = data.transactionValue;
-                        // Controlla se il valore della transazione è double.nan
+
                         if (transactionValue.isNaN) {
                           return '${formatNumber(partialBalance)} ${walletProvider.valuta}';
                         } else {
-                          // Formatta il testo dell'etichetta per includere sia il bilancio parziale che il valore della transazione
                           return '${formatNumber(partialBalance)} ${walletProvider.valuta}\n${formatNumber(transactionValue)} ${walletProvider.valuta}';
                         }
                       },
@@ -578,26 +550,19 @@ String formatNumber(double number) {
       List<Transaction> transactions, Wallet wallet) {
     List<ChartSampleData> chartData = [];
 
-    // Calculate the initial balance by summing up all transaction values
     double totalTransactionValue = transactions.fold(0, (acc, transaction) {
       return acc + (transaction.value ?? 0);
     });
 
-    // Initial balance is the wallet balance minus total transaction value
     double initialBalance = (wallet.balance ?? 0) - totalTransactionValue;
 
-    // Add initial balance as the first data point regardless of transactions
-    chartData.add(ChartSampleData(0, initialBalance,
-        double.nan)); // Use double.nan for the first transaction value
+    chartData.add(ChartSampleData(0, initialBalance, double.nan));
 
-    // Loop through each transaction and update the balance accordingly
     double balance = initialBalance;
     for (int i = 0; i < transactions.length; i++) {
-      // Get the value of the transaction
       double transactionValue = transactions[i].value!;
-      // Calculate the new balance after applying the transaction
-      balance += transactionValue; // Add or subtract transaction value
-      // Add the data point with the updated balance
+
+      balance += transactionValue;
       chartData.add(ChartSampleData(i + 1, balance, transactionValue));
     }
 
@@ -693,8 +658,7 @@ String formatNumber(double number) {
 class ChartSampleData {
   final double x;
   final double y;
-  final double
-      transactionValue; // Aggiunto valore della transazione per il punto dati del grafico
+  final double transactionValue;
 
   ChartSampleData(this.x, this.y, this.transactionValue);
 }

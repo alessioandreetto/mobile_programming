@@ -3,8 +3,7 @@ import 'package:provider/provider.dart';
 import '../../providers/wallet_provider.dart';
 
 class WelcomePage extends StatefulWidget {
-  final Function(String)
-      onNameEntered; // Callback per notificare il nome inserito
+  final Function(String) onNameEntered;
 
   WelcomePage({required this.onNameEntered});
 
@@ -81,7 +80,7 @@ class _WelcomePageState extends State<WelcomePage> {
                 controller: _nameController,
                 decoration: InputDecoration(
                   labelText: 'Inserisci il tuo nome per iniziare',
-                  counterText: '', // Nasconde il contatore del TextFormField
+                  counterText: '',
                 ),
                 maxLength: 15,
                 validator: (value) {
@@ -93,7 +92,6 @@ class _WelcomePageState extends State<WelcomePage> {
                   return null;
                 },
                 onChanged: (value) {
-                  // Aggiorna il nome nel provider quando cambia
                   Provider.of<WalletProvider>(context, listen: false)
                       .updateAccountName(value.trim());
                 },
@@ -112,7 +110,6 @@ class _WelcomePageState extends State<WelcomePage> {
             ],
           ),
         ),
-        // Aggiungi altre pagine qui
       ),
     );
   }
