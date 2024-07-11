@@ -120,17 +120,7 @@ class _SettingsPageState extends State<SettingsPage> {
               ),
             ),
           ),
- Card(
-            child: ListTile(
-              title: Text('tutorial demo'),
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (context) => PageIndicatorDemo()),
-                ); 
-              },
-            ),
-          ),
+ 
         ],
       ),
     );

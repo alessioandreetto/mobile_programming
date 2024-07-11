@@ -105,7 +105,7 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
             ),
             SizedBox(height: 10),
             Text(
-              '1. Questa è la Home! Qui puoi vedere in grafico a torta delle tue transazioni.',
+              '1. Questa è la Home! Qui puoi vedere il grafico a torta delle tue transazioni.',
               style: TextStyle(color: Colors.white, fontSize: 18),
             ),
             SizedBox(height: 10),
@@ -193,7 +193,7 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
   Widget _buildStep4(BoxConstraints constraints) {
     return Positioned(
       left: 20,
-      top: constraints.maxHeight * 0.5,
+      top: constraints.maxHeight * 0.6,
       child: Container(
         width: constraints.maxWidth - 40,
         color: Colors.black.withOpacity(0.1),
@@ -228,7 +228,7 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
     return Align(
       alignment: Alignment.bottomCenter,
       child: Padding(
-        padding: const EdgeInsets.only(bottom: 20.0),
+        padding: const EdgeInsets.only(bottom: 50.0),
         child: FloatingActionButton(
           shape:
               RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
