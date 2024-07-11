@@ -243,7 +243,7 @@ class _ChartsListState extends State<ChartsList> {
                                     ),
                                   ),
                                   child:
-                                      Text(walletProvider.wallets[index].name!),
+                                      Text(walletProvider.wallets[index].name!.length > 9 ? walletProvider.wallets[index].name!.substring(0, 9) + '...' : walletProvider.wallets[index].name!),
                                 ),
                               );
                             },
@@ -252,10 +252,11 @@ class _ChartsListState extends State<ChartsList> {
                       },
                     ),
                     Padding(
-                      padding: const EdgeInsets.only(left: 16, top: 8.0 , bottom: 10),
+                      padding:
+                          const EdgeInsets.only(left: 16, top: 8.0, bottom: 10),
                       child: Text(
-                        "Transazioni per ${selectedWallet.name}:",
-                        style: TextStyle(fontSize: 16),
+                        "Transazioni per ${selectedWallet.name!.length > 9 ? selectedWallet.name!.substring(0, 9) + '...' : selectedWallet.name }:",
+                        style: TextStyle(fontSize: 14),
                       ),
                     ),
                     Expanded(
@@ -278,18 +279,17 @@ class _ChartsListState extends State<ChartsList> {
 
                             if (transactions.isEmpty) {
                               return Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                          
-                            Icon(Icons.search_off, size: 48.0),
-                            Text(
-                              'Nessuna transazione',
-                              style: TextStyle(fontSize: 14.0),
-                            ),
-                          ],
-                        ),
-                      );
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.search_off, size: 48.0),
+                                    Text(
+                                      'Nessuna transazione',
+                                      style: TextStyle(fontSize: 14.0),
+                                    ),
+                                  ],
+                                ),
+                              );
                             }
 
                             return ListView.builder(
@@ -315,10 +315,12 @@ class _ChartsListState extends State<ChartsList> {
                                             transactions.removeAt(index);
                                           });
                                         },
-                                        backgroundColor: Theme.of(context).brightness ==
-                                    Brightness.light
-                                ? Colors.white: Colors.black,
-                            foregroundColor: Colors.red,
+                                        backgroundColor:
+                                            Theme.of(context).brightness ==
+                                                    Brightness.light
+                                                ? Colors.white
+                                                : Colors.black,
+                                        foregroundColor: Colors.red,
                                         icon: Icons.delete,
                                         label: 'Elimina',
                                       ),
@@ -395,7 +397,14 @@ class _ChartsListState extends State<ChartsList> {
 
                                                   RichText(
                                                     text: TextSpan(
-                                                      text: transaction.name,
+                                                      text: transaction
+                                                                  .name!.length >
+                                                              15
+                                                          ? transaction.name!
+                                                                  .substring(
+                                                                      0, 15) +
+                                                              '...'
+                                                          : transaction.name,
                                                       style: TextStyle(
                                                         fontFamily: 'Poppins',
                                                         color: (Theme.of(

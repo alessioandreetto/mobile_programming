@@ -454,7 +454,7 @@ walletProvider.updateSelectedCategoryIndex(_selectedCategory != null ? int.parse
                                   children: <TextSpan>[
                                     TextSpan(
                                       text:
-                                          '${walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).name}',
+                                          '${walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).name!.length > 12 ? walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).name!.substring(0, 12) + '...' : walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).name  }',
                                       style: TextStyle(
                                           fontWeight: FontWeight
                                               .bold, // Imposta il testo in grassetto
@@ -630,7 +630,7 @@ walletProvider.updateSelectedCategoryIndex(_selectedCategory != null ? int.parse
                                     ),
                                   ),
                                   child:
-                                      Text(walletProvider.wallets[index].name!),
+                                      Text(walletProvider.wallets[index].name!.length >9 ? '${walletProvider.wallets[index].name!.substring(0, 9)}...' : walletProvider.wallets[index].name!),
                                 ),
                               );
                             },
@@ -644,8 +644,8 @@ walletProvider.updateSelectedCategoryIndex(_selectedCategory != null ? int.parse
                           children: [
                             if (walletProvider.wallets.isNotEmpty)
                               Text(
-                                "Transazioni per ${walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).name}:",
-                                style: TextStyle(fontSize: 16),
+                                "Transazioni per ${walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).name!.length > 9 ? '${walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).name!.substring(0, 9)}...' : walletProvider.wallets.firstWhere((wallet) => wallet.id == walletProvider.selectedWalletIndex + 1, orElse: () => Wallet(id: 0, name: 'N/A', balance: 0)).name }:",
+                                style: TextStyle(fontSize: 14),
                               ),
                             DropdownButton<bool>(
                               value: walletProvider.getTipologiaMovimento(),
@@ -660,11 +660,11 @@ walletProvider.updateSelectedCategoryIndex(_selectedCategory != null ? int.parse
                               items: [
                                 DropdownMenuItem<bool>(
                                   value: true,
-                                  child: Text('Mostra Uscite'),
+                                  child: Text('Mostra Uscite', style: TextStyle(fontSize: 14),),
                                 ),
                                 DropdownMenuItem<bool>(
                                   value: false,
-                                  child: Text('Mostra Entrate'),
+                                  child: Text('Mostra Entrate', style: TextStyle(fontSize: 14),),
                                 ),
                               ],
                             ),
@@ -792,7 +792,7 @@ walletProvider.updateSelectedCategoryIndex(_selectedCategory != null ? int.parse
                                       ), */
                                       RichText(
                                         text: TextSpan(
-                                          text: transaction.name,
+                                          text: transaction.name!.length> 15? transaction.name!.substring(0, 15) + '...' : transaction.name,
                                           style: TextStyle(
                                             fontFamily: 'Poppins',
                                             color:
