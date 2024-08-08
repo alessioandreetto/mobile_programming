@@ -7,6 +7,7 @@ import 'pages/wallet.dart';
 import 'pages/setting.dart';
 import 'providers/wallet_provider.dart';
 import 'pages/new_operation.dart';
+import 'main.dart';
 
 class BottomBarDemo extends StatefulWidget {
   @override
@@ -99,7 +100,7 @@ class _BottomBarDemoState extends State<BottomBarDemo> {
             Text(
               label.length > 7 ? '${label.substring(0, 6)}...' : label,
               style: TextStyle(
-                fontSize: 10,
+                fontSize: FontSize.actionBar,
                 color: _selectedIndex == index ? Colors.blue : Colors.grey,
                 fontWeight: _selectedIndex == index
                     ? FontWeight.bold

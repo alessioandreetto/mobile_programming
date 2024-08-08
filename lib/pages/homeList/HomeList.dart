@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import '../new_operation.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
+import '../../main.dart';
 
 void main() {
   runApp(MyApp());
@@ -363,7 +364,7 @@ class _HomeListState extends State<HomeList> {
                   text: 'Ciao, ',
                   style: TextStyle(
                       fontFamily: 'Poppins',
-                      fontSize: 25.0,
+                      fontSize: FontSize.titles,
                       color: (Theme.of(context).brightness == Brightness.light
                           ? Colors.black
                           : Colors.white)),
@@ -464,7 +465,7 @@ class _HomeListState extends State<HomeList> {
                                   text: 'Nome Portafoglio: ',
                                   style: TextStyle(
                                       fontFamily: 'Poppins',
-                                      fontSize: 12.0,
+                                      fontSize: FontSize.listTitle,
                                       color: (Theme.of(context).brightness ==
                                               Brightness.light
                                           ? Colors.black
@@ -486,7 +487,7 @@ class _HomeListState extends State<HomeList> {
                                           : 'N/A',
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          fontSize: 20.0),
+                                          fontSize: FontSize.listTitle),
                                     ),
                                   ],
                                 ),
@@ -497,7 +498,7 @@ class _HomeListState extends State<HomeList> {
                                   text: 'Bilancio: ',
                                   style: TextStyle(
                                       fontFamily: 'Poppins',
-                                      fontSize: 12.0,
+                                      fontSize: FontSize.listTitle,
                                       color: (Theme.of(context).brightness ==
                                               Brightness.light
                                           ? Colors.black
@@ -509,7 +510,7 @@ class _HomeListState extends State<HomeList> {
                                           : '0.0 ${walletProvider.valuta}',
                                       style: TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 20.0,
+                                        fontSize: FontSize.listTitle,
                                       ),
                                     ),
                                   ],
@@ -521,7 +522,7 @@ class _HomeListState extends State<HomeList> {
                                   text: '$nomeCategoria: ',
                                   style: TextStyle(
                                       fontFamily: 'Poppins',
-                                      fontSize: 12.0,
+                                      fontSize: FontSize.listTitle,
                                       color: (Theme.of(context).brightness ==
                                               Brightness.light
                                           ? Colors.black
@@ -532,7 +533,7 @@ class _HomeListState extends State<HomeList> {
                                           '${formatNumber(valoreCategoria)} ${walletProvider.valuta}',
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,
-                                          fontSize: 20.0,
+                                          fontSize: FontSize.listTitle,
                                           color: valoreCategoria < 0
                                               ? Colors.red
                                               : Colors.green),
@@ -545,7 +546,7 @@ class _HomeListState extends State<HomeList> {
                               Text(
                                 ' ',
                                 style: TextStyle(
-                                    fontSize: 21, fontWeight: FontWeight.bold),
+                                    fontSize: 17, fontWeight: FontWeight.bold),
                               ),
                             ],
                           ],
@@ -646,7 +647,7 @@ class _HomeListState extends State<HomeList> {
                                               .wallets[index].name!.length >
                                           9
                                       ? '${walletProvider.wallets[index].name!.substring(0, 9)}...'
-                                      : walletProvider.wallets[index].name!),
+                                      : walletProvider.wallets[index].name! , style: TextStyle(fontSize: FontSize.buttons),),
                                 ),
                               );
                             },
@@ -661,7 +662,7 @@ class _HomeListState extends State<HomeList> {
                             if (walletProvider.wallets.isNotEmpty)
                               Text(
                                 "Transazioni per ${walletProvider.wallets[walletProvider.selectedWalletIndex].name!.length > 9 ? '${walletProvider.wallets[walletProvider.selectedWalletIndex].name!.substring(0, 9)}...' : walletProvider.wallets[walletProvider.selectedWalletIndex].name}:",
-                                style: TextStyle(fontSize: 14),
+                                style: TextStyle(fontSize: FontSize.secondaryText),
                               ),
                             DropdownButton<bool>(
                               value: walletProvider.getTipologiaMovimento(),
@@ -678,14 +679,14 @@ class _HomeListState extends State<HomeList> {
                                   value: true,
                                   child: Text(
                                     'Mostra Uscite',
-                                    style: TextStyle(fontSize: 14),
+                                    style: TextStyle(fontSize: FontSize.formControl),
                                   ),
                                 ),
                                 DropdownMenuItem<bool>(
                                   value: false,
                                   child: Text(
                                     'Mostra Entrate',
-                                    style: TextStyle(fontSize: 14),
+                                    style: TextStyle(fontSize: FontSize.formControl),
                                   ),
                                 ),
                               ],
@@ -711,7 +712,7 @@ class _HomeListState extends State<HomeList> {
                             Icon(Icons.search_off, size: 48.0),
                             Text(
                               'Nessuna transazione',
-                              style: TextStyle(fontSize: 14.0),
+                              style: TextStyle(fontSize: FontSize.secondaryText),
                             ),
                           ],
                         ),
@@ -838,7 +839,7 @@ class _HomeListState extends State<HomeList> {
                                           ? Colors.green
                                           : Colors.red,
                                       fontWeight: FontWeight.bold,
-                                      fontSize: 16.0,
+                                      fontSize: FontSize.paragraphText,
                                     ),
                                   ),
                                 ),

@@ -139,3 +139,15 @@ class MyApp extends StatelessWidget {
     return prefs.getBool('firstTimeUser') ?? true;
   }
 }
+
+
+class FontSize {
+  static const double titles = 20.0;
+  static const double paragraphText = 14.0;
+  static const double secondaryText = 14.0;
+  static const double tertiaryText = 14.0;
+  static const double listTitle = 16.0;
+  static const double formControl = 16.0;
+  static const double buttons = 14.0;
+  static const double actionBar = 10.0;
+}
