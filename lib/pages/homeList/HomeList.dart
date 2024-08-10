@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import '../../providers/wallet_provider.dart';
@@ -355,7 +357,10 @@ class _HomeListState extends State<HomeList> {
           SliverOverlapAbsorber(
             handle: NestedScrollView.sliverOverlapAbsorberHandleFor(context),
             sliver: SliverAppBar(
-              expandedHeight: transactions.isEmpty ? 0.0 : 300.0,
+              //expandedHeight: transactions.isEmpty ? 0.0 : 300.0,
+              expandedHeight: 300.0,
+              
+
               surfaceTintColor: Colors.transparent,
               pinned: true,
               snap: true,
@@ -403,29 +408,31 @@ flexibleSpace: FlexibleSpaceBar(
             builder: (context, snapshot) {
               if (snapshot.hasError) {
                 return Center(
-                    child: Text('Errore: ${snapshot.error}'));
+                  child: Text('Errore: ${snapshot.error}'),
+                );
               } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return ClipOval(
-                  child: Container(
+                return  Container(
                     width: 200,
                     height: 200,
-                    color: Colors.grey.withOpacity(0.1), // Colore di sfondo per evidenziare il container
-                    child: Center(
-                      child: Text(
-                        'Nessuna transazione disponibile',
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                          color: Colors.black54,
-                          fontSize: 16,
-                        ),
+                    color: Colors.transparent, // Container verde per quando non ci sono transazioni
+                    child: Container(
+                      child: Center(
+child: Row(
+                        children: [
+                            Icon(Icons.search_off, size: 48.0),
+                            Text(
+                              'Nessuna transazione',
+                              style: TextStyle(fontSize: FontSize.secondaryText),
+                            ),
+                          ],
+                      ),
                       ),
                     ),
-                  ),
+                  
                 );
               } else {
                 final transactions = snapshot.data!;
-                final categoryAmounts =
-                    _calculateCategoryAmounts(transactions);
+                final categoryAmounts = _calculateCategoryAmounts(transactions);
 
                 return GestureDetector(
                   onTapUp: (details) {
@@ -438,8 +445,7 @@ flexibleSpace: FlexibleSpaceBar(
                       color: Colors.transparent,
                       child: PieChart(
                         PieChartData(
-                          sections: _createPieChartSections(
-                              categoryAmounts),
+                          sections: _createPieChartSections(categoryAmounts),
                           sectionsSpace: 2,
                           centerSpaceRadius: 0,
                         ),
@@ -724,7 +730,7 @@ flexibleSpace: FlexibleSpaceBar(
                   if (transactions.isEmpty) {
                     return SizedBox(
                       height: MediaQuery.of(context).size.height / 2,
-                      child: Center(
+/*                       child: Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -735,7 +741,7 @@ flexibleSpace: FlexibleSpaceBar(
                             ),
                           ],
                         ),
-                      ),
+                      ), */
                     );
                   } else {
                     final Transaction transaction = transactions[index];
