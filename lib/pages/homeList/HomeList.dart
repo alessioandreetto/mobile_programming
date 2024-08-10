@@ -386,56 +386,75 @@ class _HomeListState extends State<HomeList> {
                 ),
               ),
               floating: true,
-              flexibleSpace: FlexibleSpaceBar(
-                  background: PageView.builder(
-                controller: _pageController,
-                itemCount: walletProvider.wallets.length,
-                onPageChanged: _handleSwipe,
-                itemBuilder: (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.only(top: 80.0),
-                    child: Center(
-                      child: FutureBuilder<List<Transaction>>(
-                        future: _loadTransactions(selectedWallet.id!),
-                        builder: (context, snapshot) {
-                          if (snapshot.hasError) {
-                            return Center(
-                                child: Text('Errore: ${snapshot.error}'));
-                          } else if (!snapshot.hasData ||
-                              snapshot.data!.isEmpty) {
-                            return Container();
-                          } else {
-                            final transactions = snapshot.data!;
-                            final categoryAmounts =
-                                _calculateCategoryAmounts(transactions);
+flexibleSpace: FlexibleSpaceBar(
+  background: PageView.builder(
+    controller: _pageController,
+    itemCount: walletProvider.wallets.length,
+    onPageChanged: _handleSwipe,
+    itemBuilder: (context, index) {
+      // Ottieni il portafoglio specifico per la pagina corrente
+      final wallet = walletProvider.wallets[index];
 
-                            return GestureDetector(
-                              onTapUp: (details) {
-                                _handlePieChartTap(details, categoryAmounts);
-                              },
-                              child: ClipOval(
-                                child: Container(
-                                  width: 200,
-                                  height: 200,
-                                  color: Colors.transparent,
-                                  child: PieChart(
-                                    PieChartData(
-                                      sections: _createPieChartSections(
-                                          categoryAmounts),
-                                      sectionsSpace: 2,
-                                      centerSpaceRadius: 0,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            );
-                          }
-                        },
+      return Padding(
+        padding: const EdgeInsets.only(top: 80.0),
+        child: Center(
+          child: FutureBuilder<List<Transaction>>(
+            future: _loadTransactions(wallet.id!), // Carica le transazioni per questo portafoglio
+            builder: (context, snapshot) {
+              if (snapshot.hasError) {
+                return Center(
+                    child: Text('Errore: ${snapshot.error}'));
+              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return ClipOval(
+                  child: Container(
+                    width: 200,
+                    height: 200,
+                    color: Colors.grey.withOpacity(0.1), // Colore di sfondo per evidenziare il container
+                    child: Center(
+                      child: Text(
+                        'Nessuna transazione disponibile',
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                          color: Colors.black54,
+                          fontSize: 16,
+                        ),
                       ),
                     ),
-                  );
-                },
-              )),
+                  ),
+                );
+              } else {
+                final transactions = snapshot.data!;
+                final categoryAmounts =
+                    _calculateCategoryAmounts(transactions);
+
+                return GestureDetector(
+                  onTapUp: (details) {
+                    _handlePieChartTap(details, categoryAmounts);
+                  },
+                  child: ClipOval(
+                    child: Container(
+                      width: 200,
+                      height: 200,
+                      color: Colors.transparent,
+                      child: PieChart(
+                        PieChartData(
+                          sections: _createPieChartSections(
+                              categoryAmounts),
+                          sectionsSpace: 2,
+                          centerSpaceRadius: 0,
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              }
+            },
+          ),
+        ),
+      );
+    },
+  ),
+),
             ),
           ),
         ];
