@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../providers/wallet_provider.dart';
-
+import '../main.dart';
 class AddNotePage extends StatefulWidget {
   final TextEditingController titleController;
   final TextEditingController bodyController;
@@ -130,8 +130,8 @@ class _AddNotePageState extends State<AddNotePage> {
         child: Scaffold(
           appBar: AppBar(
             title: widget.initialTitle == null && widget.initialBody == null
-                ? Text("Nuovo Portafoglio", style: TextStyle(fontSize: 25))
-                : Text("Modifica Portafiglio", style: TextStyle(fontSize: 25)),
+                ? Text("Nuovo Portafoglio", style: TextStyle(fontSize: FontSize.titles))
+                : Text("Modifica Portafiglio", style: TextStyle(fontSize: FontSize.titles)),
             backgroundColor: Colors.transparent,
             elevation: 0,
             leading: IconButton(
@@ -227,8 +227,8 @@ class _AddNotePageState extends State<AddNotePage> {
               ),
               onPressed: _saveNote,
               child: widget.initialTitle == null && widget.initialBody == null
-                  ? Text("Aggiungi")
-                  : Text("Modifica"),
+                  ? Text("Aggiungi" , style: TextStyle(fontSize: FontSize.buttons))
+                  : Text("Modifica", style: TextStyle(fontSize: FontSize.buttons)),
             ),
           ),
         ),

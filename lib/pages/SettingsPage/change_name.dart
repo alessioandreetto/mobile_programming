@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import '../../providers/wallet_provider.dart';
+import '../../main.dart';
 
 class ChangeNamePage extends StatefulWidget {
   @override
@@ -38,7 +39,7 @@ class _ChangeNamePageState extends State<ChangeNamePage> {
         onWillPop: _onWillPop,
         child: Scaffold(
           appBar: AppBar(
-            title: Text("Modifica nome account"),
+            title: Text("Modifica nome account", style: TextStyle(fontSize: FontSize.titles)),
             backgroundColor: Colors.transparent,
             elevation: 0,
           ),
@@ -82,7 +83,7 @@ class _ChangeNamePageState extends State<ChangeNamePage> {
                 ),
               ),
               onPressed: () => _saveName(context),
-              child: Text("Salva"),
+              child: Text("Salva" , style: TextStyle(fontSize: FontSize.buttons)),
             ),
           ),
         ),

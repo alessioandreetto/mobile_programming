@@ -6,6 +6,7 @@ import '../../providers/wallet_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
+import '../../main.dart';
 
 class ChartsList extends StatefulWidget {
   @override
@@ -81,7 +82,7 @@ class _ChartsListState extends State<ChartsList> {
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Grafico finanze', style: TextStyle(fontSize: 25)),
+        title: Text('Grafico finanze', style: TextStyle(fontSize: FontSize.titles)),
         elevation: 0,
         backgroundColor: Colors.transparent,
         shadowColor: Colors.transparent,
@@ -121,7 +122,7 @@ class _ChartsListState extends State<ChartsList> {
                 child: Text(
                   period,
                   style: TextStyle(
-                    fontSize: 12,
+                    fontSize: FontSize.buttons,
                     color: _selectedButton == period
                         ? Colors.black
                         : Color(0xffb3b3b3),
@@ -269,7 +270,7 @@ class _ChartsListState extends State<ChartsList> {
                           const EdgeInsets.only(left: 16, top: 8.0, bottom: 10),
                       child: Text(
                         "Transazioni per ${selectedWallet.name!.length > 9 ? selectedWallet.name!.substring(0, 9) + '...' : selectedWallet.name}:",
-                        style: TextStyle(fontSize: 14),
+                        style: TextStyle(fontSize: FontSize.secondaryText),
                       ),
                     ),
                     Expanded(
@@ -298,7 +299,7 @@ class _ChartsListState extends State<ChartsList> {
                                     Icon(Icons.search_off, size: 48.0),
                                     Text(
                                       'Nessuna transazione',
-                                      style: TextStyle(fontSize: 14.0),
+                                      style: TextStyle(fontSize: FontSize.secondaryText),
                                     ),
                                   ],
                                 ),
@@ -448,7 +449,7 @@ class _ChartsListState extends State<ChartsList> {
                                                       ? Colors.green
                                                       : Colors.red,
                                                   fontWeight: FontWeight.bold,
-                                                  fontSize: 16.0,
+                                                  fontSize: FontSize.paragraphText,
                                                 ),
                                               ),
                                             ),

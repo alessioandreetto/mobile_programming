@@ -6,6 +6,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../../providers/wallet_provider.dart';
 import 'SettingsPage/change_name.dart';
 import 'initialPage/demo.dart';
+import '../main.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -41,7 +42,7 @@ class _SettingsPageState extends State<SettingsPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Impostazioni', style: TextStyle(fontSize: 25)),
+        title: Text('Impostazioni', style: TextStyle(fontSize: FontSize.titles)),
         backgroundColor: Colors.transparent,
         elevation: 0,
         surfaceTintColor: Colors.transparent,
@@ -50,7 +51,7 @@ class _SettingsPageState extends State<SettingsPage> {
         children: <Widget>[
           Card(
             child: ListTile(
-              title: Text('Modifica nome account'),
+              title: Text('Modifica nome account', style: TextStyle(fontSize: FontSize.paragraphText)),
               onTap: () {
                 Navigator.push(
                   context,
@@ -61,7 +62,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           Card(
             child: ListTile(
-              title: Text('Cambia valuta'),
+              title: Text('Cambia valuta', style: TextStyle(fontSize: FontSize.paragraphText)),
               onTap: () {},
               trailing: DropdownButton<String>(
                 value: _selectedValuta,
@@ -83,7 +84,7 @@ class _SettingsPageState extends State<SettingsPage> {
           ),
           Card(
             child: ListTile(
-              title: Text('Modalità scura'),
+              title: Text('Modalità scura', style: TextStyle(fontSize: FontSize.paragraphText)),
               trailing: Switch(
                 value: _isDarkMode,
                 onChanged: (value) {

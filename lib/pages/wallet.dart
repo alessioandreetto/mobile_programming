@@ -4,6 +4,7 @@ import '../model/database_model.dart';
 import 'new_wallet.dart';
 import '../providers/wallet_provider.dart';
 import 'package:provider/provider.dart';
+import '../../main.dart';
 
 class WalletPage extends StatefulWidget {
   @override
@@ -154,23 +155,18 @@ class _WalletPageState extends State<WalletPage> {
       data.removeAt(index);
     });
     Provider.of<WalletProvider>(context, listen: false).loadWallets();
-    Provider.of<WalletProvider>(context, listen: false).updateSelectedWalletIndex(0);
+    Provider.of<WalletProvider>(context, listen: false)
+        .updateSelectedWalletIndex(0);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
-          children: [
-            Expanded(
-              child: Text(
-                'Portafogli',
-                style: TextStyle(fontSize: 25),
-                textAlign: TextAlign.start,
-              ),
-            ),
-          ],
+        title: Text(
+          'Portafogli',
+          style: TextStyle(fontSize: FontSize.titles),
+          textAlign: TextAlign.start,
         ),
         elevation: 0,
         actions: [
@@ -264,101 +260,132 @@ class _WalletPageState extends State<WalletPage> {
     );
   }
 
-  Widget buildItem(BuildContext context, int index, double title, String body,
-      String valuta) {
-    final isSelected = selectedIndices.contains(index);
-    final walletId = data[index].id;
+  Widget buildItem(BuildContext context, int index, double title, String body, String valuta) {
+  final isSelected = selectedIndices.contains(index);
+  final walletId = data[index].id;
 
-    return GestureDetector(
-      onLongPress: () {},
-      onTap: () {
-        if (selectedIndices.isNotEmpty) {
-          setState(() {
-            if (isSelected) {
-              selectedIndices.remove(index);
-            } else {
-              selectedIndices.add(index);
-            }
-          });
-        } else {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => AddNotePage(
-                onSave: (newTitle, newBody) {
-                  addOrEditNote(
-                    context: context,
-                    index: index,
-                    title: newTitle,
-                    body: newBody,
-                  );
-                  Navigator.pop(context);
-                },
-                initialTitle: title,
-                initialBody: body,
-                onDelete: () {
-                  deleteNote(index);
-                  Navigator.pop(context);
-                },
-                walletId: walletId!,
-              ),
+  return GestureDetector(
+    onLongPress: () {},
+    onTap: () {
+      if (selectedIndices.isNotEmpty) {
+        setState(() {
+          if (isSelected) {
+            selectedIndices.remove(index);
+          } else {
+            selectedIndices.add(index);
+          }
+        });
+      } else {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => AddNotePage(
+              onSave: (newTitle, newBody) {
+                addOrEditNote(
+                  context: context,
+                  index: index,
+                  title: newTitle,
+                  body: newBody,
+                );
+                Navigator.pop(context);
+              },
+              initialTitle: title,
+              initialBody: body,
+              onDelete: () {
+                deleteNote(index);
+                Navigator.pop(context);
+              },
+              walletId: walletId!,
             ),
-          );
-        }
-      },
-      key: ValueKey(index),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Container(
-          decoration: BoxDecoration(
-            border: Border.all(
-              color: isSelected ? Colors.red : Color(0xffb3b3b3),
-              width: 1,
-            ),
-            borderRadius: BorderRadius.circular(10),
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(8.0),
-                  child: Text(
-                    body,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 40,
+        );
+      }
+    },
+    key: ValueKey(index),
+    child: Padding(
+      padding: const EdgeInsets.all(8.0),
+      child: Stack(
+        children: [
+          // Main wallet container
+          Container(
+            decoration: BoxDecoration(
+              border: Border.all(
+                color: isSelected ? Colors.red : Color(0xffb3b3b3),
+                width: 2, // Slightly thicker border
+              ),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: Text(
+                      body,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(
+                        fontSize: FontSize.listTitle,
+                      ),
                     ),
                   ),
                 ),
+                Container(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Text(
+                          "Bilancio: ",
+                          style: TextStyle(
+                            fontSize: FontSize.secondaryText,
+                          ),
+                        ),
+                        Text(
+                          "${formatNumber(title)} $valuta",
+                          style: TextStyle(
+                            fontSize: FontSize.secondaryText,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          // fibbia del portafogli
+          Positioned(
+            right: -10,
+            top: 60,
+            child: Container(
+              width: 70,
+              height: 50,
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color:  Color(0xffb3b3b3),
+                  width: 2,
+                ),
+                borderRadius: BorderRadius.circular(5),
               ),
-              Container(
-                child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
-                      Text(
-                        "Bilancio: ",
-                        style: TextStyle(
-                          fontSize: 10,
-                        ),
-                      ),
-                      Text(
-                        "${formatNumber(title)} $valuta",
-                        style: TextStyle(
-                          fontSize: 20,
-                        ),
-                      ),
-                    ],
+              child: Center(
+                child: Container(
+                  width: 10,
+                  height: 10,
+                  decoration: BoxDecoration(
+                    color:  Color(0xffb3b3b3),
+                    shape: BoxShape.circle,
                   ),
                 ),
               ),
-            ],
+            ),
           ),
-        ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
 }

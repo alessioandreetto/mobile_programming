@@ -4,6 +4,7 @@ import '../providers/wallet_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import '../main.dart';
 
 class Category {
   final int id;
@@ -276,8 +277,8 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
         appBar: AppBar(
           backgroundColor: Colors.transparent,
           title: widget.transaction == null
-              ? Text('Nuova Transazione')
-              : Text('Modifica Transazione'),
+              ? Text('Nuova Transazione', style: TextStyle(fontSize: FontSize.titles))
+              : Text('Modifica Transazione', style: TextStyle(fontSize: FontSize.titles)),
           elevation: 0,
           leading: IconButton(
             icon: Icon(Icons.arrow_back),
@@ -510,7 +511,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
             },
             child: Text(widget.transaction == null
                 ? 'Aggiungi Transazione'
-                : 'Modifica Transazione'),
+                : 'Modifica Transazione' , style: TextStyle(fontSize: FontSize.buttons)),
           ),
         ),
       ),
@@ -527,7 +528,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
     List<Widget> buttons = actionTypes.map((type) {
       return Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
-        child: Text(type),
+        child: Text(type, style: TextStyle(fontSize: FontSize.paragraphText)),
       );
     }).toList();
 
