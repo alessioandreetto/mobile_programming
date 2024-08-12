@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../providers/wallet_provider.dart';
+import '../../main.dart';
 
 class WelcomePage extends StatefulWidget {
   final Function(String) onNameEntered;

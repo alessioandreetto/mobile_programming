@@ -352,7 +352,6 @@ class _HomeListState extends State<HomeList> {
         walletProvider.selectedWalletIndex < 0 ||
         walletProvider.selectedWalletIndex >= walletProvider.wallets.length) {
       return CircularProgressIndicator();
-
     }
 
     Wallet selectedWallet =
@@ -426,15 +425,11 @@ class _HomeListState extends State<HomeList> {
                                     .transparent, // Container verde per quando non ci sono transazioni
                                 child: Container(
                                   child: Center(
-                                    child: Row(
-                                      children: [
-                                        Icon(Icons.search_off, size: 48.0),
-                                        Text(
-                                          'Nessuna transazione',
-                                          style: TextStyle(
-                                              fontSize: FontSize.secondaryText),
-                                        ),
-                                      ],
+                                    child: Text(
+                                      'Dati non sufficienti per produrre il grafico',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          fontSize: FontSize.secondaryText),
                                     ),
                                   ),
                                 ),
@@ -747,7 +742,7 @@ class _HomeListState extends State<HomeList> {
                   if (transactions.isEmpty) {
                     return SizedBox(
                       height: MediaQuery.of(context).size.height / 2,
-/*                       child: Center(
+                      child: Center(
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
@@ -758,7 +753,7 @@ class _HomeListState extends State<HomeList> {
                             ),
                           ],
                         ),
-                      ), */
+                      ),
                     );
                   } else {
                     final Transaction transaction = transactions[index];

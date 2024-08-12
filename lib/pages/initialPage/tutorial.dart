@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
 import '../homeList/HomeList.dart';
-
+import '../../main.dart';
 class InteractiveTutorial extends StatefulWidget {
   final Function onComplete;
 
@@ -101,12 +101,12 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
           children: [
             Text(
               'Benvenuto nel Tutorial!',
-              style: TextStyle(color: Colors.white, fontSize: 24),
+              style: TextStyle(color: Colors.white, fontSize: FontSize.listTitle),
             ),
             SizedBox(height: 10),
             Text(
               '1. Questa è la Home! Qui puoi vedere il grafico a torta delle tue transazioni.',
-              style: TextStyle(color: Colors.white, fontSize: 18),
+              style: TextStyle(color: Colors.white, fontSize: FontSize.paragraphText),
             ),
             SizedBox(height: 10),
             TextButton(
@@ -135,12 +135,12 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
           children: [
             Text(
               'Portafogli',
-              style: TextStyle(color: Colors.white, fontSize: 24),
+              style: TextStyle(color: Colors.white, fontSize: FontSize.listTitle),
             ),
             SizedBox(height: 10),
             Text(
               '2. In questa sezione puoi selezionare un portafoglio per visualizzare le sue transazioni.',
-              style: TextStyle(color: Colors.white, fontSize: 18),
+              style: TextStyle(color: Colors.white, fontSize: FontSize.paragraphText),
             ),
             SizedBox(height: 10),
             TextButton(
@@ -169,12 +169,12 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
           children: [
             Text(
               'Transazioni',
-              style: TextStyle(color: Colors.white, fontSize: 24),
+              style: TextStyle(color: Colors.white, fontSize: FontSize.listTitle),
             ),
             SizedBox(height: 10),
             Text(
               '3. Qui invece puoi vedere tutte le tue transazioni! Toccando la transazione stessa puoi modificarla o eliminarla!',
-              style: TextStyle(color: Colors.white, fontSize: 18),
+              style: TextStyle(color: Colors.white, fontSize: FontSize.paragraphText),
             ),
             SizedBox(height: 10),
             TextButton(
@@ -203,12 +203,12 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
           children: [
             Text(
               'Nuova Transazione',
-              style: TextStyle(color: Colors.white, fontSize: 24),
+              style: TextStyle(color: Colors.white, fontSize: FontSize.listTitle),
             ),
             SizedBox(height: 10),
             Text(
               '4. Per andare a creare una nuova transazione, clicca su prossimo +',
-              style: TextStyle(color: Colors.white, fontSize: 18),
+              style: TextStyle(color: Colors.white, fontSize: FontSize.paragraphText),
             ),
             SizedBox(height: 10),
             TextButton(
@@ -252,12 +252,12 @@ class _InteractiveTutorialState extends State<InteractiveTutorial> {
           children: [
             Text(
               'Creazione Transazione',
-              style: TextStyle(color: Colors.white, fontSize: 24),
+              style: TextStyle(color: Colors.white, fontSize: FontSize.listTitle),
             ),
             SizedBox(height: 10),
             Text(
               '5. Dopo aver cliccato + l\'app ti porterà alla pagina di creazione della nuova transazione! Ti basterà inserire correttamente tutti i dati e premere il pulsante "Aggiungi transazione" e il gioco è fatto!',
-              style: TextStyle(color: Colors.white, fontSize: 18),
+              style: TextStyle(color: Colors.white, fontSize: FontSize.paragraphText),
             ),
             SizedBox(height: 10),
             TextButton(

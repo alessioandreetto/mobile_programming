@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import '../../main.dart';
 
 class FirstWallet extends StatefulWidget {
   final TextEditingController nameController;
@@ -60,7 +61,7 @@ class _FirstWalletState extends State<FirstWallet> {
             title: Text(
               'Crea qui il tuo primo portafoglio!',
               style: TextStyle(
-                fontSize: 20,
+                fontSize: FontSize.titles,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -80,7 +81,7 @@ class _FirstWalletState extends State<FirstWallet> {
                       Text(
                         'Inserisci qui sotto un nome significativo per il portafoglio che andrai a creare:',
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: FontSize.paragraphText,
                         ),
                       ),
                       SizedBox(height: 8),
@@ -111,7 +112,7 @@ class _FirstWalletState extends State<FirstWallet> {
                       Text(
                         'Imposta un saldo iniziale da cui parti e da dove inizierai a tener traccia delle tue spese e delle tue entrate.',
                         style: TextStyle(
-                          fontSize: 14,
+                          fontSize: FontSize.paragraphText,
                         ),
                       ),
                       SizedBox(height: 8),

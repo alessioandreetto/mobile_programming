@@ -9,6 +9,7 @@ import '../../providers/wallet_provider.dart';
 import 'package:provider/provider.dart';
 import 'tutorial.dart';
 import 'package:flutter/services.dart';
+import '../../main.dart';
 
 class PageIndicatorDemo extends StatefulWidget {
   @override
@@ -205,7 +206,7 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
                           Text(
                             'Bene, è tutto pronto\nIniziamo!',
                             style: TextStyle(
-                                fontSize: 24, fontWeight: FontWeight.bold),
+                                fontSize: FontSize.titles, fontWeight: FontWeight.bold),
                             textAlign: TextAlign.center,
                           ),
                           SizedBox(height: 20),
