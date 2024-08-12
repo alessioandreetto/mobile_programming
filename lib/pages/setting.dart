@@ -14,7 +14,7 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  late String _selectedValuta;
+  late String _selectedValuta = "€";
   bool _isDarkMode = false;
 
   @override

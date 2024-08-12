@@ -348,6 +348,13 @@ class _HomeListState extends State<HomeList> {
   @override
   Widget build(BuildContext context) {
     var walletProvider = Provider.of<WalletProvider>(context);
+    if (walletProvider.wallets.isEmpty ||
+        walletProvider.selectedWalletIndex < 0 ||
+        walletProvider.selectedWalletIndex >= walletProvider.wallets.length) {
+      return CircularProgressIndicator();
+
+    }
+
     Wallet selectedWallet =
         walletProvider.wallets[walletProvider.selectedWalletIndex];
     return Scaffold(
@@ -359,7 +366,6 @@ class _HomeListState extends State<HomeList> {
             sliver: SliverAppBar(
               //expandedHeight: transactions.isEmpty ? 0.0 : 300.0,
               expandedHeight: 300.0,
-              
 
               surfaceTintColor: Colors.transparent,
               pinned: true,
@@ -391,76 +397,81 @@ class _HomeListState extends State<HomeList> {
                 ),
               ),
               floating: true,
-flexibleSpace: FlexibleSpaceBar(
-  background: PageView.builder(
-    controller: _pageController,
-    itemCount: walletProvider.wallets.length,
-    onPageChanged: _handleSwipe,
-    itemBuilder: (context, index) {
-      // Ottieni il portafoglio specifico per la pagina corrente
-      final wallet = walletProvider.wallets[index];
+              flexibleSpace: FlexibleSpaceBar(
+                background: PageView.builder(
+                  controller: _pageController,
+                  itemCount: walletProvider.wallets.length,
+                  onPageChanged: _handleSwipe,
+                  itemBuilder: (context, index) {
+                    // Ottieni il portafoglio specifico per la pagina corrente
+                    final wallet = walletProvider.wallets[index];
 
-      return Padding(
-        padding: const EdgeInsets.only(top: 80.0),
-        child: Center(
-          child: FutureBuilder<List<Transaction>>(
-            future: _loadTransactions(wallet.id!), // Carica le transazioni per questo portafoglio
-            builder: (context, snapshot) {
-              if (snapshot.hasError) {
-                return Center(
-                  child: Text('Errore: ${snapshot.error}'),
-                );
-              } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return  Container(
-                    width: 200,
-                    height: 200,
-                    color: Colors.transparent, // Container verde per quando non ci sono transazioni
-                    child: Container(
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 80.0),
                       child: Center(
-child: Row(
-                        children: [
-                            Icon(Icons.search_off, size: 48.0),
-                            Text(
-                              'Nessuna transazione',
-                              style: TextStyle(fontSize: FontSize.secondaryText),
-                            ),
-                          ],
-                      ),
-                      ),
-                    ),
-                  
-                );
-              } else {
-                final transactions = snapshot.data!;
-                final categoryAmounts = _calculateCategoryAmounts(transactions);
+                        child: FutureBuilder<List<Transaction>>(
+                          future: _loadTransactions(wallet
+                              .id!), // Carica le transazioni per questo portafoglio
+                          builder: (context, snapshot) {
+                            if (snapshot.hasError) {
+                              return Center(
+                                child: Text('Errore: ${snapshot.error}'),
+                              );
+                            } else if (!snapshot.hasData ||
+                                snapshot.data!.isEmpty) {
+                              return Container(
+                                width: 200,
+                                height: 200,
+                                color: Colors
+                                    .transparent, // Container verde per quando non ci sono transazioni
+                                child: Container(
+                                  child: Center(
+                                    child: Row(
+                                      children: [
+                                        Icon(Icons.search_off, size: 48.0),
+                                        Text(
+                                          'Nessuna transazione',
+                                          style: TextStyle(
+                                              fontSize: FontSize.secondaryText),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            } else {
+                              final transactions = snapshot.data!;
+                              final categoryAmounts =
+                                  _calculateCategoryAmounts(transactions);
 
-                return GestureDetector(
-                  onTapUp: (details) {
-                    _handlePieChartTap(details, categoryAmounts);
-                  },
-                  child: ClipOval(
-                    child: Container(
-                      width: 200,
-                      height: 200,
-                      color: Colors.transparent,
-                      child: PieChart(
-                        PieChartData(
-                          sections: _createPieChartSections(categoryAmounts),
-                          sectionsSpace: 2,
-                          centerSpaceRadius: 0,
+                              return GestureDetector(
+                                onTapUp: (details) {
+                                  _handlePieChartTap(details, categoryAmounts);
+                                },
+                                child: ClipOval(
+                                  child: Container(
+                                    width: 200,
+                                    height: 200,
+                                    color: Colors.transparent,
+                                    child: PieChart(
+                                      PieChartData(
+                                        sections: _createPieChartSections(
+                                            categoryAmounts),
+                                        sectionsSpace: 2,
+                                        centerSpaceRadius: 0,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              );
+                            }
+                          },
                         ),
                       ),
-                    ),
-                  ),
-                );
-              }
-            },
-          ),
-        ),
-      );
-    },
-  ),
-),
+                    );
+                  },
+                ),
+              ),
             ),
           ),
         ];
@@ -668,11 +679,14 @@ child: Row(
                                       },
                                     ),
                                   ),
-                                  child: Text(walletProvider
-                                              .wallets[index].name!.length >
-                                          9
-                                      ? '${walletProvider.wallets[index].name!.substring(0, 9)}...'
-                                      : walletProvider.wallets[index].name! , style: TextStyle(fontSize: FontSize.buttons),),
+                                  child: Text(
+                                    walletProvider.wallets[index].name!.length >
+                                            9
+                                        ? '${walletProvider.wallets[index].name!.substring(0, 9)}...'
+                                        : walletProvider.wallets[index].name!,
+                                    style:
+                                        TextStyle(fontSize: FontSize.buttons),
+                                  ),
                                 ),
                               );
                             },
@@ -687,7 +701,8 @@ child: Row(
                             if (walletProvider.wallets.isNotEmpty)
                               Text(
                                 "Transazioni per ${walletProvider.wallets[walletProvider.selectedWalletIndex].name!.length > 9 ? '${walletProvider.wallets[walletProvider.selectedWalletIndex].name!.substring(0, 9)}...' : walletProvider.wallets[walletProvider.selectedWalletIndex].name}:",
-                                style: TextStyle(fontSize: FontSize.secondaryText),
+                                style:
+                                    TextStyle(fontSize: FontSize.secondaryText),
                               ),
                             DropdownButton<bool>(
                               value: walletProvider.getTipologiaMovimento(),
@@ -704,14 +719,16 @@ child: Row(
                                   value: true,
                                   child: Text(
                                     'Mostra Uscite',
-                                    style: TextStyle(fontSize: FontSize.formControl),
+                                    style: TextStyle(
+                                        fontSize: FontSize.formControl),
                                   ),
                                 ),
                                 DropdownMenuItem<bool>(
                                   value: false,
                                   child: Text(
                                     'Mostra Entrate',
-                                    style: TextStyle(fontSize: FontSize.formControl),
+                                    style: TextStyle(
+                                        fontSize: FontSize.formControl),
                                   ),
                                 ),
                               ],
