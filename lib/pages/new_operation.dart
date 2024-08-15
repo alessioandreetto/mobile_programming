@@ -248,6 +248,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
 
   @override
   Widget build(BuildContext context) {
+    var walletProvider = Provider.of<WalletProvider>(context);
     return WillPopScope(
       onWillPop: () async {
         if (isDirty()) {
@@ -337,7 +338,7 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                 ),
                 TextField(
                   controller: widget.valueController,
-                  decoration: InputDecoration(labelText: 'Valore'),
+                  decoration: InputDecoration(labelText: 'Valore (${walletProvider.valuta})'),
                   keyboardType: TextInputType.numberWithOptions(decimal: true),
                   inputFormatters: [
                     CustomNumberInputFormatter(),

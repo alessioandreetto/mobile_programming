@@ -117,6 +117,7 @@ class _AddNotePageState extends State<AddNotePage> {
   @override
   Widget build(BuildContext context) {
     bool isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    var walletProvider = Provider.of<WalletProvider>(context);
 
     return GestureDetector(
       onTap: () {
@@ -202,7 +203,7 @@ class _AddNotePageState extends State<AddNotePage> {
                           CustomNumberInputFormatter(),
                         ],
                         decoration: InputDecoration(
-                          labelText: 'Bilancio iniziale ',
+                          labelText: 'Bilancio iniziale (${walletProvider.valuta})',
                         ),
                         enabled: !_hasTransactions,
                       ),

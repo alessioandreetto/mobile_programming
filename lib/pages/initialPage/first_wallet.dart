@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_application_1/providers/wallet_provider.dart';
+import 'package:provider/provider.dart';
 import '../../main.dart';
 
 class FirstWallet extends StatefulWidget {
@@ -50,6 +52,7 @@ class _FirstWalletState extends State<FirstWallet> {
 
   @override
   Widget build(BuildContext context) {
+    var walletProvider = Provider.of<WalletProvider>(context);
     return WillPopScope(
       onWillPop: _onWillPop,
       child: GestureDetector(
@@ -128,7 +131,7 @@ class _FirstWalletState extends State<FirstWallet> {
                           });
                         },
                         decoration: InputDecoration(
-                          labelText: 'Bilancio iniziale',
+                          labelText: 'Bilancio iniziale (${walletProvider.valuta})',
                           errorText: widget.isBalanceValid
                               ? null
                               : 'Campo obbligatorio',
