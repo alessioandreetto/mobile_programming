@@ -121,7 +121,7 @@ class _FirstWalletState extends State<FirstWallet> {
                       SizedBox(height: 8),
                       TextField(
                         controller: widget.balanceController,
-                        keyboardType: TextInputType.number,
+                        keyboardType: TextInputType.numberWithOptions(decimal: true),
                         inputFormatters: [
                           CustomNumberInputFormatter(),
                         ],

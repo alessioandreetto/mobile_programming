@@ -198,7 +198,7 @@ class _AddNotePageState extends State<AddNotePage> {
                             _isDirty = true;
                           });
                         },
-                        keyboardType: TextInputType.number,
+                        keyboardType: TextInputType.numberWithOptions(decimal: true),
                         inputFormatters: [
                           CustomNumberInputFormatter(),
                         ],
