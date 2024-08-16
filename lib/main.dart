@@ -142,7 +142,7 @@ class MyApp extends StatelessWidget {
 
 
 class FontSize {
-  static const double titles = 20.0;
+  static const double titles = 25.0;
   static const double paragraphText = 14.0;
   static const double secondaryText = 14.0;
   static const double tertiaryText = 14.0;
