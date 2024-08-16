@@ -494,22 +494,26 @@ class _NewTransactionPageState extends State<NewTransactionPage> {
                 borderRadius: BorderRadius.circular(10),
               ),
             ),
-            onPressed: () async {
-              if (_validateFields()) {
-                await _performRegularTransaction();
-                Provider.of<WalletProvider>(context, listen: false)
-                    .loadWallets();
+onPressed: () async {
+  if (double.tryParse(widget.valueController.text) == null) {
+    _showSnackbar(context, 'Inserire un valore numerico nel campo "Valore"');
+    return; 
+  }
 
-                _showSnackbar(
-                    context,
-                    widget.transaction == null
-                        ? 'Transazione aggiunta con successo!'
-                        : 'Transazione modificata con successo!');
-                _navigateToHome(context);
-              } else {
-                _showSnackbar(context, 'Inserisci tutti i campi');
-              }
-            },
+  if (_validateFields()) {
+    await _performRegularTransaction();
+    Provider.of<WalletProvider>(context, listen: false).loadWallets();
+
+    _showSnackbar(
+        context,
+        widget.transaction == null
+            ? 'Transazione aggiunta con successo!'
+            : 'Transazione modificata con successo!');
+    _navigateToHome(context);
+  } else {
+    _showSnackbar(context, 'Inserisci tutti i campi');
+  }
+},
             child: Text(widget.transaction == null
                 ? 'Aggiungi Transazione'
                 : 'Modifica Transazione' , style: TextStyle(fontSize: FontSize.buttons)),

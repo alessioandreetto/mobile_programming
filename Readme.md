@@ -1,6 +1,6 @@
 cose da fare 
 - rivedere grandezza delle variabili per font 
-- bloccare inserimento testo (anche se c'è tastiera solo numeri)
+- rivedere valori su demo primo wallet se non metto valori numerici campo bilancio 
 - bloccare inserimento codice nei form (caratteri paryticolari)
 
 

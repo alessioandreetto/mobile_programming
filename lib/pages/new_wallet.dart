@@ -243,6 +243,11 @@ class _AddNotePageState extends State<AddNotePage> {
 
     if (trimmedTitle.isNotEmpty && trimmedBody.isNotEmpty) {
       double title;
+      if (double.tryParse(trimmedTitle) == null) {
+        _showSnackbar(context, 'Inserire un valore numerico nel campo "Bilancio iniziale"');
+        return;
+      }
+
       if (!_hasTransactions) {
         title = double.parse(trimmedTitle);
       } else {
