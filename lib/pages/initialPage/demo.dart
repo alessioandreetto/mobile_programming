@@ -54,7 +54,7 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
   }
 
   void _saveWalletData() {
-    if (walletName.isNotEmpty && walletBalance > 0) {
+    if (walletName.isNotEmpty && walletBalance >= 0) {
       Wallet newWallet = Wallet(
         id: walletId,
         name: walletName,
@@ -73,10 +73,31 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
     }
   }
 
+  void _validateFormAndProceed() {
+    _showErrorMessages();
+    if (_isNameValid && _isBalanceValid) {
+      _pageController.nextPage(
+        duration: Duration(milliseconds: 300),
+        curve: Curves.ease,
+      );
+    }
+  }
+
+  bool _validateCurrentForm() {
+    _showErrorMessages();
+    return _isNameValid && _isBalanceValid;
+  }
+
   void _showErrorMessages() {
     setState(() {
       _isNameValid = walletName.isNotEmpty;
-      _isBalanceValid = walletBalance > 0;
+
+      try {
+        walletBalance = double.parse(balanceController.text.trim());
+        _isBalanceValid = true;
+      } catch (e) {
+        _isBalanceValid = false;
+      }
     });
 
     if (!_isNameValid || !_isBalanceValid) {
@@ -95,7 +116,9 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
               ),
               padding: EdgeInsets.symmetric(horizontal: 10.0, vertical: 10.0),
               child: Text(
-                'Inserisci i dati per creare il primo wallet',
+                _isNameValid
+                    ? 'Inserire un valore numerico nel campo "Bilancio iniziale"'
+                    : 'Inserisci i dati per creare il primo wallet',
                 style: TextStyle(color: Colors.white),
                 textAlign: TextAlign.center,
               ),
@@ -110,21 +133,6 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
         overlayEntry.remove();
       });
     }
-  }
-
-  void _validateFormAndProceed() {
-    _showErrorMessages();
-    if (_isNameValid && _isBalanceValid) {
-      _pageController.nextPage(
-        duration: Duration(milliseconds: 300),
-        curve: Curves.ease,
-      );
-    }
-  }
-
-  bool _validateCurrentForm() {
-    _showErrorMessages();
-    return _isNameValid && _isBalanceValid;
   }
 
   @override
@@ -206,7 +214,8 @@ class _PageIndicatorDemoState extends State<PageIndicatorDemo> {
                           Text(
                             'Bene, è tutto pronto\nIniziamo!',
                             style: TextStyle(
-                                fontSize: FontSize.titles, fontWeight: FontWeight.bold),
+                                fontSize: FontSize.titles,
+                                fontWeight: FontWeight.bold),
                             textAlign: TextAlign.center,
                           ),
                           SizedBox(height: 20),
