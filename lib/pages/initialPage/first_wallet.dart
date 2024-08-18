@@ -188,6 +188,10 @@ class CustomNumberInputFormatter extends TextInputFormatter {
     TextEditingValue oldValue,
     TextEditingValue newValue,
   ) {
+
+        if (newValue.text.contains('-')) {
+      return oldValue;
+    } 
     if (newValue.text.isEmpty) {
       return newValue;
     }

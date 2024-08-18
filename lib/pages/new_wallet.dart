@@ -198,7 +198,7 @@ class _AddNotePageState extends State<AddNotePage> {
                             _isDirty = true;
                           });
                         },
-                        keyboardType: TextInputType.numberWithOptions(decimal: true),
+                        keyboardType: TextInputType.numberWithOptions(decimal: true, signed: false),
                         inputFormatters: [
                           CustomNumberInputFormatter(),
                         ],
@@ -313,6 +313,11 @@ class CustomNumberInputFormatter extends TextInputFormatter {
     TextEditingValue oldValue,
     TextEditingValue newValue,
   ) {
+
+    if (newValue.text.contains('-')) {
+      return oldValue;
+    } 
+
     if (newValue.text.isEmpty) {
       return newValue;
     }

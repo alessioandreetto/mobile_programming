@@ -1,6 +1,5 @@
 cose da fare 
-- rivedere valori su demo primo wallet se non metto valori numerici campo bilancio 
-
+- mettere immagine nuova sulla demo
 
 
 relazione 
