@@ -306,36 +306,52 @@ class _AddNotePageState extends State<AddNotePage> {
     super.dispose();
   }
 }
-
 class CustomNumberInputFormatter extends TextInputFormatter {
   @override
   TextEditingValue formatEditUpdate(
     TextEditingValue oldValue,
     TextEditingValue newValue,
   ) {
+    // Converti la virgola in punto
+    String newText = newValue.text.replaceAll(',', '.');
 
-    if (newValue.text.contains('-')) {
+    // Se contiene più di un punto, mantieni il vecchio valore
+    if (newText.indexOf('.') != newText.lastIndexOf('.')) {
       return oldValue;
-    } 
-
-    if (newValue.text.isEmpty) {
-      return newValue;
     }
 
-    final parts = newValue.text.split('.');
+    // Se contiene un trattino '-', mantieni il vecchio valore
+    if (newText.contains('-')) {
+      return oldValue;
+    }
 
+    // Se il nuovo testo è vuoto, ritorna il nuovo valore con il testo modificato
+    if (newText.isEmpty) {
+      return newValue.copyWith(text: newText);
+    }
+
+    // Suddividi il testo in parti separate dal punto decimale
+    final parts = newText.split('.');
+
+    // Limita a 9 cifre intere
     if (parts[0].length > 9) {
       return oldValue;
     }
 
+    // Limita a 2 cifre decimali
     if (parts.length > 1 && parts[1].length > 2) {
       return oldValue;
     }
 
-    if (newValue.text.length > 12) {
+    // Limita la lunghezza totale a 12 caratteri
+    if (newText.length > 12) {
       return oldValue;
     }
 
-    return newValue;
+    // Ritorna il valore modificato con il testo aggiornato
+    return newValue.copyWith(
+      text: newText,
+      selection: TextSelection.collapsed(offset: newText.length),
+    );
   }
 }
