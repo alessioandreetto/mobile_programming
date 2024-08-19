@@ -61,11 +61,18 @@ class _FirstWalletState extends State<FirstWallet> {
         },
         child: Scaffold(
           appBar: AppBar(
-            title: Text(
-              'Crea qui il tuo primo portafoglio!',
-              style: TextStyle(
-                fontSize: FontSize.titles,
-                fontWeight: FontWeight.bold,
+            title: RichText(
+              textAlign: TextAlign.center,
+              text: TextSpan(
+                style: TextStyle(
+                  fontSize: FontSize.titles,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.black, // Cambia il colore secondo il tema
+                ),
+                children: [
+                  TextSpan(text: 'Crea qui il tuo primo '),
+                  TextSpan(text: 'portafoglio!', style: TextStyle(height: 1.2)),
+                ],
               ),
             ),
             backgroundColor: Colors.transparent,
@@ -121,7 +128,8 @@ class _FirstWalletState extends State<FirstWallet> {
                       SizedBox(height: 8),
                       TextField(
                         controller: widget.balanceController,
-                        keyboardType: TextInputType.numberWithOptions(decimal: true),
+                        keyboardType:
+                            TextInputType.numberWithOptions(decimal: true),
                         inputFormatters: [
                           CustomNumberInputFormatter(),
                         ],
@@ -131,7 +139,8 @@ class _FirstWalletState extends State<FirstWallet> {
                           });
                         },
                         decoration: InputDecoration(
-                          labelText: 'Bilancio iniziale (${walletProvider.valuta})',
+                          labelText:
+                              'Bilancio iniziale (${walletProvider.valuta})',
                           errorText: widget.isBalanceValid
                               ? null
                               : 'Campo obbligatorio',
