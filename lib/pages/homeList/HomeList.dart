@@ -741,8 +741,9 @@ class _HomeListState extends State<HomeList> {
                 (BuildContext context, int index) {
                   if (transactions.isEmpty) {
                     return SizedBox(
-                      height: MediaQuery.of(context).size.height / 2,
-                      child: Center(
+                      //height: MediaQuery.of(context).size.height / 2,
+                      child: Padding(
+                        padding: const EdgeInsets.only(top: 20),
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
